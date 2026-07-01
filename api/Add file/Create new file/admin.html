@@ -14,7 +14,7 @@
     <a href="index.html">网站首页</a>
     <a href="admin.html">后台首页</a>
     <a href="publish.html">新建内容</a>
-    <a href="video.html">内容列表</a>
+    <a href="content-list.json">数据库</a>
   </nav>
 </header>
 
@@ -22,70 +22,33 @@
 
 <p class="eyebrow">DASHBOARD</p>
 <h1>后台首页</h1>
-<p class="intro">这里是云鹤系统的内容管理入口。</p>
+<p class="intro">这里管理视频、文章、案例和关于我页面。</p>
 
+<h2>视频管理</h2>
 <div class="grid">
-
-  <a class="card" href="publish.html">
-    <span>CREATE</span>
-    <h2>新建内容</h2>
-    <p>发布视频、文章、案例。</p>
-  </a>
-
-  <a class="card" href="video.html">
-    <span>CONTENT</span>
-    <h2>全部内容</h2>
-    <p>查看已经发布的内容。</p>
-  </a>
-
-  <a class="card" href="content-list.json">
-    <span>DATABASE</span>
-    <h2>内容数据库</h2>
-    <p>查看当前内容数据。</p>
-  </a>
-
-  <a class="card" href="index.html">
-    <span>SITE</span>
-    <h2>返回网站</h2>
-    <p>查看前台页面。</p>
-  </a>
-
+  <a class="card" href="publish.html?type=video"><h2>上传视频</h2><p>发布新视频内容。</p></a>
+  <a class="card" href="video.html"><h2>视频列表</h2><p>查看所有视频。</p></a>
 </div>
 
-<hr>
+<h2 style="margin-top:70px;">文章管理</h2>
+<div class="grid">
+  <a class="card" href="publish.html?type=article"><h2>上传文章</h2><p>发布新文章内容。</p></a>
+  <a class="card" href="article.html"><h2>文章列表</h2><p>查看所有文章。</p></a>
+</div>
 
-<h2>最近发布内容</h2>
+<h2 style="margin-top:70px;">案例管理</h2>
+<div class="grid">
+  <a class="card" href="publish.html?type=case"><h2>上传案例</h2><p>发布新案例内容。</p></a>
+  <a class="card" href="case.html"><h2>案例列表</h2><p>查看所有案例。</p></a>
+</div>
 
-<div id="list"></div>
+<h2 style="margin-top:70px;">关于我管理</h2>
+<div class="grid">
+  <a class="card" href="about.html"><h2>查看关于我</h2><p>查看前台关于页面。</p></a>
+  <a class="card" href="about-edit.html"><h2>编辑关于我</h2><p>之后做专门编辑页。</p></a>
+</div>
 
 </main>
-
-<script>
-async function loadList() {
-
-  const res = await fetch("content-list.json");
-  const data = await res.json();
-
-  const box = document.getElementById("list");
-
-  if (!data.length) {
-    box.innerHTML = "<p>暂无内容</p>";
-    return;
-  }
-
-  box.innerHTML = data.slice(0, 5).map(item => `
-    <div class="card" style="margin-bottom:15px;">
-      <span>${item.tag || item.topic || "CONTENT"}</span>
-      <h2>${item.title}</h2>
-      <p>${item.intro}</p>
-      <a href="${item.url}">打开内容 →</a>
-    </div>
-  `).join("");
-
-}
-
-loadList();
-</script>
 
 </body>
 </html>
