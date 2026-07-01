@@ -3,7 +3,11 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Only POST allowed" });
   }
 
-  const { title, intro, video, body, tag } = req.body;
+  const { password, title, intro, video, body, tag } = req.body;
+
+  if (password !== process.env.PUBLISH_PASSWORD) {
+    return res.status(401).json({ error: "密码错误" });
+  }
 
   const filename = `content-${Date.now()}.html`;
 
@@ -31,7 +35,7 @@ module.exports = async function handler(req, res) {
 <h1>${title}</h1>
 <p class="intro">${intro}</p>
 <hr>
-<h2>视频</h2>
+<h2>视频 / 链接</h2>
 <p>${video}</p>
 <hr>
 <h2>正文</h2>
@@ -42,9 +46,9 @@ module.exports = async function handler(req, res) {
 
   const content = Buffer.from(html).toString("base64");
 
-  const url = `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/${filename}`;
+  const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/${filename}`;
 
-  const response = await fetch(url, {
+  const response = await fetch(apiUrl, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
@@ -54,7 +58,7 @@ module.exports = async function handler(req, res) {
     body: JSON.stringify({
       message: `publish ${filename}`,
       content,
-      branch: process.env.GITHUB_BRANCH || "main"
+      branch: "main"
     })
   });
 
@@ -66,7 +70,6 @@ module.exports = async function handler(req, res) {
 
   return res.status(200).json({
     success: true,
-    filename,
-    url: data.content.html_url
+    filename
   });
 };
