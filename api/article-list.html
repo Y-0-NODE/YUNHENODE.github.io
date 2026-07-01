@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>文章列表｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="article.html">返回文章</a><a href="admin.html">后台</a></nav></header>
+<main class="home">
+<p class="eyebrow">ARTICLE / LIST</p>
+<h1>文章列表</h1>
+<p class="intro">这里显示所有已发布文章。</p>
+<div id="list" class="grid"></div>
+</main>
+<script>
+async function loadArticles(){
+  const res = await fetch("content-list.json");
+  const data = await res.json();
+  const articles = data.filter(item => item.type === "article");
+  const box = document.getElementById("list");
+  if(!articles.length){ box.innerHTML = "<p>暂无文章。</p>"; return; }
+  box.innerHTML = articles.map(item => `
+    <a class="card" href="${item.url}">
+      <span>${item.topic || item.tag || "ARTICLE"}</span>
+      <h2>${item.title}</h2>
+      <p>${item.intro}</p>
+    </a>
+  `).join("");
+}
+loadArticles();
+</script>
+</body>
+</html>
