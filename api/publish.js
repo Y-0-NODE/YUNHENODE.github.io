@@ -1,15 +1,21 @@
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST allowed" });
+    return res.status(405).json({ success: false, error: "Only POST allowed" });
   }
 
-  const { password, title, intro, video, body, tag } = req.body;
+  const data = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+
+  const { password, title, intro, video, body, tag } = data;
 
   if (password !== process.env.PUBLISH_PASSWORD) {
-    return res.status(401).json({ error: "密码错误" });
+    return res.status(401).json({ success: false, error: "发布密码错误" });
   }
 
-  const filename = `content-${Date.now()}.html`;
+  const safeTitle = title
+    .replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "-")
+    .slice(0, 40);
+
+  const filename = `content-${Date.now()}-${safeTitle}.html`;
 
   const html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -18,7 +24,9 @@ module.exports = async function handler(req, res) {
 <title>${title}</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
 <header class="topbar">
   <div class="logo">YUNHENODE</div>
   <nav>
@@ -31,16 +39,35 @@ module.exports = async function handler(req, res) {
 </header>
 
 <main class="home">
+
 <p class="eyebrow">${tag}</p>
+
 <h1>${title}</h1>
+
 <p class="intro">${intro}</p>
+
 <hr>
+
 <h2>视频 / 链接</h2>
 <p>${video}</p>
+
 <hr>
+
 <h2>正文</h2>
-<p>${body}</p>
+<p>${body.replace(/\n/g, "<br>")}</p>
+
+<hr>
+
+<h2>返回</h2>
+<div class="grid">
+  <a class="card" href="index.html">
+    <h2>回首页</h2>
+    <p>返回云鹤系统入口</p>
+  </a>
+</div>
+
 </main>
+
 </body>
 </html>`;
 
@@ -62,14 +89,18 @@ module.exports = async function handler(req, res) {
     })
   });
 
-  const data = await response.json();
+  const result = await response.json();
 
   if (!response.ok) {
-    return res.status(500).json({ error: data });
+    return res.status(500).json({
+      success: false,
+      error: result
+    });
   }
 
   return res.status(200).json({
     success: true,
-    filename
+    filename,
+    url: `/${filename}`
   });
 };
