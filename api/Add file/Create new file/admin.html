@@ -52,7 +52,40 @@
 
 </div>
 
+<hr>
+
+<h2>最近发布内容</h2>
+
+<div id="list"></div>
+
 </main>
+
+<script>
+async function loadList() {
+
+  const res = await fetch("content-list.json");
+  const data = await res.json();
+
+  const box = document.getElementById("list");
+
+  if (!data.length) {
+    box.innerHTML = "<p>暂无内容</p>";
+    return;
+  }
+
+  box.innerHTML = data.slice(0, 5).map(item => `
+    <div class="card" style="margin-bottom:15px;">
+      <span>${item.tag || item.topic || "CONTENT"}</span>
+      <h2>${item.title}</h2>
+      <p>${item.intro}</p>
+      <a href="${item.url}">打开内容 →</a>
+    </div>
+  `).join("");
+
+}
+
+loadList();
+</script>
 
 </body>
 </html>
