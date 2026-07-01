@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
 <meta charset="UTF-8">
 <title>内容发布器｜云鹤系统</title>
@@ -23,12 +22,15 @@
 <main class="home">
 
 <p class="eyebrow">PUBLISH SYSTEM</p>
+<h1>内容发布器</h1>
+<p class="intro">填写内容后，直接发布到网站。</p>
 
-<h1>内容发布器（模板系统）</h1>
+<hr>
 
-<p class="intro">
-在这里填写内容，然后复制生成页面
-</p>
+<h2>发布权限</h2>
+
+<p>发布密码：</p>
+<textarea id="password" style="width:100%;height:40px;"></textarea>
 
 <hr>
 
@@ -44,7 +46,7 @@
 <textarea id="video" style="width:100%;height:60px;"></textarea>
 
 <p>正文：</p>
-<textarea id="body" style="width:100%;height:120px;"></textarea>
+<textarea id="body" style="width:100%;height:160px;"></textarea>
 
 <p>主题分类：</p>
 <textarea id="tag" style="width:100%;height:40px;"></textarea>
@@ -53,14 +55,13 @@
 
 <button onclick="publishToSite()">发布到网站</button>
 
-<h2>生成结果（复制到GitHub）</h2>
-
-<pre id="output" style="white-space:pre-wrap;background:#111;padding:10px;"></pre>
+<pre id="output" style="white-space:pre-wrap;background:#111;padding:10px;margin-top:30px;"></pre>
 
 </main>
 
 <script>
 async function publishToSite() {
+  const password = document.getElementById("password").value;
   const title = document.getElementById("title").value;
   const intro = document.getElementById("intro").value;
   const video = document.getElementById("video").value;
@@ -72,180 +73,20 @@ async function publishToSite() {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ title, intro, video, body, tag })
+    body: JSON.stringify({ password, title, intro, video, body, tag })
   });
 
   const data = await res.json();
 
   if (data.success) {
+    document.getElementById("output").textContent =
+      "发布成功！文件名：" + data.filename;
     alert("发布成功：" + data.filename);
   } else {
-    alert("发布失败，请检查 Vercel 环境变量或 GitHub Token");
-    console.log(data);
+    document.getElementById("output").textContent =
+      "发布失败：" + JSON.stringify(data, null, 2);
+    alert("发布失败，请看页面底部错误信息");
   }
-}
-</script>
-
-async function publish(){
-
-  const title = document.getElementById('title').value;
-  const intro = document.getElementById('intro').value;
-  const video = document.getElementById('video').value;
-  const body = document.getElementById('body').value;
-  const tag = document.getElementById('tag').value;
-
-  const html = `
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>${title}</title>
-<link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header class="topbar">
-  <div class="logo">YUNHENODE</div>
-  <nav>
-    <a href="index.html">首页</a>
-    <a href="video.html">视频</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-    <a href="about.html">关于我</a>
-  </nav>
-</header>
-
-<main class="home">
-
-<p class="eyebrow">${tag}</p>
-<h1>${title}</h1>
-<p class="intro">${intro}</p>
-
-<hr>
-
-<h2>视频</h2>
-<p>${video}</p>
-
-<hr>
-
-<h2>正文</h2>
-<p>${body}</p>
-
-</main>
-
-</body>
-</html>
-`;
-
-  const filename = "video-" + Date.now() + ".html";
-
-  const token = "YOUR_GITHUB_TOKEN"; // 👈 等下你替换
-
-  const repo = "YUNHENODE.github.io";
-  const owner = "YUNHENODE";
-
-  const content = btoa(unescape(encodeURIComponent(html)));
-
-  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
-
-  const response = await fetch(apiUrl, {
-    method: "PUT",
-    headers: {
-      "Authorization": "token " + token,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: "auto publish",
-      content: content
-    })
-  });
-
-  if(response.ok){
-    alert("发布成功！文件：" + filename);
-  }else{
-    alert("发布失败，请检查token");
-  }
-
-}
-
-</script>
-  const title = document.getElementById('title').value;
-  const intro = document.getElementById('intro').value;
-  const video = document.getElementById('video').value;
-  const body = document.getElementById('body').value;
-  const tag = document.getElementById('tag').value;
-
-  const html = `
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>${title}</title>
-<link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header class="topbar">
-  <div class="logo">YUNHENODE</div>
-  <nav>
-    <a href="index.html">首页</a>
-    <a href="video.html">视频</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-    <a href="about.html">关于我</a>
-  </nav>
-</header>
-
-<main class="home">
-
-<p class="eyebrow">${tag}</p>
-
-<h1>${title}</h1>
-
-<p class="intro">${intro}</p>
-
-<hr>
-
-<h2>视频</h2>
-<p>${video}</p>
-
-<hr>
-
-<h2>正文</h2>
-<p>${body}</p>
-
-<hr>
-
-<h2>返回</h2>
-<div class="grid">
-<a class="card" href="index.html">回首页</a>
-</div>
-
-</main>
-
-</body>
-</html>
-`;
-
- const blob = new Blob([html], {type: "text/html"});
-const url = URL.createObjectURL(blob);
-
-const a = document.createElement("a");
-a.href = url;
-a.download = title + ".html";
-a.click();
-
-const blob = new Blob([html], {type: "text/html"});
-const url = URL.createObjectURL(blob);
-
-const a = document.createElement("a");
-a.href = url;
-a.download = title + ".html";
-a.click();
-
-document.getElementById('output').textContent = html;
 }
 </script>
 
