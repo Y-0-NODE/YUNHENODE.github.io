@@ -13,6 +13,21 @@ module.exports = async function handler(req, res) {
   const finalType = type || "article";
   const finalTopic = topic || tag || "未分类";
 
+  const typeNameMap = {
+    video: "视频系统",
+    article: "文章系统",
+    case: "案例系统"
+  };
+
+  const typeUrlMap = {
+    video: "video.html",
+    article: "article.html",
+    case: "case.html"
+  };
+
+  const returnName = typeNameMap[finalType] || "内容系统";
+  const returnUrl = typeUrlMap[finalType] || "index.html";
+
   const filename = `content-${Date.now()}.html`;
 
   const html = `<!DOCTYPE html>
@@ -43,6 +58,21 @@ module.exports = async function handler(req, res) {
 <hr>
 <h2>正文</h2>
 <p>${body.replace(/\n/g, "<br>")}</p>
+
+<hr>
+
+<div class="grid">
+  <a class="card" href="${returnUrl}">
+    <h2>返回${returnName}</h2>
+    <p>查看同类内容。</p>
+  </a>
+
+  <a class="card" href="index.html">
+    <h2>返回首页</h2>
+    <p>回到云鹤系统首页。</p>
+  </a>
+</div>
+
 </main>
 </body>
 </html>`;
