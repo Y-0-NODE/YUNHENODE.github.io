@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>案例分类｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="case.html">返回案例</a><a href="admin.html">后台</a></nav></header>
+
+<main class="home">
+<p class="eyebrow">CASE / CATEGORY</p>
+<h1>案例分类</h1>
+<p class="intro">按研究主题查看案例。</p>
+<div id="category-list" class="grid"></div>
+</main>
+
+<script>
+const topics = ["品牌","平台","城市","组织","消费","艺术","空间","梦境"];
+
+async function loadCategories(){
+  const res = await fetch("content-list.json");
+  const data = await res.json();
+  const cases = data.filter(item => item.type === "case");
+  const box = document.getElementById("category-list");
+
+  box.innerHTML = topics.map(topic => {
+    const count = cases.filter(item => item.topic === topic || item.tag === topic).length;
+    return `
+      <a class="card" href="case-topic.html?topic=${encodeURIComponent(topic)}">
+        <span>${count} 个案例</span>
+        <h2>${topic}</h2>
+        <p>查看${topic}相关案例。</p>
+      </a>
+    `;
+  }).join("");
+}
+loadCategories();
+</script>
+</body>
+</html>
