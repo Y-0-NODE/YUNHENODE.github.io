@@ -9,21 +9,24 @@
 <p class="intro">按研究主题查看文章。</p>
 <div id="category-list" class="grid"></div>
 </main>
+
 <script>
 const topics = ["品牌","平台","城市","组织","消费","艺术","空间","梦境"];
+
 async function loadCategories(){
   const res = await fetch("content-list.json");
   const data = await res.json();
   const articles = data.filter(item => item.type === "article");
   const box = document.getElementById("category-list");
+
   box.innerHTML = topics.map(topic => {
     const count = articles.filter(item => item.topic === topic || item.tag === topic).length;
     return `
-      <div class="card">
+      <a class="card" href="article-topic.html?topic=${encodeURIComponent(topic)}">
         <span>${count} 篇</span>
         <h2>${topic}</h2>
-        <p>${topic}相关文章。</p>
-      </div>
+        <p>查看${topic}相关文章。</p>
+      </a>
     `;
   }).join("");
 }
