@@ -26,13 +26,13 @@
 <p class="intro">这里管理真实事件、平台问题、品牌问题与现实结构案例。</p>
 
 <div class="grid">
-  <a class="card" href="case-list.html">
+  <a class="card" href="publish.html">
     <span>01</span>
     <h2>上传案例</h2>
     <p>进入发布后台，内容类型选择“案例”。</p>
   </a>
 
-  <a class="card" href="#case-list">
+  <a class="card" href="case-list.html">
     <span>02</span>
     <h2>案例列表</h2>
     <p>查看已经发布的案例。</p>
@@ -51,37 +51,7 @@
   </a>
 </div>
 
-<hr>
-
-<h2 id="case-list">案例列表</h2>
-<div id="content-list" class="grid"></div>
-
 </main>
-
-<script>
-async function loadContent() {
-  const res = await fetch("content-list.json");
-  const list = await res.json();
-
-  const cases = list.filter(item => item.type === "case");
-  const box = document.getElementById("content-list");
-
-  if (!cases.length) {
-    box.innerHTML = "<p>暂无案例内容。</p>";
-    return;
-  }
-
-  box.innerHTML = cases.map(item => `
-    <a class="card" href="${item.url}">
-      <span>${item.topic || item.tag || "CASE"}</span>
-      <h2>${item.title}</h2>
-      <p>${item.intro}</p>
-    </a>
-  `).join("");
-}
-
-loadContent();
-</script>
 
 </body>
 </html>
