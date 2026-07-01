@@ -4,18 +4,13 @@ module.exports = async function handler(req, res) {
   }
 
   const data = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-
   const { password, title, intro, video, body, tag } = data;
 
   if (password !== process.env.PUBLISH_PASSWORD) {
     return res.status(401).json({ success: false, error: "发布密码错误" });
   }
 
-  const safeTitle = title
-    .replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, "-")
-    .slice(0, 40);
-
-  const filename = `content-${Date.now()}-${safeTitle}.html`;
+  const filename = `content-${Date.now()}.html`;
 
   const html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -24,9 +19,7 @@ module.exports = async function handler(req, res) {
 <title>${title}</title>
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
 <header class="topbar">
   <div class="logo">YUNHENODE</div>
   <nav>
@@ -37,65 +30,86 @@ module.exports = async function handler(req, res) {
     <a href="about.html">关于我</a>
   </nav>
 </header>
-
 <main class="home">
-
 <p class="eyebrow">${tag}</p>
-
 <h1>${title}</h1>
-
 <p class="intro">${intro}</p>
-
 <hr>
-
 <h2>视频 / 链接</h2>
 <p>${video}</p>
-
 <hr>
-
 <h2>正文</h2>
 <p>${body.replace(/\n/g, "<br>")}</p>
-
-<hr>
-
-<h2>返回</h2>
-<div class="grid">
-  <a class="card" href="index.html">
-    <h2>回首页</h2>
-    <p>返回云鹤系统入口</p>
-  </a>
-</div>
-
 </main>
-
 </body>
 </html>`;
 
-  const content = Buffer.from(html).toString("base64");
+  const owner = process.env.GITHUB_OWNER;
+  const repo = process.env.GITHUB_REPO;
+  const token = process.env.GITHUB_TOKEN;
+  const branch = "main";
 
-  const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/${filename}`;
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github+json",
+    "Content-Type": "application/json"
+  };
 
-  const response = await fetch(apiUrl, {
+  const pageContent = Buffer.from(html).toString("base64");
+
+  const pageUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
+
+  const pageResponse = await fetch(pageUrl, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-      Accept: "application/vnd.github+json",
-      "Content-Type": "application/json"
-    },
+    headers,
     body: JSON.stringify({
       message: `publish ${filename}`,
-      content,
-      branch: "main"
+      content: pageContent,
+      branch
     })
   });
 
-  const result = await response.json();
+  if (!pageResponse.ok) {
+    const error = await pageResponse.json();
+    return res.status(500).json({ success: false, step: "create-page", error });
+  }
 
-  if (!response.ok) {
-    return res.status(500).json({
-      success: false,
-      error: result
-    });
+  const listUrl = `https://api.github.com/repos/${owner}/${repo}/contents/content-list.json`;
+
+  const listGet = await fetch(listUrl, { headers });
+  const listData = await listGet.json();
+
+  let list = [];
+
+  if (listData.content) {
+    const decoded = Buffer.from(listData.content, "base64").toString("utf-8");
+    list = JSON.parse(decoded);
+  }
+
+  list.unshift({
+    title,
+    intro,
+    tag,
+    url: filename,
+    date: new Date().toISOString()
+  });
+
+  const newListContent = Buffer.from(JSON.stringify(list, null, 2)).toString("base64");
+
+  const listUpdate = await fetch(listUrl, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      message: `update content list`,
+      content: newListContent,
+      sha: listData.sha,
+      branch
+    })
+  });
+
+  if (!listUpdate.ok) {
+    const error = await listUpdate.json();
+    return res.status(500).json({ success: false, step: "update-list", error });
   }
 
   return res.status(200).json({
