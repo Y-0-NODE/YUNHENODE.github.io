@@ -23,8 +23,37 @@
 
 <p class="eyebrow">ARTICLE SYSTEM</p>
 <h1>文章系统</h1>
-<p class="intro">这里自动显示通过后台发布的文章内容。</p>
+<p class="intro">这里管理文章内容，并自动显示通过后台发布的文章。</p>
 
+<div class="grid">
+  <a class="card" href="publish.html">
+    <span>01</span>
+    <h2>上传文章</h2>
+    <p>进入发布后台，内容类型选择“文章”。</p>
+  </a>
+
+  <a class="card" href="#article-list">
+    <span>02</span>
+    <h2>文章列表</h2>
+    <p>查看已经发布的文章内容。</p>
+  </a>
+
+  <a class="card" href="article-category.html">
+    <span>03</span>
+    <h2>文章分类</h2>
+    <p>按研究主题整理文章。</p>
+  </a>
+
+  <a class="card" href="article-draft.html">
+    <span>04</span>
+    <h2>文章草稿</h2>
+    <p>暂存文章选题与未发布内容。</p>
+  </a>
+</div>
+
+<hr>
+
+<h2 id="article-list">文章列表</h2>
 <div id="content-list" class="grid"></div>
 
 </main>
@@ -35,7 +64,6 @@ async function loadContent() {
   const list = await res.json();
 
   const articles = list.filter(item => item.type === "article");
-
   const box = document.getElementById("content-list");
 
   if (!articles.length) {
