@@ -128,6 +128,14 @@ a.href = url;
 a.download = title + ".html";
 a.click();
 
+const blob = new Blob([html], {type: "text/html"});
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+a.href = url;
+a.download = title + ".html";
+a.click();
+
 document.getElementById('output').textContent = html;
 }
 </script>
