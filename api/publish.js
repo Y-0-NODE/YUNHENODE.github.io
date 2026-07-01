@@ -4,11 +4,14 @@ module.exports = async function handler(req, res) {
   }
 
   const data = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-  const { password, title, intro, video, body, tag } = data;
+  const { password, title, intro, video, body, tag, type, topic } = data;
 
   if (password !== process.env.PUBLISH_PASSWORD) {
     return res.status(401).json({ success: false, error: "发布密码错误" });
   }
+
+  const finalType = type || "article";
+  const finalTopic = topic || tag || "未分类";
 
   const filename = `content-${Date.now()}.html`;
 
@@ -31,12 +34,12 @@ module.exports = async function handler(req, res) {
   </nav>
 </header>
 <main class="home">
-<p class="eyebrow">${tag}</p>
+<p class="eyebrow">${finalTopic} / ${finalType}</p>
 <h1>${title}</h1>
 <p class="intro">${intro}</p>
 <hr>
 <h2>视频 / 链接</h2>
-<p>${video}</p>
+<p>${video || "无"}</p>
 <hr>
 <h2>正文</h2>
 <p>${body.replace(/\n/g, "<br>")}</p>
@@ -89,7 +92,10 @@ module.exports = async function handler(req, res) {
   list.unshift({
     title,
     intro,
-    tag,
+    type: finalType,
+    topic: finalTopic,
+    tag: finalTopic,
+    video,
     url: filename,
     date: new Date().toISOString()
   });
