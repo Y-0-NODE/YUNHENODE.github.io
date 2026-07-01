@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>视频列表｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="video.html">返回视频</a>
+    <a href="admin.html">后台</a>
+  </nav>
+</header>
+
+<main class="home">
+<p class="eyebrow">VIDEO / LIST</p>
+<h1>视频列表</h1>
+<p class="intro">这里显示所有已发布的视频。</p>
+
+<div id="list" class="grid"></div>
+</main>
+
+<script>
+async function loadVideos() {
+  const res = await fetch("content-list.json");
+  const data = await res.json();
+  const videos = data.filter(item => item.type === "video");
+  const box = document.getElementById("list");
+
+  if (!videos.length) {
+    box.innerHTML = "<p>暂无视频。</p>";
+    return;
+  }
+
+  box.innerHTML = videos.map(item => `
+    <a class="card" href="${item.url}">
+      <span>${item.topic || item.tag || "VIDEO"}</span>
+      <h2>${item.title}</h2>
+      <p>${item.intro}</p>
+    </a>
+  `).join("");
+}
+loadVideos();
+</script>
+</body>
+</html>
