@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>案例列表｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="case.html">返回案例</a><a href="admin.html">后台</a></nav></header>
+
+<main class="home">
+<p class="eyebrow">CASE / LIST</p>
+<h1>案例列表</h1>
+<p class="intro">这里显示所有已经发布的案例内容。</p>
+<div id="list" class="grid"></div>
+</main>
+
+<script>
+async function loadCases(){
+  const res = await fetch("content-list.json");
+  const data = await res.json();
+  const cases = data.filter(item => item.type === "case");
+  const box = document.getElementById("list");
+
+  if(!cases.length){
+    box.innerHTML = "<p>暂无案例。</p>";
+    return;
+  }
+
+  box.innerHTML = cases.map(item => `
+    <a class="card" href="${item.url}">
+      <span>${item.topic || item.tag || "CASE"}</span>
+      <h2>${item.title}</h2>
+      <p>${item.intro}</p>
+    </a>
+  `).join("");
+}
+loadCases();
+</script>
+</body>
+</html>
