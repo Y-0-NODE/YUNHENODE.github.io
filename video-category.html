@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>视频分类｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="video.html">返回视频</a>
+    <a href="admin.html">后台</a>
+  </nav>
+</header>
+
+<main class="home">
+<p class="eyebrow">VIDEO / CATEGORY</p>
+<h1>视频分类</h1>
+<p class="intro">按主题查看视频。</p>
+
+<div class="grid" id="category-list"></div>
+</main>
+
+<script>
+const topics = ["品牌","平台","城市","组织","消费","艺术","空间","梦境"];
+
+async function loadCategories() {
+  const res = await fetch("content-list.json");
+  const data = await res.json();
+  const videos = data.filter(item => item.type === "video");
+  const box = document.getElementById("category-list");
+
+  box.innerHTML = topics.map(topic => {
+    const count = videos.filter(item => item.topic === topic || item.tag === topic).length;
+    return `
+      <a class="card" href="video-list.html">
+        <span>${count} 条</span>
+        <h2>${topic}</h2>
+        <p>查看${topic}相关视频。</p>
+      </a>
+    `;
+  }).join("");
+}
+loadCategories();
+</script>
+</body>
+</html>
