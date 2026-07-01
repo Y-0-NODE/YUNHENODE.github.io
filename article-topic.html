@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>主题文章｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="article-category.html">返回分类</a><a href="article.html">返回文章</a></nav></header>
+
+<main class="home">
+<p class="eyebrow">ARTICLE / TOPIC</p>
+<h1 id="title">主题文章</h1>
+<p class="intro">这里显示该主题下的文章。</p>
+<div id="list" class="grid"></div>
+</main>
+
+<script>
+async function loadTopic(){
+  const params = new URLSearchParams(window.location.search);
+  const topic = params.get("topic");
+
+  document.getElementById("title").textContent = topic + "文章";
+
+  const res = await fetch("content-list.json");
+  const data = await res.json();
+
+  const articles = data.filter(item =>
+    item.type === "article" && (item.topic === topic || item.tag === topic)
+  );
+
+  const box = document.getElementById("list");
+
+  if (!articles.length) {
+    box.innerHTML = "<p>暂无该主题文章。</p>";
+    return;
+  }
+
+  box.innerHTML = articles.map(item => `
+    <a class="card" href="${item.url}">
+      <span>${item.topic || item.tag || "ARTICLE"}</span>
+      <h2>${item.title}</h2>
+      <p>${item.intro}</p>
+    </a>
+  `).join("");
+}
+loadTopic();
+</script>
+</body>
+</html>
