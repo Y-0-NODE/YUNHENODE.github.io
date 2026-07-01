@@ -17,7 +17,7 @@ async function loadArticles(){
   const box = document.getElementById("list");
   if(!articles.length){ box.innerHTML = "<p>暂无文章。</p>"; return; }
   box.innerHTML = articles.map(item => `
-    <a class="card" href="${item.url}">
+    <a class="card" href="article-list.html">
       <span>${item.topic || item.tag || "ARTICLE"}</span>
       <h2>${item.title}</h2>
       <p>${item.intro}</p>
