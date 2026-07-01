@@ -51,7 +51,7 @@
 
 <hr>
 
-<button onclick="publish()">生成内容页代码</button>
+<button onclick="publishToSite()">发布到网站</button>
 
 <h2>生成结果（复制到GitHub）</h2>
 
@@ -60,7 +60,31 @@
 </main>
 
 <script>
-<script>
+async function publishToSite() {
+  const title = document.getElementById("title").value;
+  const intro = document.getElementById("intro").value;
+  const video = document.getElementById("video").value;
+  const body = document.getElementById("body").value;
+  const tag = document.getElementById("tag").value;
+
+  const res = await fetch("/api/publish", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ title, intro, video, body, tag })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert("发布成功：" + data.filename);
+  } else {
+    alert("发布失败，请检查 Vercel 环境变量或 GitHub Token");
+    console.log(data);
+  }
+}
+</script>
 
 async function publish(){
 
