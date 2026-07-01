@@ -51,7 +51,7 @@
 
 <hr>
 
-<button onclick="generate()">生成内容页代码</button>
+<button onclick="publish()">生成内容页代码</button>
 
 <h2>生成结果（复制到GitHub）</h2>
 
@@ -60,7 +60,92 @@
 </main>
 
 <script>
-function generate(){
+<script>
+
+async function publish(){
+
+  const title = document.getElementById('title').value;
+  const intro = document.getElementById('intro').value;
+  const video = document.getElementById('video').value;
+  const body = document.getElementById('body').value;
+  const tag = document.getElementById('tag').value;
+
+  const html = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="video.html">视频</a>
+    <a href="article.html">文章</a>
+    <a href="case.html">案例</a>
+    <a href="about.html">关于我</a>
+  </nav>
+</header>
+
+<main class="home">
+
+<p class="eyebrow">${tag}</p>
+<h1>${title}</h1>
+<p class="intro">${intro}</p>
+
+<hr>
+
+<h2>视频</h2>
+<p>${video}</p>
+
+<hr>
+
+<h2>正文</h2>
+<p>${body}</p>
+
+</main>
+
+</body>
+</html>
+`;
+
+  const filename = "video-" + Date.now() + ".html";
+
+  const token = "YOUR_GITHUB_TOKEN"; // 👈 等下你替换
+
+  const repo = "YUNHENODE.github.io";
+  const owner = "YUNHENODE";
+
+  const content = btoa(unescape(encodeURIComponent(html)));
+
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
+
+  const response = await fetch(apiUrl, {
+    method: "PUT",
+    headers: {
+      "Authorization": "token " + token,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "auto publish",
+      content: content
+    })
+  });
+
+  if(response.ok){
+    alert("发布成功！文件：" + filename);
+  }else{
+    alert("发布失败，请检查token");
+  }
+
+}
+
+</script>
   const title = document.getElementById('title').value;
   const intro = document.getElementById('intro').value;
   const video = document.getElementById('video').value;
