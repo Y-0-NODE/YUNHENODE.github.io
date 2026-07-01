@@ -23,31 +23,30 @@
 
 <p class="eyebrow">VIDEO SYSTEM</p>
 <h1>视频系统</h1>
-<p class="intro">这里收录所有视频内容。每一条视频都是一个独立页面。</p>
+<p class="intro">这里自动显示通过后台发布的内容。</p>
 
-<div class="grid">
-
-<a class="card" href="video-post-001.html">
-  <span>001</span>
-  <h2>第一条视频</h2>
-  <p>点击进入视频内容页。</p>
-</a>
-
-<a class="card" href="video-post.html">
-  <span>TEMPLATE</span>
-  <h2>视频模板</h2>
-  <p>以后复制这个模板创建新视频。</p>
-</a>
-
-<a class="card" href="publish.html">
-  <span>PUBLISH</span>
-  <h2>内容发布器</h2>
-  <p>填写内容，生成并下载 HTML 文件。</p>
-</a>
-
-</div>
+<div id="content-list" class="grid"></div>
 
 </main>
+
+<script>
+async function loadContent() {
+  const res = await fetch("content-list.json");
+  const list = await res.json();
+
+  const box = document.getElementById("content-list");
+
+  box.innerHTML = list.map(item => `
+    <a class="card" href="${item.url}">
+      <span>${item.tag || "CONTENT"}</span>
+      <h2>${item.title}</h2>
+      <p>${item.intro}</p>
+    </a>
+  `).join("");
+}
+
+loadContent();
+</script>
 
 </body>
 </html>
