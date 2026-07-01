@@ -21,14 +21,33 @@
 
 <main class="home">
 
-<p class="eyebrow">PUBLISH BACKEND</p>
+<p class="eyebrow">YUNHENODE CMS</p>
 <h1>内容发布后台</h1>
-<p class="intro">填写内容，直接发布到网站。</p>
+<p class="intro">发布视频、文章、案例，并自动进入内容目录。</p>
 
 <hr>
 
 <p>发布密码：</p>
 <textarea id="password" style="width:100%;height:40px;"></textarea>
+
+<p>内容类型：</p>
+<select id="type" style="width:100%;height:44px;">
+  <option value="video">视频</option>
+  <option value="article">文章</option>
+  <option value="case">案例</option>
+</select>
+
+<p>研究主题：</p>
+<select id="topic" style="width:100%;height:44px;">
+  <option value="平台">平台</option>
+  <option value="品牌">品牌</option>
+  <option value="城市">城市</option>
+  <option value="组织">组织</option>
+  <option value="消费">消费</option>
+  <option value="艺术">艺术</option>
+  <option value="空间">空间</option>
+  <option value="梦境">梦境</option>
+</select>
 
 <p>标题：</p>
 <textarea id="title" style="width:100%;height:40px;"></textarea>
@@ -42,9 +61,6 @@
 <p>正文：</p>
 <textarea id="body" style="width:100%;height:180px;"></textarea>
 
-<p>主题分类：</p>
-<textarea id="tag" style="width:100%;height:40px;"></textarea>
-
 <hr>
 
 <button onclick="publishToSite()">发布到网站</button>
@@ -56,27 +72,27 @@
 <script>
 async function publishToSite() {
   const password = document.getElementById("password").value;
+  const type = document.getElementById("type").value;
+  const topic = document.getElementById("topic").value;
   const title = document.getElementById("title").value;
   const intro = document.getElementById("intro").value;
   const video = document.getElementById("video").value;
   const body = document.getElementById("body").value;
-  const tag = document.getElementById("tag").value;
 
   const output = document.getElementById("output");
   output.textContent = "正在发布，请稍等...";
 
   const res = await fetch("/api/publish", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
       password,
+      type,
+      topic,
       title,
       intro,
       video,
-      body,
-      tag
+      body
     })
   });
 
