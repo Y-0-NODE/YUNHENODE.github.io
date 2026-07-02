@@ -1,37 +1,40 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>内容详情</title>
-
+<meta charset="utf-8">
+<title>文章详情</title>
 <style>
-body { background:#111; color:#fff; font-family:Arial; padding:40px; }
-a { color:#fff; }
+body{
+  background:#0a0a0a;
+  color:#fff;
+  font-family:Arial;
+  padding:40px;
+}
+a{color:#888}
 </style>
 </head>
 
 <body>
 
-<a href="article-list.html">← 返回列表</a>
+<a href="index.html">← 返回</a>
 
-<div id="app">加载中...</div>
+<h1 id="title"></h1>
+<p id="intro"></p>
+<div id="body"></div>
 
 <script>
-const SUPABASE_URL = "https://ndraugyrdneccqcyfzjt.supabase.co";
-
-const slug = new URLSearchParams(location.search).get("slug");
+const SUPABASE_URL = "https://你的项目.supabase.co";
+const params = new URLSearchParams(location.search);
+const slug = params.get("slug");
 
 fetch(`${SUPABASE_URL}/rest/v1/contents?slug=eq.${slug}`)
-.then(r => r.json())
-.then(data => {
-  const item = data[0];
+.then(r=>r.json())
+.then(data=>{
+  const post = data[0];
 
-  document.getElementById("app").innerHTML = `
-    <h1>${item.title}</h1>
-    <p>${item.intro || ""}</p>
-    <hr>
-    <div>${item.body}</div>
-  `;
+  document.getElementById("title").innerText = post.title;
+  document.getElementById("intro").innerText = post.intro || "";
+  document.getElementById("body").innerHTML = post.body || "";
 });
 </script>
 
