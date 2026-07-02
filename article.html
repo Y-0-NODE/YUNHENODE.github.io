@@ -3,12 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <title>文章｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  margin:0;
+  background:#0a0a0a;
+  color:#eaeaea;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  padding:20px 40px;
+  border-bottom:1px solid #141414;
+}
+
+.logo{color:#aaa;font-size:13px;letter-spacing:2px;}
+
+nav a{
+  color:#777;
+  margin-left:16px;
+  text-decoration:none;
+  font-size:13px;
+}
+
+nav a:hover{color:#fff;}
+
+main{
+  max-width:1100px;
+  margin:0 auto;
+  padding:60px 40px;
+}
+
+h1{font-size:42px;margin:0;}
+.intro{color:#777;margin-top:10px;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-top:40px;
+}
+
+.card{
+  border:1px solid #151515;
+  background:#0a0a0a;
+  padding:18px;
+  border-radius:10px;
+  text-decoration:none;
+  color:inherit;
+  transition:.2s;
+}
+
+.card:hover{
+  border-color:#2a2a2a;
+  transform:translateY(-2px);
+}
+
+.card span{
+  font-size:12px;
+  color:#666;
+}
+
+.card h2{
+  font-size:15px;
+  margin:10px 0;
+}
+
+.card p{
+  font-size:12px;
+  color:#666;
+}
+
+hr{
+  border:0;
+  border-top:1px solid #141414;
+  margin:50px 0;
+}
+
+.article-body{
+  line-height:1.8;
+  color:#ddd;
+  margin-top:20px;
+}
+</style>
 </head>
 
 <body>
 
-<header class="topbar">
+<header>
   <div class="logo">YUNHENODE</div>
   <nav>
     <a href="index.html">首页</a>
@@ -19,68 +103,136 @@
   </nav>
 </header>
 
-<main class="home">
+<main>
 
-<p class="eyebrow">ARTICLE SYSTEM</p>
-<h1>文章系统</h1>
+<!-- =========================
+     文章系统入口
+========================= -->
+<p style="color:#777;font-size:12px;letter-spacing:2px;">ARTICLE SYSTEM</p>
+
+<h1 id="title">文章系统</h1>
 <p class="intro">这里管理文章内容，并自动显示通过后台发布的文章。</p>
 
 <div class="grid">
+
   <a class="card" href="publish.html">
     <span>01</span>
     <h2>上传文章</h2>
-    <p>进入发布后台，内容类型选择“文章”。</p>
+    <p>进入发布后台</p>
   </a>
 
-  <a class="card" href="#article-list">
+  <a class="card" href="#list">
     <span>02</span>
     <h2>文章列表</h2>
-    <p>查看已经发布的文章内容。</p>
+    <p>查看已发布内容</p>
   </a>
 
   <a class="card" href="article-category.html">
     <span>03</span>
     <h2>文章分类</h2>
-    <p>按研究主题整理文章。</p>
+    <p>按主题整理内容</p>
   </a>
 
   <a class="card" href="article-draft.html">
     <span>04</span>
-    <h2>文章草稿</h2>
-    <p>暂存文章选题与未发布内容。</p>
+    <h2>草稿</h2>
+    <p>未发布内容</p>
   </a>
+
 </div>
 
 <hr>
 
-<h2 id="article-list">文章列表</h2>
+<!-- =========================
+     列表（Supabase）
+========================= -->
+<h2 id="list">文章列表</h2>
 <div id="content-list" class="grid"></div>
+
+<!-- =========================
+     详情（slug页面）
+========================= -->
+<div id="article-detail" style="margin-top:60px;"></div>
 
 </main>
 
 <script>
-async function loadContent() {
-  const res = await fetch("content-list.json");
-  const list = await res.json();
 
-  const articles = list.filter(item => item.type === "article");
+/* =========================
+   1. 配置 Supabase
+========================= */
+const SUPABASE_URL = "https://你的项目.supabase.co";
+const SUPABASE_KEY = "你的anon key";
+
+/* =========================
+   2. 加载文章列表
+========================= */
+async function loadList(){
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/contents?select=title,slug,intro,topic,type&order=created_at.desc`,
+    {
+      headers:{
+        apikey:SUPABASE_KEY,
+        Authorization:`Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  const data = await res.json();
+
   const box = document.getElementById("content-list");
 
-  if (!articles.length) {
-    box.innerHTML = "<p>暂无文章内容。</p>";
-    return;
-  }
-
-  box.innerHTML = articles.map(item => `
-    <a class="card" href="${item.url}">
-      <span>${item.topic || item.tag || "ARTICLE"}</span>
+  box.innerHTML = data.map(item=>`
+    <a class="card" href="?slug=${item.slug}">
+      <span>${item.topic || "ARTICLE"}</span>
       <h2>${item.title}</h2>
-      <p>${item.intro}</p>
+      <p>${item.intro || ""}</p>
     </a>
   `).join("");
+
 }
 
-loadContent();
+/* =========================
+   3. 详情页（slug）
+========================= */
+async function loadDetail(){
+
+  const params = new URLSearchParams(location.search);
+  const slug = params.get("slug");
+
+  if(!slug) return;
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/contents?slug=eq.${slug}`,
+    {
+      headers:{
+        apikey:SUPABASE_KEY,
+        Authorization:`Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  const data = await res.json();
+  const post = data[0];
+
+  if(!post) return;
+
+  document.getElementById("article-detail").innerHTML = `
+    <hr>
+    <h1>${post.title}</h1>
+    <p style="color:#777">${post.intro || ""}</p>
+    <div class="article-body">${post.body || ""}</div>
+  `;
+
+}
+
+/* =========================
+   启动
+========================= */
+loadList();
+loadDetail();
+
 </script>
 
 </body>
