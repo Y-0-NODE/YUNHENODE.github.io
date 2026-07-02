@@ -44,8 +44,11 @@ module.exports = async function handler(req, res) {
     // =========================
     // 2️⃣ slug 生成
     // =========================
-    const slug = `post-${Date.now()}`;
-
+  const slug = title
+  .toLowerCase()
+  .replace(/\s+/g, "-")
+  .replace(/[^a-z0-9\u4e00-\u9fa5-]/g, "")
+  + "-" + Date.now();
     // =========================
     // 3️⃣ 写入 Supabase（统一标准写法）
     // =========================
