@@ -1,135 +1,143 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <title>云鹤系统</title>
-  <style>
-    body { font-family: Arial; padding: 40px; background:#111; color:#fff; }
+<meta charset="UTF-8">
+<title>云鹤系统</title>
 
-    .top {
-      display:flex;
-      gap:10px;
-      margin-bottom:20px;
-    }
+<style>
+body{
+  margin:0;
+  background:#0d0d0d;
+  color:#fff;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC";
+}
 
-    select, input {
-      padding:8px;
-      background:#222;
-      color:#fff;
-      border:1px solid #444;
-    }
+/* 顶部栏 */
+header{
+  display:flex;
+  justify-content:space-between;
+  padding:20px 40px;
+  border-bottom:1px solid #222;
+}
 
-    .card {
-      padding:20px;
-      border:1px solid #333;
-      margin-bottom:15px;
-      border-radius:10px;
-      background:#1a1a1a;
-    }
+header .logo{
+  font-weight:700;
+  letter-spacing:2px;
+}
 
-    a { color:#fff; text-decoration:none; }
+nav a{
+  color:#aaa;
+  margin-left:20px;
+  text-decoration:none;
+  font-size:14px;
+}
 
-    button {
-      margin-top:10px;
-      padding:6px 10px;
-      background:#333;
-      color:#fff;
-      border:1px solid #555;
-      cursor:pointer;
-    }
+/* 主体 */
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:80px 40px;
+}
 
-    button:hover {
-      background:#555;
-    }
-  </style>
+h1{
+  font-size:56px;
+  margin:0;
+}
+
+.sub{
+  color:#aaa;
+  margin-top:10px;
+  font-size:16px;
+}
+
+/* 卡片 */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  gap:20px;
+  margin-top:60px;
+}
+
+.card{
+  border:1px solid #222;
+  padding:20px;
+  border-radius:10px;
+  transition:0.3s;
+  cursor:pointer;
+}
+
+.card:hover{
+  border-color:#555;
+  transform:translateY(-3px);
+}
+
+.card h3{
+  margin:0;
+  font-size:22px;
+}
+
+.card p{
+  color:#888;
+  font-size:13px;
+  margin-top:10px;
+  line-height:1.5;
+}
+
+/* 响应式 */
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr 1fr;}
+}
+
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr;}
+  h1{font-size:36px;}
+}
+</style>
 </head>
+
 <body>
 
-<h1>内容列表</h1>
+<header>
+  <div class="logo">YUNHE SYSTEM</div>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="video.html">视频</a>
+    <a href="article-list.html">文章</a>
+    <a href="case.html">案例</a>
+    <a href="about.html">关于我</a>
+  </nav>
+</header>
 
-<!-- 分类过滤 -->
-<div class="top">
-  <select id="typeFilter">
-    <option value="">全部类型</option>
-    <option value="article">文章</option>
-    <option value="video">视频</option>
-    <option value="case">案例</option>
-  </select>
+<div class="container">
+
+  <h1>云鹤系统</h1>
+  <div class="sub">一个用于存放视频、文字、案例与现实判断的个人系统入口。</div>
+
+  <div class="grid">
+
+    <a class="card" href="video.html">
+      <h3>视频</h3>
+      <p>内容切片、表达记录、阶段性判断。</p>
+    </a>
+
+    <a class="card" href="article-list.html">
+      <h3>文章</h3>
+      <p>分析文本、方法论、观察记录。</p>
+    </a>
+
+    <a class="card" href="case.html">
+      <h3>案例</h3>
+      <p>平台、品牌、城市、消费与现实事件。</p>
+    </a>
+
+    <a class="card" href="about.html">
+      <h3>关于我</h3>
+      <p>身份、方法、边界与合作方式。</p>
+    </a>
+
+  </div>
+
 </div>
-
-<div id="list"></div>
-
-<script>
-
-const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co"; // ← 改这里
-
-function load(type = "") {
-
-  let url = SUPABASE_URL + "/rest/v1/contents?select=*&order=created_at.desc";
-
-  if (type) {
-    url += `&type=eq.${type}`;
-  }
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById("list");
-      list.innerHTML = "";
-
-      data.forEach(item => {
-
-        const div = document.createElement("div");
-        div.className = "card";
-
-        div.innerHTML = `
-          <h2>
-            <a href="content.html?slug=${item.slug}">
-              ${item.title}
-            </a>
-          </h2>
-
-          <p>${item.intro || ""}</p>
-
-          <small>${item.type || ""} / ${item.topic || ""}</small>
-
-          <br/>
-
-          <button onclick="del(${item.id})">删除</button>
-        `;
-
-        list.appendChild(div);
-      });
-    });
-}
-
-// 删除功能
-function del(id) {
-
-  if (!confirm("确定删除？")) return;
-
-  fetch(SUPABASE_URL + "/rest/v1/contents?id=eq." + id, {
-    method: "DELETE",
-    headers: {
-      apikey: "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM",          // ← 改这里
-      Authorization: "Bearer sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM
-    }
-  })
-  .then(() => {
-    alert("删除成功");
-    load(document.getElementById("typeFilter").value);
-  });
-}
-
-// 监听分类
-document.getElementById("typeFilter").addEventListener("change", (e) => {
-  load(e.target.value);
-});
-
-// 初始化
-load();
-
-</script>
 
 </body>
 </html>
