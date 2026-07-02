@@ -1,222 +1,117 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>云鹤系统</title>
-
-<style>
-body{
-  margin:0;
-  background:#0a0a0a;
-  color:#eaeaea;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
-}
-
-/* header */
-header{
-  display:flex;
-  justify-content:space-between;
-  padding:22px 48px;
-  border-bottom:1px solid #141414;
-}
-
-.logo{font-size:13px;color:#bbb;letter-spacing:2px;}
-
-nav a{
-  color:#777;
-  margin-left:18px;
-  text-decoration:none;
-  font-size:13px;
-}
-nav a:hover{color:#fff;}
-
-.container{
-  max-width:1180px;
-  margin:0 auto;
-  padding:80px 48px;
-}
-
-h1{font-size:64px;margin:0;}
-.sub{color:#777;margin-top:12px;line-height:1.6;}
-
-/* grid */
-.grid-4{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:18px;
-  margin-top:60px;
-}
-
-.card{
-  border:1px solid #161616;
-  padding:22px;
-  border-radius:10px;
-  background:#0b0b0b;
-  cursor:pointer;
-  transition:.2s;
-  text-decoration:none;
-  color:inherit;
-}
-
-.card:hover{
-  border-color:#2a2a2a;
-  transform:translateY(-2px);
-}
-
-.card h3{margin:0;font-size:16px;}
-.card p{color:#666;font-size:12px;margin-top:10px;line-height:1.5;}
-
-.section-title{
-  margin-top:70px;
-  font-size:12px;
-  color:#888;
-  letter-spacing:2px;
-}
-
-/* topics */
-.grid-8{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-top:20px;
-}
-
-.topic{
-  border:1px solid #151515;
-  padding:16px;
-  border-radius:10px;
-}
-
-.topic h4{margin:0;font-size:14px;}
-.topic p{font-size:12px;color:#666;margin-top:6px;line-height:1.5;}
-
-/* 最新内容区 */
-.latest{
-  margin-top:80px;
-}
-
-.latest-item{
-  border-bottom:1px solid #141414;
-  padding:16px 0;
-}
-
-.latest-item a{
-  color:#ddd;
-  text-decoration:none;
-}
-
-.latest-item small{
-  color:#666;
-}
-
-/* responsive */
-@media(max-width:900px){
-  .grid-4,.grid-8{grid-template-columns:1fr 1fr;}
-  h1{font-size:40px;}
-}
-@media(max-width:520px){
-  .grid-4,.grid-8{grid-template-columns:1fr;}
-}
-</style>
+  <meta charset="UTF-8">
+  <title>云鹤系统｜YUNHENODE</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-  <div class="logo">YUNHE SYSTEM</div>
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
   <nav>
+    <a href="index.html">首页</a>
     <a href="video.html">视频</a>
-    <a href="article-list.html">文章</a>
+    <a href="article.html">文章</a>
     <a href="case.html">案例</a>
     <a href="about.html">关于我</a>
   </nav>
 </header>
 
-<div class="container">
+<main class="home">
 
-  <h1>云鹤系统</h1>
-  <div class="sub">结构化记录 / 内容系统 / 现实判断入口</div>
+  <section class="hero">
+    <p class="eyebrow">个人内容系统 / 现实判断档案</p>
+    <h1>云鹤系统</h1>
+    <p class="intro">一个用于存放视频、文字、案例与现实判断的个人系统入口。</p>
+  </section>
 
-  <!-- 一级入口 -->
-  <div class="grid-4">
+  <section>
+    <h2>内容入口</h2>
 
-    <a class="card" href="video.html">
-      <h3>视频</h3>
-      <p>行为记录 / 表达切片 / 观察系统</p>
-    </a>
-
-    <a class="card" href="article-list.html">
-      <h3>文章</h3>
-      <p>文本分析 / 方法论 / 系统记录</p>
-    </a>
-
-    <a class="card" href="case.html">
-      <h3>案例</h3>
-      <p>平台 / 城市 / 品牌 / 现实事件</p>
-    </a>
-
-    <a class="card" href="about.html">
-      <h3>关于我</h3>
-      <p>身份 / 方法 / 合作 / 边界</p>
-    </a>
-
-  </div>
-
-  <!-- 研究主题 -->
-  <div class="section-title">RESEARCH FIELDS</div>
-
-  <div class="grid-8">
-
-    <div class="topic"><h4>品牌</h4><p>结构 / 用户路径</p></div>
-    <div class="topic"><h4>平台</h4><p>规则 / 权限系统</p></div>
-    <div class="topic"><h4>城市</h4><p>公共结构 / 运行机制</p></div>
-    <div class="topic"><h4>组织</h4><p>岗位关系 / 系统失效</p></div>
-
-    <div class="topic"><h4>消费</h4><p>价格 / 服务路径</p></div>
-    <div class="topic"><h4>艺术</h4><p>图像 / 文本系统</p></div>
-    <div class="topic"><h4>空间</h4><p>身体 / 环境结构</p></div>
-    <div class="topic"><h4>梦境</h4><p>潜意识 / 记忆结构</p></div>
-
-  </div>
-
-  <!-- 🔥 新增：系统动态（关键升级） -->
-  <div class="latest">
-    <div class="section-title">LATEST CONTENT</div>
-    <div id="latest"></div>
-  </div>
-
-</div>
-
-<script>
-const SUPABASE_URL = "https://你的项目.supabase.co";
-const KEY = "你的anon key";
-
-fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,slug,created_at&order=created_at.desc&limit=5`, {
-  headers:{
-    apikey:KEY,
-    Authorization:`Bearer ${KEY}`
-  }
-})
-.then(r=>r.json())
-.then(data=>{
-  const box = document.getElementById("latest");
-
-  data.forEach(i=>{
-    const div = document.createElement("div");
-    div.className="latest-item";
-
-    div.innerHTML=`
-      <a href="content.html?slug=${i.slug}">
-        ${i.title}
+    <div class="grid">
+      <a class="card" href="video.html">
+        <span>01</span>
+        <h2>视频</h2>
+        <p>内容切片、表达记录、阶段性判断。</p>
       </a>
-      <br>
-      <small>${i.created_at || ""}</small>
-    `;
 
-    box.appendChild(div);
-  });
-});
-</script>
+      <a class="card" href="article.html">
+        <span>02</span>
+        <h2>文章</h2>
+        <p>分析文本、方法论、观察记录。</p>
+      </a>
+
+      <a class="card" href="case.html">
+        <span>03</span>
+        <h2>案例</h2>
+        <p>平台、品牌、城市、消费与现实事件。</p>
+      </a>
+
+      <a class="card" href="about.html">
+        <span>04</span>
+        <h2>关于我</h2>
+        <p>身份、方法、边界与合作方式。</p>
+      </a>
+    </div>
+  </section>
+
+  <section style="margin-top:80px;">
+    <h2>研究主题</h2>
+
+    <div class="grid">
+      <a class="card" href="brand.html">
+        <span>01</span>
+        <h2>品牌</h2>
+        <p>品牌结构、商业系统、用户路径。</p>
+      </a>
+
+      <a class="card" href="platform.html">
+        <span>02</span>
+        <h2>平台</h2>
+        <p>平台规则、客服系统、退出机制。</p>
+      </a>
+
+      <a class="card" href="city.html">
+        <span>03</span>
+        <h2>城市</h2>
+        <p>城市运行、公共系统、街区观察。</p>
+      </a>
+
+      <a class="card" href="organization.html">
+        <span>04</span>
+        <h2>组织</h2>
+        <p>组织结构、岗位关系、系统失效。</p>
+      </a>
+
+      <a class="card" href="consumption.html">
+        <span>05</span>
+        <h2>消费</h2>
+        <p>消费现场、服务路径、价格判断。</p>
+      </a>
+
+      <a class="card" href="art.html">
+        <span>06</span>
+        <h2>艺术</h2>
+        <p>图像、文本、作品与表达系统。</p>
+      </a>
+
+      <a class="card" href="space.html">
+        <span>07</span>
+        <h2>空间</h2>
+        <p>居住、街区、场域与身体感知。</p>
+      </a>
+
+      <a class="card" href="dream.html">
+        <span>08</span>
+        <h2>梦境</h2>
+        <p>梦境记录、象征结构、潜意识材料。</p>
+      </a>
+    </div>
+  </section>
+
+</main>
 
 </body>
 </html>
