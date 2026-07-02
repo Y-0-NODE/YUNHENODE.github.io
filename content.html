@@ -1,41 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <title>文章详情</title>
+
 <style>
 body{
   background:#0a0a0a;
-  color:#fff;
-  font-family:Arial;
+  color:#eaeaea;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
   padding:40px;
+  max-width:900px;
+  margin:0 auto;
 }
-a{color:#888}
+
+a{
+  color:#888;
+  text-decoration:none;
+}
+
+a:hover{
+  color:#fff;
+}
+
+h1{
+  font-size:34px;
+  margin-bottom:10px;
+}
+
+#intro{
+  color:#777;
+  margin-bottom:30px;
+  line-height:1.6;
+}
+
+#body{
+  color:#dcdcdc;
+  line-height:1.8;
+  font-size:15px;
+  white-space:pre-wrap;
+}
 </style>
 </head>
 
 <body>
 
-<a href="index.html">← 返回</a>
+<a href="article-list.html">← 返回列表</a>
 
-<h1 id="title"></h1>
+<h1 id="title">加载中...</h1>
 <p id="intro"></p>
 <div id="body"></div>
 
 <script>
+
 const SUPABASE_URL = "https://你的项目.supabase.co";
+const SUPABASE_KEY = "你的anon key";
+
 const params = new URLSearchParams(location.search);
 const slug = params.get("slug");
 
-fetch(`${SUPABASE_URL}/rest/v1/contents?slug=eq.${slug}`)
-.then(r=>r.json())
-.then(data=>{
+// 🚨 1. slug不存在保护
+if(!slug){
+  document.getElementById("title").innerText = "未找到文章";
+  throw new Error("missing slug");
+}
+
+// 🚨 2. 拉 Supabase 数据（增强版）
+fetch(`${SUPABASE_URL}/rest/v1/contents?slug=eq.${slug}&limit=1`, {
+  headers:{
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`
+  }
+})
+.then(res => res.json())
+.then(data => {
+
+  // 🚨 3. 数据不存在保护
+  if(!data || data.length === 0){
+    document.getElementById("title").innerText = "文章不存在";
+    return;
+  }
+
   const post = data[0];
 
-  document.getElementById("title").innerText = post.title;
+  // 🚨 4. 安全渲染
+  document.getElementById("title").innerText = post.title || "无标题";
   document.getElementById("intro").innerText = post.intro || "";
+
+  // body支持HTML（你以后可以做富文本）
   document.getElementById("body").innerHTML = post.body || "";
+
+})
+.catch(err => {
+  console.error(err);
+  document.getElementById("title").innerText = "加载失败";
 });
+
 </script>
 
 </body>
