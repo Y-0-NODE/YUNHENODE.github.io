@@ -111,8 +111,8 @@ function del(id) {
   fetch(SUPABASE_URL + "/rest/v1/contents?id=eq." + id, {
     method: "DELETE",
     headers: {
-      apikey: "你的anon key",          // ← 改这里
-      Authorization: "Bearer 你的anon key"
+      apikey: "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM",          // ← 改这里
+      Authorization: "Bearer sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM
     }
   })
   .then(() => {
