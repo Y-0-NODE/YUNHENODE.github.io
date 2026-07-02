@@ -57,7 +57,7 @@ const SUPABASE_URL = "https://你的项目.supabase.co";
 const SUPABASE_KEY = "你的anon key";
 
 const params = new URLSearchParams(location.search);
-const slug = params.get("slug");
+const slug = new URLSearchParams(location.search).get("slug");
 
 // 🚨 1. slug不存在保护
 if(!slug){
