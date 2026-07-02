@@ -1,8 +1,7 @@
 {
-  "name": "yunhenode-api",
+  "name": "api",
   "version": "1.0.0",
-  "type": "commonjs",
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.0"
+    "@supabase/supabase-js": "^2.39.0"
   }
 }
