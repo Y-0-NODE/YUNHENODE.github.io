@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>内容详情</title>
+  <style>
+    body { font-family: Arial; padding: 40px; background:#111; color:#fff; }
+    .box { max-width:800px; margin:auto; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h1 id="title"></h1>
+  <p id="intro"></p>
+  <hr>
+  <div id="body"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://你的项目.supabase.co";
+
+const params = new URLSearchParams(location.search);
+const slug = params.get("slug");
+
+fetch(`${SUPABASE_URL}/rest/v1/contents?slug=eq.${slug}&select=*`)
+  .then(res => res.json())
+  .then(data => {
+    const item = data[0];
+
+    document.getElementById("title").innerText = item.title;
+    document.getElementById("intro").innerText = item.intro || "";
+    document.getElementById("body").innerHTML = item.body;
+  });
+</script>
+
+</body>
+</html>
