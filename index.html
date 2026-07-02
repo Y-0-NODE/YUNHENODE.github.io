@@ -5,37 +5,130 @@
   <title>云鹤系统</title>
   <style>
     body { font-family: Arial; padding: 40px; background:#111; color:#fff; }
-    .card { padding:20px; border:1px solid #333; margin-bottom:15px; border-radius:10px; }
+
+    .top {
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    select, input {
+      padding:8px;
+      background:#222;
+      color:#fff;
+      border:1px solid #444;
+    }
+
+    .card {
+      padding:20px;
+      border:1px solid #333;
+      margin-bottom:15px;
+      border-radius:10px;
+      background:#1a1a1a;
+    }
+
     a { color:#fff; text-decoration:none; }
+
+    button {
+      margin-top:10px;
+      padding:6px 10px;
+      background:#333;
+      color:#fff;
+      border:1px solid #555;
+      cursor:pointer;
+    }
+
+    button:hover {
+      background:#555;
+    }
   </style>
 </head>
 <body>
 
 <h1>内容列表</h1>
+
+<!-- 分类过滤 -->
+<div class="top">
+  <select id="typeFilter">
+    <option value="">全部类型</option>
+    <option value="article">文章</option>
+    <option value="video">视频</option>
+    <option value="case">案例</option>
+  </select>
+</div>
+
 <div id="list"></div>
 
 <script>
-const SUPABASE_URL = "https://你的项目.supabase.co";
-const API = SUPABASE_URL + "/rest/v1/contents?select=*&order=created_at.desc";
 
-fetch(API)
-  .then(res => res.json())
-  .then(data => {
-    const list = document.getElementById("list");
+const SUPABASE_URL = "https://你的项目.supabase.co"; // ← 改这里
 
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "card";
+function load(type = "") {
 
-      div.innerHTML = `
-        <h2><a href="content.html?slug=${item.slug}">${item.title}</a></h2>
-        <p>${item.intro || ""}</p>
-        <small>${item.type} / ${item.topic}</small>
-      `;
+  let url = SUPABASE_URL + "/rest/v1/contents?select=*&order=created_at.desc";
 
-      list.appendChild(div);
+  if (type) {
+    url += `&type=eq.${type}`;
+  }
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      data.forEach(item => {
+
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+          <h2>
+            <a href="content.html?slug=${item.slug}">
+              ${item.title}
+            </a>
+          </h2>
+
+          <p>${item.intro || ""}</p>
+
+          <small>${item.type || ""} / ${item.topic || ""}</small>
+
+          <br/>
+
+          <button onclick="del(${item.id})">删除</button>
+        `;
+
+        list.appendChild(div);
+      });
     });
+}
+
+// 删除功能
+function del(id) {
+
+  if (!confirm("确定删除？")) return;
+
+  fetch(SUPABASE_URL + "/rest/v1/contents?id=eq." + id, {
+    method: "DELETE",
+    headers: {
+      apikey: "你的anon key",          // ← 改这里
+      Authorization: "Bearer 你的anon key"
+    }
+  })
+  .then(() => {
+    alert("删除成功");
+    load(document.getElementById("typeFilter").value);
   });
+}
+
+// 监听分类
+document.getElementById("typeFilter").addEventListener("change", (e) => {
+  load(e.target.value);
+});
+
+// 初始化
+load();
+
 </script>
 
 </body>
