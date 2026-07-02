@@ -5,79 +5,123 @@
 <title>云鹤系统</title>
 
 <style>
+/* =====================
+   全局基础
+===================== */
 body{
   margin:0;
   background:#000;
   color:#fff;
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC";
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
 }
 
-/* 顶部 */
+/* =====================
+   顶部导航
+===================== */
 header{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   padding:20px 40px;
   border-bottom:1px solid #111;
 }
 
-header a{
-  color:#aaa;
-  margin-left:20px;
-  text-decoration:none;
+.logo{
+  font-weight:600;
+  letter-spacing:2px;
   font-size:14px;
+  color:#fff;
 }
 
-/* 主体 */
+nav a{
+  color:#888;
+  margin-left:18px;
+  text-decoration:none;
+  font-size:13px;
+}
+
+nav a:hover{
+  color:#fff;
+}
+
+/* =====================
+   主体容器
+===================== */
 .container{
   max-width:1200px;
   margin:0 auto;
   padding:80px 40px;
 }
 
+/* =====================
+   标题区
+===================== */
 h1{
-  font-size:60px;
+  font-size:64px;
   margin:0;
+  font-weight:600;
 }
 
 .sub{
-  color:#888;
-  margin-top:10px;
+  margin-top:12px;
+  color:#777;
+  font-size:15px;
+  max-width:600px;
+  line-height:1.6;
 }
 
-/* ===== 一级入口 ===== */
+/* =====================
+   4个入口
+===================== */
 .grid-4{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:20px;
+  gap:18px;
   margin-top:60px;
 }
 
 .card{
   border:1px solid #111;
-  padding:20px;
+  padding:22px;
   background:#000;
+  transition:0.2s;
+  cursor:pointer;
+}
+
+.card:hover{
+  border-color:#333;
+  transform:translateY(-2px);
 }
 
 .card h3{
   margin:0;
+  font-size:18px;
 }
 
 .card p{
+  margin-top:10px;
+  font-size:12px;
   color:#777;
-  font-size:13px;
+  line-height:1.5;
 }
 
-/* ===== 研究主题 ===== */
+/* =====================
+   研究主题标题
+===================== */
 .section-title{
   margin-top:80px;
-  font-size:20px;
+  font-size:16px;
   color:#fff;
+  letter-spacing:1px;
 }
 
+/* =====================
+   8个主题
+===================== */
 .grid-8{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:15px;
+  gap:14px;
   margin-top:20px;
 }
 
@@ -85,23 +129,34 @@ h1{
   border:1px solid #111;
   padding:18px;
   background:#000;
+  min-height:90px;
 }
 
 .topic h4{
   margin:0;
-  font-size:18px;
+  font-size:16px;
 }
 
 .topic p{
+  margin-top:8px;
   font-size:12px;
   color:#777;
-  margin-top:8px;
+  line-height:1.4;
 }
 
-/* responsive */
+/* =====================
+   响应式
+===================== */
 @media(max-width:900px){
   .grid-4,.grid-8{
     grid-template-columns:1fr 1fr;
+  }
+  h1{font-size:42px;}
+}
+
+@media(max-width:500px){
+  .grid-4,.grid-8{
+    grid-template-columns:1fr;
   }
 }
 </style>
@@ -110,8 +165,9 @@ h1{
 <body>
 
 <header>
-  <div>YUNHE SYSTEM</div>
+  <div class="logo">YUNHE SYSTEM</div>
   <nav>
+    <a href="index.html">首页</a>
     <a href="video.html">视频</a>
     <a href="article-list.html">文章</a>
     <a href="case.html">案例</a>
@@ -123,24 +179,26 @@ h1{
 
   <!-- 主标题 -->
   <h1>云鹤系统</h1>
-  <div class="sub">一个用于视频、文字、案例与现实判断的个人结构系统</div>
+  <div class="sub">
+    一个用于存放视频、文本、案例与现实判断的结构化个人系统入口。
+  </div>
 
-  <!-- 一级入口 -->
+  <!-- 4入口 -->
   <div class="grid-4">
 
     <a class="card" href="video.html">
       <h3>视频</h3>
-      <p>内容切片 / 表达记录 / 行为观察</p>
+      <p>表达记录 / 片段输出 / 状态观察</p>
     </a>
 
     <a class="card" href="article-list.html">
       <h3>文章</h3>
-      <p>文本分析 / 方法论 / 系统记录</p>
+      <p>文本分析 / 方法论 / 结构记录</p>
     </a>
 
     <a class="card" href="case.html">
       <h3>案例</h3>
-      <p>平台 / 城市 / 品牌 / 现实事件</p>
+      <p>平台 / 品牌 / 城市 / 现实事件</p>
     </a>
 
     <a class="card" href="about.html">
@@ -155,15 +213,45 @@ h1{
 
   <div class="grid-8">
 
-    <div class="topic"><h4>品牌</h4><p>结构 / 商业系统 / 用户路径</p></div>
-    <div class="topic"><h4>平台</h4><p>规则 / 客服系统 / 退出机制</p></div>
-    <div class="topic"><h4>城市</h4><p>运行系统 / 公共结构</p></div>
-    <div class="topic"><h4>组织</h4><p>岗位关系 / 系统失效</p></div>
+    <div class="topic">
+      <h4>品牌</h4>
+      <p>商业结构 / 用户路径 / 系统关系</p>
+    </div>
 
-    <div class="topic"><h4>消费</h4><p>服务路径 / 价格判断</p></div>
-    <div class="topic"><h4>艺术</h4><p>图像 / 文本 / 表达系统</p></div>
-    <div class="topic"><h4>空间</h4><p>居住 / 街区 / 身体感知</p></div>
-    <div class="topic"><h4>梦境</h4><p>潜意识结构 / 记忆材料</p></div>
+    <div class="topic">
+      <h4>平台</h4>
+      <p>规则系统 / 审核机制 / 退出结构</p>
+    </div>
+
+    <div class="topic">
+      <h4>城市</h4>
+      <p>空间运行 / 公共系统 / 基础设施</p>
+    </div>
+
+    <div class="topic">
+      <h4>组织</h4>
+      <p>权力结构 / 岗位关系 / 系统失效</p>
+    </div>
+
+    <div class="topic">
+      <h4>消费</h4>
+      <p>价格系统 / 服务路径 / 行为选择</p>
+    </div>
+
+    <div class="topic">
+      <h4>艺术</h4>
+      <p>图像 / 文本 / 表达系统</p>
+    </div>
+
+    <div class="topic">
+      <h4>空间</h4>
+      <p>居住 / 身体感 / 环境结构</p>
+    </div>
+
+    <div class="topic">
+      <h4>梦境</h4>
+      <p>潜意识结构 / 记忆模型</p>
+    </div>
 
   </div>
 
