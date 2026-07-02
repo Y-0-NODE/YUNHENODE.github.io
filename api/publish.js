@@ -5,6 +5,10 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ success: false, error: "Only POST allowed" });
   }
 
+  const timeout = (ms) => new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("timeout")), ms)
+  );
+
   try {
     const data = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const { password, title, intro, video, body, tag, type, topic } = data;
@@ -14,10 +18,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (!title || !intro || !body) {
-      return res.status(400).json({
-        success: false,
-        error: "标题、简介、正文不能为空"
-      });
+      return res.status(400).json({ success: false, error: "标题、简介、正文不能为空" });
     }
 
     const owner = process.env.GITHUB_OWNER;
@@ -28,8 +29,7 @@ module.exports = async function handler(req, res) {
     if (!owner || !repo || !token) {
       return res.status(500).json({
         success: false,
-        error: "Vercel 环境变量缺失",
-        need: ["GITHUB_OWNER", "GITHUB_REPO", "GITHUB_TOKEN"]
+        error: "Vercel 环境变量缺失"
       });
     }
 
@@ -71,6 +71,7 @@ module.exports = async function handler(req, res) {
     <a href="about.html">关于我</a>
   </nav>
 </header>
+
 <main class="home">
 <p class="eyebrow">${finalTopic} / ${finalType}</p>
 <h1>${title}</h1>
@@ -106,66 +107,55 @@ module.exports = async function handler(req, res) {
       "Content-Type": "application/json"
     };
 
+    // =========================
+    // 1. 创建页面（防卡 + timeout）
+    // =========================
     const pageContent = Buffer.from(html).toString("base64");
     const pageUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
 
-    console.time("create-page");
-
-    const pageResponse = await fetch(pageUrl, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify({
-        message: `publish ${filename}`,
-        content: pageContent,
-        branch
-      })
-    });
-
-    console.timeEnd("create-page");
+    const pageResponse = await Promise.race([
+      fetch(pageUrl, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          message: `publish ${filename}`,
+          content: pageContent,
+          branch
+        })
+      }),
+      timeout(15000)
+    ]);
 
     if (!pageResponse.ok) {
-      const error = await pageResponse.json();
+      const text = await pageResponse.text();
       return res.status(500).json({
         success: false,
         step: "create-page",
-        message: "内容页面创建失败",
-        error
+        error: text
       });
     }
 
+    // =========================
+    // 2. 读取 list（安全解析）
+    // =========================
     const listUrl = `https://api.github.com/repos/${owner}/${repo}/contents/content-list.json`;
-
-    console.time("get-list");
 
     const listGet = await fetch(listUrl, { headers });
 
-    console.timeEnd("get-list");
-
-    if (!listGet.ok) {
-      const error = await listGet.json();
-      return res.status(500).json({
-        success: false,
-        step: "get-list",
-        message: "读取 content-list.json 失败",
-        error
-      });
-    }
-
-    const listData = await listGet.json();
-
     let list = [];
+    let sha = null;
 
-    if (listData.content) {
-      try {
-        const decoded = Buffer.from(listData.content, "base64").toString("utf-8");
-        list = JSON.parse(decoded);
-      } catch (err) {
-        return res.status(500).json({
-          success: false,
-          step: "parse-list",
-          message: "content-list.json 解析失败",
-          error: err.message
-        });
+    if (listGet.ok) {
+      const listData = await listGet.json();
+      sha = listData.sha;
+
+      if (listData.content) {
+        try {
+          const decoded = Buffer.from(listData.content, "base64").toString("utf-8");
+          list = JSON.parse(decoded);
+        } catch (e) {
+          list = [];
+        }
       }
     }
 
@@ -182,41 +172,26 @@ module.exports = async function handler(req, res) {
 
     const newListContent = Buffer.from(JSON.stringify(list, null, 2)).toString("base64");
 
-    console.time("update-list");
-
+    // =========================
+    // 3. 更新 list（防卡）
+    // =========================
     const listUpdate = await fetch(listUrl, {
       method: "PUT",
       headers,
       body: JSON.stringify({
         message: `update content list`,
         content: newListContent,
-        sha: listData.sha,
+        sha,
         branch
       })
     });
 
-    console.timeEnd("update-list");
     console.timeEnd("publish-total");
-
-    if (!listUpdate.ok) {
-      const error = await listUpdate.json();
-      return res.status(500).json({
-        success: false,
-        step: "update-list",
-        message: "内容页面已创建，但 content-list.json 更新失败",
-        filename,
-        url: `/${filename}`,
-        error
-      });
-    }
 
     return res.status(200).json({
       success: true,
-      message: "发布成功",
       filename,
-      url: `/${filename}`,
-      type: finalType,
-      topic: finalTopic
+      url: `/${filename}`
     });
 
   } catch (err) {
@@ -224,8 +199,6 @@ module.exports = async function handler(req, res) {
 
     return res.status(500).json({
       success: false,
-      step: "server-error",
-      message: "服务器执行出错",
       error: err.message
     });
   }
