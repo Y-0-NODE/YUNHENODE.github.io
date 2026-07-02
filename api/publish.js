@@ -4,9 +4,10 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST allowed" });
+    return res.status(405).json({ error: "Only POST" });
   }
 
   try {
@@ -19,25 +20,21 @@ module.exports = async function handler(req, res) {
     if (!title || !body) {
       return res.status(400).json({
         success: false,
-        error: "title / body 必填"
+        error: "title/body 必填"
       });
     }
 
     const slug = `post-${Date.now()}`;
 
-    // =========================
-    // 1. 写 Supabase（唯一数据源）
-    // =========================
     const { error } = await supabase.from("contents").insert([
       {
+        slug,
         title,
         intro: intro || "",
         body,
         video: video || "",
         type: type || "article",
-        topic: topic || "未分类",
-        slug,
-        created_at: new Date().toISOString()
+        topic: topic || "未分类"
       }
     ]);
 
@@ -48,9 +45,6 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // =========================
-    // 2. 返回成功（不再 GitHub push，避免卡死）
-    // =========================
     return res.status(200).json({
       success: true,
       slug,
@@ -59,7 +53,6 @@ module.exports = async function handler(req, res) {
 
   } catch (e) {
     return res.status(500).json({
-      success: false,
       error: e.message
     });
   }
