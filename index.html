@@ -1,117 +1,42 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>云鹤系统｜YUNHENODE</title>
-  <link rel="stylesheet" href="style.css">
+  <title>云鹤系统</title>
+  <style>
+    body { font-family: Arial; padding: 40px; background:#111; color:#fff; }
+    .card { padding:20px; border:1px solid #333; margin-bottom:15px; border-radius:10px; }
+    a { color:#fff; text-decoration:none; }
+  </style>
 </head>
-
 <body>
 
-<header class="topbar">
-  <div class="logo">YUNHENODE</div>
-  <nav>
-    <a href="index.html">首页</a>
-    <a href="video.html">视频</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-    <a href="about.html">关于我</a>
-  </nav>
-</header>
+<h1>内容列表</h1>
+<div id="list"></div>
 
-<main class="home">
+<script>
+const SUPABASE_URL = "https://你的项目.supabase.co";
+const API = SUPABASE_URL + "/rest/v1/contents?select=*&order=created_at.desc";
 
-  <section class="hero">
-    <p class="eyebrow">个人内容系统 / 现实判断档案</p>
-    <h1>云鹤系统</h1>
-    <p class="intro">一个用于存放视频、文字、案例与现实判断的个人系统入口。</p>
-  </section>
+fetch(API)
+  .then(res => res.json())
+  .then(data => {
+    const list = document.getElementById("list");
 
-  <section>
-    <h2>内容入口</h2>
+    data.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "card";
 
-    <div class="grid">
-      <a class="card" href="video.html">
-        <span>01</span>
-        <h2>视频</h2>
-        <p>内容切片、表达记录、阶段性判断。</p>
-      </a>
+      div.innerHTML = `
+        <h2><a href="content.html?slug=${item.slug}">${item.title}</a></h2>
+        <p>${item.intro || ""}</p>
+        <small>${item.type} / ${item.topic}</small>
+      `;
 
-      <a class="card" href="article.html">
-        <span>02</span>
-        <h2>文章</h2>
-        <p>分析文本、方法论、观察记录。</p>
-      </a>
-
-      <a class="card" href="case.html">
-        <span>03</span>
-        <h2>案例</h2>
-        <p>平台、品牌、城市、消费与现实事件。</p>
-      </a>
-
-      <a class="card" href="about.html">
-        <span>04</span>
-        <h2>关于我</h2>
-        <p>身份、方法、边界与合作方式。</p>
-      </a>
-    </div>
-  </section>
-
-  <section style="margin-top:80px;">
-    <h2>研究主题</h2>
-
-    <div class="grid">
-      <a class="card" href="brand.html">
-        <span>01</span>
-        <h2>品牌</h2>
-        <p>品牌结构、商业系统、用户路径。</p>
-      </a>
-
-      <a class="card" href="platform.html">
-        <span>02</span>
-        <h2>平台</h2>
-        <p>平台规则、客服系统、退出机制。</p>
-      </a>
-
-      <a class="card" href="city.html">
-        <span>03</span>
-        <h2>城市</h2>
-        <p>城市运行、公共系统、街区观察。</p>
-      </a>
-
-      <a class="card" href="organization.html">
-        <span>04</span>
-        <h2>组织</h2>
-        <p>组织结构、岗位关系、系统失效。</p>
-      </a>
-
-      <a class="card" href="consumption.html">
-        <span>05</span>
-        <h2>消费</h2>
-        <p>消费现场、服务路径、价格判断。</p>
-      </a>
-
-      <a class="card" href="art.html">
-        <span>06</span>
-        <h2>艺术</h2>
-        <p>图像、文本、作品与表达系统。</p>
-      </a>
-
-      <a class="card" href="space.html">
-        <span>07</span>
-        <h2>空间</h2>
-        <p>居住、街区、场域与身体感知。</p>
-      </a>
-
-      <a class="card" href="dream.html">
-        <span>08</span>
-        <h2>梦境</h2>
-        <p>梦境记录、象征结构、潜意识材料。</p>
-      </a>
-    </div>
-  </section>
-
-</main>
+      list.appendChild(div);
+    });
+  });
+</script>
 
 </body>
 </html>
