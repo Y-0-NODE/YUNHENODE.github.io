@@ -71,7 +71,15 @@
 </main>
 
 <script>
+
+const SUPABASE_URL = "https://你的项目.supabase.co";
+const SUPABASE_KEY = "你的anon key";
+
+/* =========================
+   发布函数（升级版）
+========================= */
 async function publishToSite() {
+
   const password = document.getElementById("password").value.trim();
   const type = document.getElementById("type").value;
   const topic = document.getElementById("topic").value;
@@ -79,62 +87,74 @@ async function publishToSite() {
   const intro = document.getElementById("intro").value.trim();
   const video = document.getElementById("video").value.trim();
   const body = document.getElementById("body").value.trim();
-
   const output = document.getElementById("output");
 
-  if (!password || !title || !intro || !body) {
-    output.textContent = "发布失败：发布密码、标题、简介、正文不能为空。";
-    alert("请先填写必填内容");
+  if (!password || !title || !body) {
+    output.textContent = "❌ 必填项缺失：密码 / 标题 / 正文";
     return;
   }
 
-  output.textContent = "正在连接 /api/publish，请稍等...";
+  output.textContent = "🚀 正在发布...";
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => {
-    controller.abort();
-  }, 20000);
+  /* =========================
+     1️⃣ 自动生成 slug（关键）
+  ========================= */
+  const slug =
+    title
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\u4e00-\u9fa5-]/g, "") +
+    "-" +
+    Date.now();
 
+  /* =========================
+     2️⃣ 请求 Supabase
+  ========================= */
   try {
-    const res = await fetch("/api/publish", {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/contents`, {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      signal: controller.signal,
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation"
+      },
       body: JSON.stringify({
-        password,
-        type,
-        topic,
         title,
         intro,
+        body,
         video,
-        body
+        type,
+        topic,
+        slug,
+        created_at: new Date().toISOString()
       })
     });
 
-    clearTimeout(timer);
-
-    output.textContent = "API 已返回，正在读取结果...";
-
     const data = await res.json();
 
-    if (data.success) {
+    /* =========================
+       3️⃣ 成功返回
+    ========================= */
+    if (res.ok) {
       output.textContent =
-        "发布成功！\n文件名：" + data.filename + "\n访问地址：" + data.url;
-      alert("发布成功！");
+        "✅ 发布成功\n\n" +
+        "标题：" + title + "\n" +
+        "slug：" + slug + "\n" +
+        "访问链接：content.html?slug=" + slug;
+
+      alert("发布成功");
     } else {
-      output.textContent = "发布失败：\n" + JSON.stringify(data, null, 2);
-      alert("发布失败，看页面底部错误信息");
+      output.textContent =
+        "❌ 发布失败：\n" + JSON.stringify(data, null, 2);
     }
 
   } catch (err) {
-    clearTimeout(timer);
-
     output.textContent =
-      "请求卡住或超时：\n" +
-      err.message +
-      "\n\n说明：前端已经发出请求，但 /api/publish 没有在20秒内返回。";
+      "❌ 请求失败：\n" + err.message;
   }
 }
+
 </script>
 
 </body>
