@@ -88,31 +88,51 @@ async function publishToSite() {
     return;
   }
 
-  output.textContent = "正在发布，请稍等...";
+  output.textContent = "正在连接 /api/publish，请稍等...";
 
-  const res = await fetch("/api/publish", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      password,
-      type,
-      topic,
-      title,
-      intro,
-      video,
-      body
-    })
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => {
+    controller.abort();
+  }, 20000);
 
-  const data = await res.json();
+  try {
+    const res = await fetch("/api/publish", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      signal: controller.signal,
+      body: JSON.stringify({
+        password,
+        type,
+        topic,
+        title,
+        intro,
+        video,
+        body
+      })
+    });
 
-  if (data.success) {
+    clearTimeout(timer);
+
+    output.textContent = "API 已返回，正在读取结果...";
+
+    const data = await res.json();
+
+    if (data.success) {
+      output.textContent =
+        "发布成功！\n文件名：" + data.filename + "\n访问地址：" + data.url;
+      alert("发布成功！");
+    } else {
+      output.textContent = "发布失败：\n" + JSON.stringify(data, null, 2);
+      alert("发布失败，看页面底部错误信息");
+    }
+
+  } catch (err) {
+    clearTimeout(timer);
+
     output.textContent =
-      "发布成功！\n文件名：" + data.filename + "\n访问地址：" + data.url;
-    alert("发布成功！");
-  } else {
-    output.textContent = "发布失败：\n" + JSON.stringify(data, null, 2);
-    alert("发布失败，看页面底部错误信息");
+      "请求卡住或超时：\n" +
+      err.message +
+      "\n\n说明：前端已经发出请求，但 /api/publish 没有在20秒内返回。";
   }
 }
 </script>
