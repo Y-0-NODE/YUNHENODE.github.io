@@ -1,30 +1,63 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><title>文章列表｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
-<body>
-<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="article.html">返回文章</a><a href="admin.html">后台</a></nav></header>
-<main class="home">
-<p class="eyebrow">ARTICLE / LIST</p>
-<h1>文章列表</h1>
-<p class="intro">这里显示所有已发布文章。</p>
-<div id="list" class="grid"></div>
-</main>
 <script>
-async function loadArticles(){
-  const res = await fetch("content-list.json");
-  const data = await res.json();
-  const articles = data.filter(item => item.type === "article");
-  const box = document.getElementById("list");
-  if(!articles.length){ box.innerHTML = "<p>暂无文章。</p>"; return; }
-  box.innerHTML = articles.map(item => `
-    <a class="card" href="article-list.html">
-      <span>${item.topic || item.tag || "ARTICLE"}</span>
-      <h2>${item.title}</h2>
-      <p>${item.intro}</p>
-    </a>
-  `).join("");
+const SUPABASE_URL = "https://ndraugyrdneccqcyfzjt.supabase.co";
+
+const API = SUPABASE_URL + "/rest/v1/contents?select=*&order=created_at.desc";
+
+let DATA = [];
+
+function render(list){
+  const el = document.getElementById("list");
+  el.innerHTML = "";
+
+  list.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <h2>
+        <a href="content.html?slug=${item.slug}">
+          ${item.title}
+        </a>
+      </h2>
+
+      <p>${item.intro || ""}</p>
+
+      <small>${item.type} / ${item.topic}</small>
+
+      <br><br>
+
+      <button onclick="deletePost('${item.id}')">删除</button>
+    `;
+
+    el.appendChild(div);
+  });
 }
-loadArticles();
+
+// 🧨 删除功能（关键）
+function deletePost(id){
+  fetch(`${SUPABASE_URL}/rest/v1/contents?id=eq.${id}`, {
+    method: "DELETE",
+    headers: {
+      apikey: "sb_publishable_xxx",
+      Authorization: "Bearer sb_publishable_xxx",
+      "Content-Type": "application/json"
+    }
+  })
+  .then(() => {
+    alert("已删除");
+    location.reload();
+  });
+}
+
+function filterType(type){
+  if(type === "all") return render(DATA);
+  render(DATA.filter(i => i.type === type));
+}
+
+fetch(API)
+  .then(r => r.json())
+  .then(data => {
+    DATA = data;
+    render(DATA);
+  });
 </script>
-</body>
-</html>
