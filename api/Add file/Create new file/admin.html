@@ -3,52 +3,271 @@
 <head>
 <meta charset="UTF-8">
 <title>YUNHENODE CMS｜后台</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  margin:0;
+  background:#0a0a0a;
+  color:#eaeaea;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
+}
+
+/* ===== 顶部导航 ===== */
+header{
+  padding:20px 40px;
+  border-bottom:1px solid #141414;
+  display:flex;
+  justify-content:space-between;
+}
+
+header a{
+  color:#888;
+  text-decoration:none;
+  margin-left:16px;
+}
+
+header a:hover{
+  color:#fff;
+}
+
+/* ===== 主体 ===== */
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:40px;
+}
+
+/* ===== dashboard模块 ===== */
+.section-title{
+  color:#aaa;
+  font-size:12px;
+  letter-spacing:2px;
+  margin-top:50px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  margin-top:20px;
+}
+
+.card{
+  border:1px solid #1a1a1a;
+  padding:16px;
+  border-radius:10px;
+  background:#0a0a0a;
+}
+
+.card h2{
+  font-size:16px;
+  margin:0 0 6px 0;
+}
+
+.card p{
+  font-size:12px;
+  color:#777;
+}
+
+/* ===== 编辑列表 ===== */
+.editor{
+  border:1px solid #1a1a1a;
+  padding:16px;
+  border-radius:10px;
+  margin-bottom:14px;
+}
+
+input,textarea,select{
+  width:100%;
+  background:#111;
+  color:#fff;
+  border:1px solid #222;
+  padding:8px;
+  margin-top:6px;
+}
+
+textarea{
+  min-height:80px;
+}
+
+button{
+  margin-top:10px;
+  padding:6px 10px;
+  background:#111;
+  color:#aaa;
+  border:1px solid #222;
+  cursor:pointer;
+}
+
+button:hover{
+  border-color:#555;
+  color:#fff;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+</style>
 </head>
 
 <body>
 
-<header class="topbar">
-  <div class="logo">YUNHENODE CMS</div>
-  <nav>
-    <a href="index.html">网站首页</a>
-    <a href="admin.html">后台首页</a>
+<header>
+  <div>YUNHENODE CMS</div>
+  <div>
+    <a href="index.html">首页</a>
     <a href="publish.html">新建内容</a>
-    <a href="content-list.json">数据库</a>
-  </nav>
+  </div>
 </header>
 
-<main class="home">
+<div class="container">
 
-<p class="eyebrow">DASHBOARD</p>
+<!-- =========================
+     DASHBOARD入口
+========================= -->
+<p class="section-title">DASHBOARD</p>
+
 <h1>后台首页</h1>
-<p class="intro">这里管理视频、文章、案例和关于我页面。</p>
+<p style="color:#777;">统一管理视频 / 文章 / 案例 / 关于我</p>
 
-<h2>视频管理</h2>
 <div class="grid">
-  <a class="card" href="publish.html?type=video"><h2>上传视频</h2><p>发布新视频内容。</p></a>
-  <a class="card" href="video.html"><h2>视频列表</h2><p>查看所有视频。</p></a>
+
+  <div class="card">
+    <h2>视频管理</h2>
+    <p>上传 / 编辑 / 删除视频内容</p>
+    <a href="video.html">进入</a>
+  </div>
+
+  <div class="card">
+    <h2>文章管理</h2>
+    <p>文章发布与内容管理</p>
+    <a href="article.html">进入</a>
+  </div>
+
+  <div class="card">
+    <h2>案例管理</h2>
+    <p>平台 / 城市 / 品牌案例</p>
+    <a href="case.html">进入</a>
+  </div>
+
+  <div class="card">
+    <h2>关于我</h2>
+    <p>个人页面内容管理</p>
+    <a href="about.html">进入</a>
+  </div>
+
 </div>
 
-<h2 style="margin-top:70px;">文章管理</h2>
-<div class="grid">
-  <a class="card" href="publish.html?type=article"><h2>上传文章</h2><p>发布新文章内容。</p></a>
-  <a class="card" href="article.html"><h2>文章列表</h2><p>查看所有文章。</p></a>
+<!-- =========================
+     CONTENT MANAGEMENT
+========================= -->
+<p class="section-title">CONTENT MANAGER</p>
+
+<h2>全部内容管理</h2>
+
+<div id="list"></div>
+
 </div>
 
-<h2 style="margin-top:70px;">案例管理</h2>
-<div class="grid">
-  <a class="card" href="publish.html?type=case"><h2>上传案例</h2><p>发布新案例内容。</p></a>
-  <a class="card" href="case.html"><h2>案例列表</h2><p>查看所有案例。</p></a>
-</div>
+<script>
 
-<h2 style="margin-top:70px;">关于我管理</h2>
-<div class="grid">
-  <a class="card" href="about.html"><h2>查看关于我</h2><p>查看前台关于页面。</p></a>
-  <a class="card" href="about-edit.html"><h2>编辑关于我</h2><p>之后做专门编辑页。</p></a>
-</div>
+const SUPABASE_URL = "https://你的项目.supabase.co";
+const KEY = "你的anon key";
 
-</main>
+/* =========================
+   读取全部内容
+========================= */
+async function load(){
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/contents?select=*&order=created_at.desc`,
+    {
+      headers:{
+        apikey:KEY,
+        Authorization:`Bearer ${KEY}`
+      }
+    }
+  );
+
+  const data = await res.json();
+
+  const box = document.getElementById("list");
+
+  box.innerHTML = data.map(item=>`
+    <div class="editor">
+
+      <small style="color:#777;">
+        ${item.type} / ${item.topic || "未分类"}
+      </small>
+
+      <input id="t-${item.id}" value="${item.title}" />
+
+      <textarea id="i-${item.id}">${item.intro || ""}</textarea>
+
+      <select id="s-${item.id}">
+        <option value="published" ${item.status==="published"?"selected":""}>published</option>
+        <option value="draft" ${item.status==="draft"?"selected":""}>draft</option>
+      </select>
+
+      <div class="row">
+        <button onclick="update(${item.id})">保存修改</button>
+        <button onclick="del(${item.id})">删除</button>
+      </div>
+
+    </div>
+  `).join("");
+}
+
+/* =========================
+   更新内容
+========================= */
+async function update(id){
+
+  const title = document.getElementById("t-"+id).value;
+  const intro = document.getElementById("i-"+id).value;
+  const status = document.getElementById("s-"+id).value;
+
+  await fetch(`${SUPABASE_URL}/rest/v1/contents?id=eq.${id}`,{
+    method:"PATCH",
+    headers:{
+      apikey:KEY,
+      Authorization:`Bearer ${KEY}`,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      title,
+      intro,
+      status
+    })
+  });
+
+  alert("已更新");
+  load();
+}
+
+/* =========================
+   删除内容
+========================= */
+async function del(id){
+
+  await fetch(`${SUPABASE_URL}/rest/v1/contents?id=eq.${id}`,{
+    method:"DELETE",
+    headers:{
+      apikey:KEY,
+      Authorization:`Bearer ${KEY}`
+    }
+  });
+
+  alert("已删除");
+  load();
+}
+
+/* init */
+load();
+
+</script>
 
 </body>
 </html>
