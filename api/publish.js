@@ -15,30 +15,32 @@ module.exports = async function handler(req, res) {
       ? JSON.parse(req.body)
       : req.body;
 
+    console.log("DATA:", data);
+
     const { title, intro, body, video, type, topic } = data;
 
     if (!title || !body) {
       return res.status(400).json({
-        success: false,
-        error: "title/body 必填"
+        error: "title/body missing"
       });
     }
 
-    const slug = `post-${Date.now()}`;
-
-    const { error } = await supabase.from("contents").insert([
-      {
-        slug,
-        title,
-        intro: intro || "",
-        body,
-        video: video || "",
-        type: type || "article",
-        topic: topic || "未分类"
-      }
-    ]);
+    const { data: result, error } = await supabase
+      .from("contents")
+      .insert([
+        {
+          title,
+          intro: intro || "",
+          body,
+          video: video || "",
+          type: type || "article",
+          topic: topic || "未分类"
+        }
+      ])
+      .select();
 
     if (error) {
+      console.log("SUPABASE ERROR:", error);
       return res.status(500).json({
         step: "supabase_insert",
         error
@@ -47,8 +49,7 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      slug,
-      url: `/content.html?slug=${slug}`
+      data: result
     });
 
   } catch (e) {
