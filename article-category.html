@@ -1,36 +1,124 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><title>文章分类｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<head>
+<meta charset="UTF-8">
+<title>文章分类｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+/* 轻量增强：不改你原设计，只修数据层 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.card {
+  border: 1px solid #1a1a1a;
+  padding: 16px;
+  border-radius: 10px;
+  background: #0a0a0a;
+  color: #eaeaea;
+  text-decoration: none;
+}
+
+.card span {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.card h2 {
+  margin: 10px 0 6px;
+  font-size: 16px;
+}
+
+.card p {
+  font-size: 12px;
+  opacity: 0.6;
+}
+</style>
+</head>
+
 <body>
-<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="article.html">返回文章</a><a href="admin.html">后台</a></nav></header>
+
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="article.html">返回文章</a>
+    <a href="index.html">首页</a>
+  </nav>
+</header>
+
 <main class="home">
+
 <p class="eyebrow">ARTICLE / CATEGORY</p>
 <h1>文章分类</h1>
 <p class="intro">按研究主题查看文章。</p>
+
 <div id="category-list" class="grid"></div>
+
 </main>
 
 <script>
-const topics = ["品牌","平台","城市","组织","消费","艺术","空间","梦境"];
+// =======================
+// 1️⃣ Supabase 配置（必须填）
+// =======================
+const SUPABASE_URL = "https://你的项目.supabase.co";
+const SUPABASE_KEY = "你的anon/public key";
 
-async function loadCategories(){
-  const res = await fetch("content-list.json");
+// =======================
+// 2️⃣ 分类定义（固定结构）
+// =======================
+const topics = [
+  "品牌",
+  "平台",
+  "城市",
+  "组织",
+  "消费",
+  "艺术",
+  "空间",
+  "梦境"
+];
+
+// =======================
+// 3️⃣ 拉取 Supabase 数据
+// =======================
+async function loadCategories() {
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/contents?select=topic,type`
+    ,{
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
   const data = await res.json();
-  const articles = data.filter(item => item.type === "article");
+
+  const articles = data.filter(i => i.type === "article");
+
   const box = document.getElementById("category-list");
 
   box.innerHTML = topics.map(topic => {
-    const count = articles.filter(item => item.topic === topic || item.tag === topic).length;
+
+    const count = articles.filter(
+      item => item.topic === topic
+    ).length;
+
     return `
       <a class="card" href="article-topic.html?topic=${encodeURIComponent(topic)}">
         <span>${count} 篇</span>
         <h2>${topic}</h2>
-        <p>查看${topic}相关文章。</p>
+        <p>查看 ${topic} 相关文章</p>
       </a>
     `;
   }).join("");
 }
+
 loadCategories();
 </script>
+
 </body>
 </html>
