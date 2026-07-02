@@ -9,7 +9,10 @@ module.exports = async function handler(req, res) {
   console.log("➡️ publish called");
 
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST allowed" });
+    return res.status(405).json({
+      success: false,
+      error: "Only POST allowed"
+    });
   }
 
   try {
@@ -39,12 +42,12 @@ module.exports = async function handler(req, res) {
     }
 
     // =========================
-    // 2️⃣ slug（用于前端链接）
+    // 2️⃣ slug 生成
     // =========================
     const slug = `post-${Date.now()}`;
 
     // =========================
-    // 3️⃣ 写入 Supabase（唯一数据源）
+    // 3️⃣ 写入 Supabase（统一标准写法）
     // =========================
     const { data: result, error } = await supabase
       .from("contents")
@@ -73,7 +76,7 @@ module.exports = async function handler(req, res) {
     }
 
     // =========================
-    // 4️⃣ 返回（前端必须用这个）
+    // 4️⃣ 返回统一结构（前端依赖这个）
     // =========================
     return res.status(200).json({
       success: true,
