@@ -13,10 +13,24 @@
 
 <script>
 async function loadTopic(){
-  const params = new URLSearchParams(window.location.search);
-  const topic = params.get("topic");
+ const params = new URLSearchParams(location.search);
+const topic = params.get("topic");
 
-  document.getElementById("title").textContent = topic + "文章";
+fetch(`${SUPABASE_URL}/rest/v1/contents?topic=eq.${topic}`, {
+  headers:{
+    apikey: KEY,
+    Authorization:`Bearer ${KEY}`
+  }
+})
+.then(r=>r.json())
+.then(data=>{
+  document.getElementById("list").innerHTML = data.map(item=>`
+    <a href="content.html?slug=${item.slug}" class="card">
+      <h2>${item.title}</h2>
+      <p>${item.intro}</p>
+    </a>
+  `).join("");
+});
 
   const res = await fetch("content-list.json");
   const data = await res.json();
