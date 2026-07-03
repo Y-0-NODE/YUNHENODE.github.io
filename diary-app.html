@@ -278,6 +278,7 @@ select{
       <h1>内部日记</h1>
       <div id="count" class="sync">0 篇</div>
     </div>
+    <div id="sync-mode" class="sync">正在等待登录</div>
 
     <input id="search" class="search" type="search" placeholder="搜索日记" oninput="renderList()">
 
@@ -369,6 +370,10 @@ function persist(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 }
 
+function setSyncMode(text){
+  document.getElementById("sync-mode").textContent = text;
+}
+
 function normalizeEntry(entry){
   return {
     id: entry.id || uid(),
@@ -416,18 +421,28 @@ async function unlock(){
 
     if(res.ok){
       cloudMode = true;
-      entries = (result.data || []).map(normalizeEntry);
+      const cloudEntries = (result.data || []).map(normalizeEntry);
+      const localEntries = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]").map(normalizeEntry);
+      const merged = new Map();
+
+      localEntries.forEach(entry => merged.set(entry.id, entry));
+      cloudEntries.forEach(entry => merged.set(entry.id, entry));
+
+      entries = Array.from(merged.values());
       persist();
       status.textContent = "";
+      setSyncMode("云端模式：已连接 Supabase");
     }else{
       cloudMode = false;
       loadEntries();
       status.textContent = result.error || "云端登录失败，已进入本机模式。";
+      setSyncMode("本机模式：云端还没连上");
     }
   }catch(err){
     cloudMode = false;
     loadEntries();
     status.textContent = "当前离线或接口未部署，已进入本机模式。";
+    setSyncMode("本机模式：云端接口不可用");
   }
 
   document.getElementById("lock").hidden = true;
@@ -525,6 +540,13 @@ function showEditor(entry){
 
 function markDirty(){
   dirty = true;
+  const existing = entries.find(item => item.id === activeId);
+
+  if(existing){
+    Object.assign(existing, collectEditorEntry(existing));
+    persist();
+    renderList();
+  }
 }
 
 async function saveEntry(){
@@ -548,6 +570,7 @@ async function saveEntry(){
   renderList();
 
   if(cloudMode){
+    setSyncMode("云端模式：正在保存...");
     const res = await fetch("./api/diary-save", {
       method:"POST",
       headers:{
@@ -563,7 +586,12 @@ async function saveEntry(){
     if(!res.ok){
       const result = await res.json().catch(() => ({}));
       alert(result.error || "云端保存失败，已保存在本机。");
+      setSyncMode("本机已保存，云端保存失败");
+    }else{
+      setSyncMode("云端模式：已保存");
     }
+  }else{
+    setSyncMode("本机模式：已保存到当前设备");
   }
 }
 
