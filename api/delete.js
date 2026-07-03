@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
     const expectedAdminName =
       process.env.DATA_ADMIN_NAME ||
       process.env.ADMIN_NAME ||
-      "admin";
+      "YUNHE";
 
     if (!adminPassword) {
       return res.status(500).json({
