@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据备份｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.panel{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+  margin-top:36px;
+}
+
+.panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.panel input{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.panel button{
+  margin-top:18px;
+  border:1px solid #2a2a2a;
+  background:#f2f2f2;
+  color:#0b0b0b;
+  padding:12px 14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.status{
+  color:#aaa;
+  margin-top:18px;
+  line-height:1.7;
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="admin.html">后台首页</a>
+    <a href="index.html">网站首页</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">BACKUP</p>
+  <h1>数据备份</h1>
+  <p class="intro">导出网站文章、内部日记、摄影影像作品索引和删除前备份。</p>
+
+  <section class="panel">
+    <label for="admin-name">账户名称</label>
+    <input id="admin-name" type="text" value="YUNHE">
+
+    <label for="admin-password">账户密码</label>
+    <input id="admin-password" type="password">
+
+    <button type="button" onclick="downloadBackup()">下载备份</button>
+    <div id="status" class="status"></div>
+  </section>
+</main>
+
+<script>
+async function downloadBackup(){
+  const status = document.getElementById("status");
+  status.textContent = "正在生成备份...";
+
+  const res = await fetch("./api/backup", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      adminName:document.getElementById("admin-name").value.trim(),
+      password:document.getElementById("admin-password").value.trim()
+    })
+  });
+
+  const result = await res.json().catch(() => ({}));
+
+  if(!res.ok){
+    status.textContent = result.error || "备份失败。";
+    return;
+  }
+
+  const blob = new Blob([JSON.stringify(result.backup, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `yunhe-backup-${new Date().toISOString().slice(0,10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  status.textContent = "备份已下载。";
+}
+</script>
+</body>
+</html>
