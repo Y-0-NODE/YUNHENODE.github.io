@@ -156,14 +156,26 @@ async function publish(id){
 
 /* 删除 */
 async function del(id){
+  const password = prompt("请输入管理员密码");
 
-  await fetch(`${SUPABASE_URL}/rest/v1/contents?id=eq.${id}`,{
-    method:"DELETE",
+  if(!password) return;
+
+  const res = await fetch("/api/delete",{
+    method:"POST",
     headers:{
-      apikey:SUPABASE_KEY,
-      Authorization:`Bearer ${SUPABASE_KEY}`
-    }
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      id,
+      password
+    })
   });
+
+  if(!res.ok){
+    const result = await res.json().catch(() => ({}));
+    alert(result.error || "删除失败，请检查管理员密码或 Vercel 环境变量。");
+    return;
+  }
 
   alert("已删除");
   loadDraft();
