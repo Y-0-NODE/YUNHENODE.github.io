@@ -34,3 +34,4 @@ module.exports = async function handler(req, res) {
     message: "这里只显示环境变量是否存在，以及 SUPABASE_SERVICE_ROLE_KEY 的角色，不显示任何密码或密钥内容"
   });
 };
+
