@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.admin-grid{
+  margin-top:56px;
+}
+
+.admin-note{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+  margin-top:56px;
+  color:#aaa;
+  line-height:1.8;
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="index.html">网站首页</a>
+    <a href="publish.html">新建内容</a>
+    <a href="article-manage.html">文章管理</a>
+    <a href="diary.html">内部日记</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">ADMIN CENTER</p>
+  <h1>后台</h1>
+  <p class="intro">集中管理发布、文章、草稿与内部记录。</p>
+
+  <div class="grid admin-grid">
+    <a class="card" href="publish.html">
+      <span>01</span>
+      <h2>新建内容</h2>
+      <p>发布文章、视频、案例。</p>
+    </a>
+
+    <a class="card" href="article-manage.html">
+      <span>02</span>
+      <h2>文章管理</h2>
+      <p>搜索、编辑、删除文章。</p>
+    </a>
+
+    <a class="card" href="article-draft.html">
+      <span>03</span>
+      <h2>草稿箱</h2>
+      <p>检查未发布内容。</p>
+    </a>
+
+    <a class="card" href="diary.html">
+      <span>04</span>
+      <h2>内部日记</h2>
+      <p>私人记录入口，下一步接电脑 App。</p>
+    </a>
+  </div>
+
+  <div class="admin-note">
+    管理后台使用 Vercel 环境变量进行验证。管理员名称填写环境变量名，例如 YUNHE；密码填写该环境变量对应的值。
+  </div>
+</main>
+
+</body>
+</html>
