@@ -1,5 +1,7 @@
 const { createClient } = require("@supabase/supabase-js");
 
+const DELETE_API_VERSION = "delete-api-2026-07-03-check-after-delete-v2";
+
 function checkAdmin(adminName, password) {
   if (!adminName || !password) {
     return {
@@ -81,6 +83,14 @@ async function findArticle(supabase, { id, slug, title }) {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
+
+  if (req.method === "GET") {
+    return res.status(200).json({
+      success: true,
+      version: DELETE_API_VERSION,
+      message: "这是删除接口版本检查。看到 check-after-delete-v2 才说明 GitHub/Vercel 已经更新到新版。"
+    });
+  }
 
   if (req.method !== "POST") {
     return res.status(405).json({
