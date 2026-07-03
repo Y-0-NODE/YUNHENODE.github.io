@@ -5,6 +5,40 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+function checkAdmin(adminName, password) {
+  if (!adminName || !password) {
+    return {
+      ok: false,
+      status: 400,
+      error: "请填写数据管理员名称和密码"
+    };
+  }
+
+  // 你在 Vercel 里新增的环境变量名就是管理员名称。
+  // 例如：环境变量名 YUNHE，值是密码；页面登录时名称填 YUNHE。
+  const passwordFromNamedVariable = process.env[adminName];
+  const fallbackPassword = process.env.PUBLISH_PASSWORD;
+  const expectedPassword = passwordFromNamedVariable || fallbackPassword;
+
+  if (!expectedPassword) {
+    return {
+      ok: false,
+      status: 500,
+      error: `Vercel 里没有找到名为 ${adminName} 的环境变量，也没有找到 PUBLISH_PASSWORD`
+    };
+  }
+
+  if (password !== expectedPassword) {
+    return {
+      ok: false,
+      status: 401,
+      error: "数据管理员名称或密码错误"
+    };
+  }
+
+  return { ok: true };
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -19,36 +53,12 @@ module.exports = async function handler(req, res) {
       : req.body;
 
     const { id, adminName, password } = data || {};
+    const auth = checkAdmin(adminName, password);
 
-    const adminPassword =
-      process.env.ADMIN_PASSWORD ||
-      process.env.PUBLISH_PASSWORD ||
-      process.env.SITE_PASSWORD ||
-      process.env.PASSWORD;
-
-    const expectedAdminName =
-      process.env.DATA_ADMIN_NAME ||
-      process.env.ADMIN_NAME ||
-      "YUNHE";
-
-    if (!adminPassword) {
-      return res.status(500).json({
+    if (!auth.ok) {
+      return res.status(auth.status).json({
         success: false,
-        error: "管理员密码没有在 Vercel 环境变量里配置"
-      });
-    }
-
-    if (adminName !== expectedAdminName) {
-      return res.status(401).json({
-        success: false,
-        error: "数据管理员名称错误"
-      });
-    }
-
-    if (password !== adminPassword) {
-      return res.status(401).json({
-        success: false,
-        error: "管理员密码错误"
+        error: auth.error
       });
     }
 
