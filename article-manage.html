@@ -161,7 +161,7 @@ function render(list){
       <p>${item.intro || ""}</p>
       <div class="actions">
         <a href="${articleUrl(item)}">打开文章</a>
-        <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${String(item.title || "").replace(/'/g, "\\'")}')">删除文章</button>
+        <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除文章</button>
       </div>
     </div>
   `).join("");
@@ -234,8 +234,10 @@ async function reloadArticles(){
   }
 }
 
-async function deleteArticle(id, title){
-  const name = title || `ID ${id}`;
+async function deleteArticle(id, encodedSlug, encodedTitle){
+  const slug = decodeURIComponent(encodedSlug || "");
+  const title = decodeURIComponent(encodedTitle || "");
+  const name = title || slug || `ID ${id}`;
   const ok = confirm(`确定删除「${name}」吗？删除后不能在网站里恢复。`);
 
   if(!ok) return;
@@ -247,6 +249,8 @@ async function deleteArticle(id, title){
     },
     body:JSON.stringify({
       id,
+      slug,
+      title,
       adminName: ADMIN_NAME,
       password: ADMIN_PASSWORD
     })
