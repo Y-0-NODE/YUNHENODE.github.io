@@ -7,7 +7,9 @@
 <link rel="stylesheet" href="style.css">
 <style>
 .login-panel,
-.manage-item{
+.manage-item,
+.editor-panel,
+.tool-panel{
   border:1px solid #2a2a2a;
   background:#111;
   padding:22px;
@@ -32,9 +34,22 @@
   padding:12px;
 }
 
+.tool-panel{
+  margin-top:28px;
+}
+
+.tool-panel input{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
 .login-panel button,
 .actions a,
-.actions button{
+.actions button,
+.editor-actions button{
   border:1px solid #2a2a2a;
   background:#0b0b0b;
   color:#ddd;
@@ -55,7 +70,8 @@
 
 .login-panel button:hover,
 .actions a:hover,
-.actions button:hover{
+.actions button:hover,
+.editor-actions button:hover{
   background:#dcdcdc;
 }
 
@@ -93,6 +109,38 @@
   line-height:1.7;
 }
 
+.editor-panel{
+  margin-top:32px;
+}
+
+.editor-panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.editor-panel input,
+.editor-panel select,
+.editor-panel textarea{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.editor-panel textarea{
+  min-height:160px;
+  resize:vertical;
+}
+
+.editor-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
 .hidden{
   display:none;
 }
@@ -128,6 +176,42 @@
   </section>
 
   <section id="manager-panel" class="hidden">
+    <div class="tool-panel">
+      <input id="search" type="search" placeholder="搜索标题、简介、主题" oninput="applySearch()">
+    </div>
+
+    <section id="editor-panel" class="editor-panel hidden">
+      <p class="eyebrow">EDIT ARTICLE</p>
+      <h2 id="editor-heading">编辑文章</h2>
+
+      <label for="edit-title">标题</label>
+      <input id="edit-title" type="text">
+
+      <label for="edit-intro">简介</label>
+      <textarea id="edit-intro"></textarea>
+
+      <label for="edit-topic">主题</label>
+      <select id="edit-topic">
+        <option value="平台">平台</option>
+        <option value="品牌">品牌</option>
+        <option value="城市">城市</option>
+        <option value="组织">组织</option>
+        <option value="消费">消费</option>
+        <option value="艺术">艺术</option>
+        <option value="空间">空间</option>
+        <option value="梦境">梦境</option>
+        <option value="未分类">未分类</option>
+      </select>
+
+      <label for="edit-body">正文</label>
+      <textarea id="edit-body"></textarea>
+
+      <div class="editor-actions">
+        <button type="button" onclick="saveEdit()">保存修改</button>
+        <button type="button" onclick="closeEditor()">取消</button>
+      </div>
+    </section>
+
     <div id="status" class="status">正在加载文章...</div>
     <div id="list" class="manage-list"></div>
   </section>
@@ -137,6 +221,7 @@
 let DATA = [];
 let ADMIN_NAME = "";
 let ADMIN_PASSWORD = "";
+let EDITING_ID = "";
 
 function articleUrl(item){
   if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
@@ -161,10 +246,30 @@ function render(list){
       <p>${item.intro || ""}</p>
       <div class="actions">
         <a href="${articleUrl(item)}">打开文章</a>
+        <button type="button" onclick="openEditor('${item.id}')">编辑文章</button>
         <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除文章</button>
       </div>
     </div>
   `).join("");
+}
+
+function applySearch(){
+  const q = document.getElementById("search").value.trim().toLowerCase();
+
+  if(!q){
+    render(DATA);
+    return;
+  }
+
+  render(DATA.filter(item => {
+    return [
+      item.title,
+      item.intro,
+      item.topic,
+      item.type,
+      item.slug
+    ].some(value => String(value || "").toLowerCase().includes(q));
+  }));
 }
 
 async function login(){
@@ -230,8 +335,72 @@ async function reloadArticles(){
 
   if(res.ok){
     DATA = Array.isArray(result.data) ? result.data : [];
-    render(DATA);
+    applySearch();
   }
+}
+
+function openEditor(id){
+  const item = DATA.find(row => String(row.id) === String(id));
+
+  if(!item){
+    alert("没有找到这篇文章，请刷新管理页。");
+    return;
+  }
+
+  EDITING_ID = String(item.id);
+  document.getElementById("editor-heading").textContent = `编辑文章：${item.title || "未命名文章"}`;
+  document.getElementById("edit-title").value = item.title || "";
+  document.getElementById("edit-intro").value = item.intro || "";
+  document.getElementById("edit-topic").value = item.topic || "未分类";
+  document.getElementById("edit-body").value = item.body || "";
+  document.getElementById("editor-panel").classList.remove("hidden");
+  document.getElementById("editor-panel").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+function closeEditor(){
+  EDITING_ID = "";
+  document.getElementById("editor-panel").classList.add("hidden");
+}
+
+async function saveEdit(){
+  if(!EDITING_ID){
+    alert("没有正在编辑的文章。");
+    return;
+  }
+
+  const payload = {
+    id: EDITING_ID,
+    title: document.getElementById("edit-title").value.trim(),
+    intro: document.getElementById("edit-intro").value.trim(),
+    topic: document.getElementById("edit-topic").value,
+    body: document.getElementById("edit-body").value.trim(),
+    adminName: ADMIN_NAME,
+    password: ADMIN_PASSWORD
+  };
+
+  if(!payload.title || !payload.body){
+    alert("标题和正文不能为空。");
+    return;
+  }
+
+  const res = await fetch("/api/update", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify(payload)
+  });
+
+  const result = await res.json().catch(() => ({}));
+
+  if(!res.ok){
+    alert(result.error || "保存失败，请检查接口或环境变量。");
+    return;
+  }
+
+  alert("已保存");
+  closeEditor();
+  await reloadArticles();
 }
 
 async function deleteArticle(id, encodedSlug, encodedTitle){
