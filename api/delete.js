@@ -139,11 +139,10 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const { data: deletedRows, error } = await supabase
+    const { error } = await supabase
       .from("contents")
       .delete()
-      .eq("id", found.article.id)
-      .select("id,title");
+      .eq("id", found.article.id);
 
     if (error) {
       return res.status(500).json({
@@ -152,10 +151,23 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    if (!deletedRows || deletedRows.length === 0) {
-      return res.status(404).json({
+    const { data: remainingRows, error: verifyError } = await supabase
+      .from("contents")
+      .select("id")
+      .eq("id", found.article.id)
+      .limit(1);
+
+    if (verifyError) {
+      return res.status(500).json({
         success: false,
-        error: `已经找到文章「${found.article.title}」，但 Supabase 删除后没有返回被删除记录，请检查 contents 表权限`
+        error: verifyError.message || verifyError
+      });
+    }
+
+    if (remainingRows && remainingRows.length > 0) {
+      return res.status(500).json({
+        success: false,
+        error: `已经找到文章「${found.article.title}」，但删除后它仍然存在。请检查 SUPABASE_SERVICE_ROLE_KEY 是否真的是 service_role 密钥。`
       });
     }
 
@@ -163,7 +175,10 @@ module.exports = async function handler(req, res) {
       success: true,
       id: found.article.id,
       matchedBy: found.matchedBy,
-      deleted: deletedRows[0]
+      deleted: {
+        id: found.article.id,
+        title: found.article.title
+      }
     });
 
   } catch (e) {
