@@ -6,16 +6,58 @@
 <title>文章管理｜云鹤系统</title>
 <link rel="stylesheet" href="style.css">
 <style>
-.manage-list{
-  display:grid;
-  gap:14px;
-  margin-top:40px;
-}
-
+.login-panel,
 .manage-item{
   border:1px solid #2a2a2a;
   background:#111;
   padding:22px;
+}
+
+.login-panel{
+  margin-top:36px;
+  max-width:520px;
+}
+
+.login-panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 10px;
+}
+
+.login-panel input{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.login-panel button,
+.actions a,
+.actions button{
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#ddd;
+  padding:10px 14px;
+  text-decoration:none;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.login-panel button{
+  margin-top:18px;
+}
+
+.login-panel button:hover,
+.actions a:hover,
+.actions button:hover{
+  background:#181818;
+}
+
+.manage-list{
+  display:grid;
+  gap:14px;
+  margin-top:40px;
 }
 
 .manage-item h2{
@@ -35,22 +77,6 @@
   margin-top:18px;
 }
 
-.actions a,
-.actions button{
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#ddd;
-  padding:10px 14px;
-  text-decoration:none;
-  cursor:pointer;
-  font-size:14px;
-}
-
-.actions a:hover,
-.actions button:hover{
-  background:#181818;
-}
-
 .actions .danger{
   color:#ff9a9a;
   border-color:#4a2525;
@@ -58,31 +84,12 @@
 
 .status{
   color:#888;
-  margin-top:36px;
+  margin-top:28px;
   line-height:1.7;
 }
 
-.password-panel{
-  border:1px solid #2a2a2a;
-  background:#111;
-  padding:18px;
-  margin-top:36px;
-}
-
-.password-panel label{
-  display:block;
-  color:#aaa;
-  margin-bottom:10px;
-}
-
-.password-panel input{
-  width:100%;
-  max-width:420px;
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-  margin-bottom:14px;
+.hidden{
+  display:none;
 }
 </style>
 </head>
@@ -102,26 +109,28 @@
 <main class="home">
   <p class="eyebrow">ARTICLE MANAGEMENT</p>
   <h1>文章管理</h1>
-  <p class="intro">这里用于打开、检查和删除 Supabase 里的文章。</p>
+  <p class="intro">先登录数据管理员账户，再管理和删除文章。</p>
 
-  <div class="password-panel">
+  <section id="login-panel" class="login-panel">
     <label for="admin-name">数据管理员名称</label>
-    <input id="admin-name" type="text" autocomplete="username" placeholder="默认：admin">
+    <input id="admin-name" type="text" autocomplete="username" placeholder="填写你的环境变量名称，例如 YUNHE">
 
-    <label for="admin-password">管理员密码</label>
-    <input id="admin-password" type="password" autocomplete="current-password" placeholder="输入 PUBLISH_PASSWORD 对应的密码">
-  </div>
+    <label for="admin-password">数据管理员密码</label>
+    <input id="admin-password" type="password" autocomplete="current-password" placeholder="填写这个环境变量对应的密码">
 
-  <div id="status" class="status">正在加载文章...</div>
-  <div id="list" class="manage-list"></div>
+    <button type="button" onclick="login()">登录管理</button>
+  </section>
+
+  <section id="manager-panel" class="hidden">
+    <div id="status" class="status">正在加载文章...</div>
+    <div id="list" class="manage-list"></div>
+  </section>
 </main>
 
 <script>
-const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
-const API = `${SUPABASE_URL}/rest/v1/contents?select=id,title,slug,intro,type,topic,created_at&type=eq.article&order=created_at.desc`;
-
 let DATA = [];
+let ADMIN_NAME = "";
+let ADMIN_PASSWORD = "";
 
 function articleUrl(item){
   if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
@@ -152,41 +161,71 @@ function render(list){
   `).join("");
 }
 
-async function loadArticles(){
-  try{
-    const res = await fetch(API, {
-      headers:{
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`
-      }
-    });
+async function login(){
+  ADMIN_NAME = document.getElementById("admin-name").value.trim();
+  ADMIN_PASSWORD = document.getElementById("admin-password").value.trim();
 
-    if(!res.ok) throw new Error("load failed");
+  if(!ADMIN_NAME){
+    alert("请填写数据管理员名称。例如：YUNHE");
+    document.getElementById("admin-name").focus();
+    return;
+  }
 
-    DATA = await res.json();
-    render(Array.isArray(DATA) ? DATA : []);
-  }catch(err){
-    document.getElementById("status").textContent = "文章加载失败，请检查 Supabase 配置。";
+  if(!ADMIN_PASSWORD){
+    alert("请填写数据管理员密码。");
+    document.getElementById("admin-password").focus();
+    return;
+  }
+
+  document.getElementById("status").textContent = "正在登录...";
+  document.getElementById("manager-panel").classList.remove("hidden");
+
+  const res = await fetch("/api/admin-list", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      adminName: ADMIN_NAME,
+      password: ADMIN_PASSWORD
+    })
+  });
+
+  const result = await res.json().catch(() => ({}));
+
+  if(!res.ok){
+    document.getElementById("manager-panel").classList.add("hidden");
+    alert(result.error || "登录失败，请检查 Vercel 环境变量名称和密码。");
+    return;
+  }
+
+  document.getElementById("login-panel").classList.add("hidden");
+  DATA = Array.isArray(result.data) ? result.data : [];
+  render(DATA);
+}
+
+async function reloadArticles(){
+  const res = await fetch("/api/admin-list", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      adminName: ADMIN_NAME,
+      password: ADMIN_PASSWORD
+    })
+  });
+
+  const result = await res.json().catch(() => ({}));
+
+  if(res.ok){
+    DATA = Array.isArray(result.data) ? result.data : [];
+    render(DATA);
   }
 }
 
 async function deleteArticle(id, title){
   const name = title || `ID ${id}`;
-  const adminName = document.getElementById("admin-name").value.trim();
-  const password = document.getElementById("admin-password").value.trim();
-
-  if(!adminName){
-    alert("请先输入数据管理员名称。");
-    document.getElementById("admin-name").focus();
-    return;
-  }
-
-  if(!password){
-    alert("请先输入管理员密码。");
-    document.getElementById("admin-password").focus();
-    return;
-  }
-
   const ok = confirm(`确定删除「${name}」吗？删除后不能在网站里恢复。`);
 
   if(!ok) return;
@@ -198,25 +237,23 @@ async function deleteArticle(id, title){
     },
     body:JSON.stringify({
       id,
-      adminName,
-      password
+      adminName: ADMIN_NAME,
+      password: ADMIN_PASSWORD
     })
   });
 
   const result = await res.json().catch(() => ({}));
 
   if(!res.ok){
-    alert(result.error || "删除失败，请检查管理员密码或 Vercel 环境变量。");
+    alert(result.error || "删除失败，请检查 Vercel 环境变量和 Supabase 权限。");
     return;
   }
 
   alert("已删除");
   DATA = DATA.filter(item => String(item.id) !== String(id));
   render(DATA);
-  loadArticles();
+  reloadArticles();
 }
-
-loadArticles();
 </script>
 
 </body>
