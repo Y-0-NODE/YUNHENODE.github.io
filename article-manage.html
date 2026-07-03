@@ -46,12 +46,17 @@
 
 .login-panel button{
   margin-top:18px;
+  width:100%;
+  max-width:420px;
+  background:#f2f2f2;
+  color:#0b0b0b;
+  font-weight:700;
 }
 
 .login-panel button:hover,
 .actions a:hover,
 .actions button:hover{
-  background:#181818;
+  background:#dcdcdc;
 }
 
 .manage-list{
@@ -118,7 +123,8 @@
     <label for="admin-password">数据管理员密码</label>
     <input id="admin-password" type="password" autocomplete="current-password" placeholder="填写这个环境变量对应的密码">
 
-    <button type="button" onclick="login()">登录管理</button>
+    <button type="button" onclick="login()">登录管理后台</button>
+    <div id="login-status" class="status"></div>
   </section>
 
   <section id="manager-panel" class="hidden">
@@ -178,6 +184,7 @@ async function login(){
   }
 
   document.getElementById("status").textContent = "正在登录...";
+  document.getElementById("login-status").textContent = "正在登录...";
   document.getElementById("manager-panel").classList.remove("hidden");
 
   const res = await fetch("/api/admin-list", {
@@ -195,11 +202,14 @@ async function login(){
 
   if(!res.ok){
     document.getElementById("manager-panel").classList.add("hidden");
-    alert(result.error || "登录失败，请检查 Vercel 环境变量名称和密码。");
+    const message = result.error || "登录失败，请检查 Vercel 环境变量名称和密码。";
+    document.getElementById("login-status").textContent = message;
+    alert(message);
     return;
   }
 
   document.getElementById("login-panel").classList.add("hidden");
+  document.getElementById("login-status").textContent = "";
   DATA = Array.isArray(result.data) ? result.data : [];
   render(DATA);
 }
