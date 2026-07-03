@@ -35,6 +35,8 @@ function checkAdmin(adminName, password) {
 }
 
 module.exports = async function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store");
+
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
