@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公众号接入｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.panel,
+.item{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+}
+
+.panel{
+  margin-top:36px;
+}
+
+.panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.panel input{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.actions button,
+.actions a{
+  border:1px solid #2a2a2a;
+  background:#151515;
+  color:#f2f2f2;
+  padding:10px 14px;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.actions .primary{
+  background:#f2f2f2;
+  color:#0b0b0b;
+  font-weight:700;
+}
+
+.status{
+  color:#aaa;
+  margin-top:18px;
+  line-height:1.7;
+}
+
+.list{
+  display:grid;
+  gap:14px;
+  margin-top:32px;
+}
+
+.meta{
+  color:#777;
+  font-size:13px;
+}
+
+.item h2{
+  margin:10px 0;
+  font-size:22px;
+}
+
+.item p{
+  color:#aaa;
+  line-height:1.7;
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="admin.html">后台首页</a>
+    <a href="article-manage.html">文章管理</a>
+    <a href="index.html">网站首页</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">WECHAT CONNECT</p>
+  <h1>公众号接入</h1>
+  <p class="intro">同步公众号“云鹤系统”的图文素材，先进入独立库，再自动归类。</p>
+
+  <section class="panel">
+    <label for="admin-name">账户名称</label>
+    <input id="admin-name" type="text" value="YUNHE">
+
+    <label for="admin-password">账户密码</label>
+    <input id="admin-password" type="password">
+
+    <div class="actions">
+      <button class="primary" type="button" onclick="syncWechat()">同步公众号文章</button>
+      <button type="button" onclick="loadWechat()">刷新列表</button>
+    </div>
+
+    <div id="status" class="status">需要先在 Vercel 添加 WECHAT_APP_ID 和 WECHAT_APP_SECRET。</div>
+  </section>
+
+  <section id="list" class="list"></section>
+</main>
+
+<script>
+function authPayload(){
+  return {
+    adminName:document.getElementById("admin-name").value.trim(),
+    password:document.getElementById("admin-password").value.trim()
+  };
+}
+
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function syncWechat(){
+  const status = document.getElementById("status");
+  status.textContent = "正在同步公众号素材...";
+
+  const res = await fetch("./api/wechat-sync", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(authPayload())
+  });
+
+  const result = await res.json().catch(() => ({}));
+  if(!res.ok){
+    status.textContent = result.error || "同步失败。";
+    return;
+  }
+
+  status.textContent = `同步完成：新增或更新 ${result.count || 0} 篇。`;
+  loadWechat();
+}
+
+async function loadWechat(){
+  const status = document.getElementById("status");
+  const list = document.getElementById("list");
+  status.textContent = "正在读取公众号文章...";
+
+  const res = await fetch("./api/wechat-list", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(authPayload())
+  });
+
+  const result = await res.json().catch(() => ({}));
+  if(!res.ok){
+    status.textContent = result.error || "读取失败。";
+    return;
+  }
+
+  const rows = Array.isArray(result.data) ? result.data : [];
+  status.textContent = rows.length ? `共 ${rows.length} 篇公众号文章。` : "还没有同步到公众号文章。";
+  list.innerHTML = rows.map(item => `
+    <article class="item">
+      <div class="meta">${escapeHtml(item.category)} / ${escapeHtml(item.topic)} / ${escapeHtml(item.status)}</div>
+      <h2>${escapeHtml(item.title)}</h2>
+      <p>${escapeHtml(item.digest || item.ai_summary || "")}</p>
+      <div class="actions">
+        ${item.content_url ? `<a href="${escapeHtml(item.content_url)}" target="_blank" rel="noopener">打开公众号原文</a>` : ""}
+      </div>
+    </article>
+  `).join("");
+}
+</script>
+</body>
+</html>
