@@ -34,6 +34,51 @@ function checkAdmin(adminName, password) {
   return { ok: true };
 }
 
+async function findArticle(supabase, { id, slug, title }) {
+  if (id) {
+    const { data, error } = await supabase
+      .from("contents")
+      .select("id,title,slug")
+      .eq("id", id)
+      .limit(1);
+
+    if (error) return { error };
+    if (data && data.length === 1) return { article: data[0], matchedBy: "id" };
+  }
+
+  if (slug) {
+    const { data, error } = await supabase
+      .from("contents")
+      .select("id,title,slug")
+      .eq("slug", slug)
+      .limit(2);
+
+    if (error) return { error };
+    if (data && data.length === 1) return { article: data[0], matchedBy: "slug" };
+  }
+
+  if (title) {
+    const { data, error } = await supabase
+      .from("contents")
+      .select("id,title,slug")
+      .eq("type", "article")
+      .eq("title", title)
+      .limit(2);
+
+    if (error) return { error };
+    if (data && data.length === 1) return { article: data[0], matchedBy: "title" };
+    if (data && data.length > 1) {
+      return {
+        error: {
+          message: `找到多篇标题同为「${title}」的文章，为避免误删，请刷新管理页后再删除`
+        }
+      };
+    }
+  }
+
+  return { article: null, matchedBy: null };
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -49,7 +94,7 @@ module.exports = async function handler(req, res) {
       ? JSON.parse(req.body)
       : req.body;
 
-    const { id, adminName, password } = data || {};
+    const { id, slug, title, adminName, password } = data || {};
     const auth = checkAdmin(adminName, password);
 
     if (!auth.ok) {
@@ -78,10 +123,26 @@ module.exports = async function handler(req, res) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
+    const found = await findArticle(supabase, { id, slug, title });
+
+    if (found.error) {
+      return res.status(500).json({
+        success: false,
+        error: found.error.message || found.error
+      });
+    }
+
+    if (!found.article) {
+      return res.status(404).json({
+        success: false,
+        error: `Supabase 没有找到这篇文章。页面传来的信息是：ID=${id || "空"}，slug=${slug || "空"}，标题=${title || "空"}。请重新登录管理页刷新列表后再试。`
+      });
+    }
+
     const { data: deletedRows, error } = await supabase
       .from("contents")
       .delete()
-      .eq("id", id)
+      .eq("id", found.article.id)
       .select("id,title");
 
     if (error) {
@@ -94,13 +155,14 @@ module.exports = async function handler(req, res) {
     if (!deletedRows || deletedRows.length === 0) {
       return res.status(404).json({
         success: false,
-        error: `Supabase 没有找到 ID 为 ${id} 的文章，所以没有删除任何内容`
+        error: `已经找到文章「${found.article.title}」，但 Supabase 删除后没有返回被删除记录，请检查 contents 表权限`
       });
     }
 
     return res.status(200).json({
       success: true,
-      id,
+      id: found.article.id,
+      matchedBy: found.matchedBy,
       deleted: deletedRows[0]
     });
 
