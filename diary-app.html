@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内部日记 App｜云鹤系统</title>
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:320px 1fr;
+}
+
+.sidebar{
+  border-right:1px solid #242424;
+  background:#101010;
+  padding:24px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:28px;
+}
+
+.brand h1{
+  font-size:18px;
+  margin:0;
+  letter-spacing:1px;
+}
+
+.sync{
+  color:#8d8d8d;
+  font-size:12px;
+}
+
+.search{
+  width:100%;
+  border:1px solid #303030;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+  margin-bottom:14px;
+}
+
+.toolbar{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.btn{
+  border:1px solid #303030;
+  background:#151515;
+  color:#e8e8e8;
+  padding:10px 12px;
+  cursor:pointer;
+}
+
+.btn:hover{
+  background:#1f1f1f;
+}
+
+.btn.primary{
+  background:#f2f2f2;
+  color:#0b0b0b;
+  font-weight:700;
+}
+
+.btn.danger{
+  color:#ff9b9b;
+  border-color:#4c2727;
+}
+
+.entry-list{
+  display:grid;
+  gap:10px;
+}
+
+.entry-item{
+  border:1px solid #252525;
+  background:#141414;
+  padding:14px;
+  cursor:pointer;
+}
+
+.entry-item.active{
+  border-color:#777;
+  background:#1a1a1a;
+}
+
+.entry-item h2{
+  font-size:15px;
+  margin:0 0 8px;
+  line-height:1.35;
+}
+
+.entry-item p{
+  color:#858585;
+  margin:0;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.main{
+  padding:32px;
+  min-width:0;
+}
+
+.topline{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:center;
+  margin-bottom:22px;
+}
+
+.topline .date{
+  color:#8d8d8d;
+  font-size:13px;
+}
+
+.editor{
+  display:grid;
+  gap:14px;
+  max-width:980px;
+}
+
+.editor input,
+.editor textarea,
+.editor select{
+  width:100%;
+  border:1px solid #2d2d2d;
+  background:#101010;
+  color:#f2f2f2;
+  padding:13px;
+}
+
+.title-input{
+  font-size:28px;
+  font-weight:700;
+}
+
+.meta-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
+}
+
+.body-input{
+  min-height:420px;
+  line-height:1.8;
+  resize:vertical;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.empty{
+  border:1px solid #2a2a2a;
+  background:#111;
+  color:#aaa;
+  padding:28px;
+  max-width:680px;
+  line-height:1.8;
+}
+
+.lock{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
+
+.lock-card{
+  width:min(460px,100%);
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:28px;
+}
+
+.lock-card h1{
+  margin:0 0 10px;
+  font-size:28px;
+}
+
+.lock-card p{
+  color:#aaa;
+  line-height:1.7;
+}
+
+.lock-card input{
+  width:100%;
+  border:1px solid #303030;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:13px;
+  margin:10px 0;
+}
+
+.file-input{
+  display:none;
+}
+
+@media(max-width:860px){
+  .app{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    position:relative;
+    height:auto;
+  }
+
+  .meta-row{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<section id="lock" class="lock">
+  <div class="lock-card">
+    <h1>内部日记</h1>
+    <p id="lock-copy">输入本机日记密码。</p>
+    <input id="lock-password" type="password" autocomplete="current-password" placeholder="本机密码">
+    <button class="btn primary" type="button" onclick="unlock()">进入</button>
+  </div>
+</section>
+
+<section id="app" class="app" hidden>
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>内部日记</h1>
+      <div id="count" class="sync">0 篇</div>
+    </div>
+
+    <input id="search" class="search" type="search" placeholder="搜索日记" oninput="renderList()">
+
+    <div class="toolbar">
+      <button class="btn primary" type="button" onclick="newEntry()">新建</button>
+      <button class="btn" type="button" onclick="exportData()">导出</button>
+      <button class="btn" type="button" onclick="document.getElementById('import-file').click()">导入</button>
+      <button class="btn" type="button" onclick="lockApp()">锁定</button>
+    </div>
+
+    <input id="import-file" class="file-input" type="file" accept="application/json" onchange="importData(event)">
+    <div id="entry-list" class="entry-list"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topline">
+      <div class="date" id="current-date"></div>
+      <a class="btn" href="admin.html">后台首页</a>
+    </div>
+
+    <section id="empty" class="empty">
+      选择一篇日记，或者新建一篇。
+    </section>
+
+    <section id="editor" class="editor" hidden>
+      <input id="title" class="title-input" type="text" placeholder="标题" oninput="markDirty()">
+
+      <div class="meta-row">
+        <input id="entry-date" type="date" onchange="markDirty()">
+        <select id="mood" onchange="markDirty()">
+          <option value="平静">平静</option>
+          <option value="清醒">清醒</option>
+          <option value="疲惫">疲惫</option>
+          <option value="焦虑">焦虑</option>
+          <option value="开心">开心</option>
+          <option value="混乱">混乱</option>
+        </select>
+        <input id="tags" type="text" placeholder="标签，用逗号分隔" oninput="markDirty()">
+      </div>
+
+      <textarea id="body" class="body-input" placeholder="写点什么" oninput="markDirty()"></textarea>
+
+      <div class="actions">
+        <button class="btn primary" type="button" onclick="saveEntry()">保存</button>
+        <button class="btn" type="button" onclick="duplicateEntry()">复制</button>
+        <button class="btn danger" type="button" onclick="deleteEntry()">删除</button>
+      </div>
+    </section>
+  </main>
+</section>
+
+<script>
+const STORAGE_KEY = "yunhe.diary.entries.v1";
+const PASSWORD_KEY = "yunhe.diary.password.v1";
+
+let entries = [];
+let activeId = "";
+let dirty = false;
+
+function today(){
+  return new Date().toISOString().slice(0, 10);
+}
+
+function uid(){
+  return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+}
+
+function loadEntries(){
+  entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}
+
+function persist(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+function unlock(){
+  const input = document.getElementById("lock-password");
+  const password = input.value.trim();
+  const saved = localStorage.getItem(PASSWORD_KEY);
+
+  if(!password){
+    alert("请输入密码。");
+    return;
+  }
+
+  if(!saved){
+    localStorage.setItem(PASSWORD_KEY, password);
+  }else if(password !== saved){
+    alert("密码不正确。");
+    return;
+  }
+
+  document.getElementById("lock").hidden = true;
+  document.getElementById("app").hidden = false;
+  loadEntries();
+  renderList();
+  document.getElementById("current-date").textContent = today();
+}
+
+function lockApp(){
+  activeId = "";
+  document.getElementById("app").hidden = true;
+  document.getElementById("lock").hidden = false;
+  document.getElementById("lock-password").value = "";
+}
+
+function renderList(){
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const list = document.getElementById("entry-list");
+  const filtered = entries
+    .filter(entry => {
+      const haystack = [
+        entry.title,
+        entry.body,
+        entry.mood,
+        entry.tags,
+        entry.date
+      ].join(" ").toLowerCase();
+      return haystack.includes(q);
+    })
+    .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+
+  document.getElementById("count").textContent = entries.length + " 篇";
+
+  list.innerHTML = filtered.map(entry => `
+    <article class="entry-item ${entry.id === activeId ? "active" : ""}" onclick="openEntry('${entry.id}')">
+      <h2>${entry.title || "未命名日记"}</h2>
+      <p>${entry.date || ""} / ${entry.mood || ""}</p>
+    </article>
+  `).join("");
+}
+
+function newEntry(){
+  const entry = {
+    id: uid(),
+    title: "未命名日记",
+    date: today(),
+    mood: "平静",
+    tags: "",
+    body: "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  entries.unshift(entry);
+  activeId = entry.id;
+  persist();
+  renderList();
+  showEditor(entry);
+}
+
+function openEntry(id){
+  if(dirty && !confirm("当前内容还没保存，继续切换吗？")) return;
+
+  const entry = entries.find(item => item.id === id);
+  if(!entry) return;
+
+  activeId = id;
+  dirty = false;
+  renderList();
+  showEditor(entry);
+}
+
+function showEditor(entry){
+  document.getElementById("empty").hidden = true;
+  document.getElementById("editor").hidden = false;
+  document.getElementById("title").value = entry.title || "";
+  document.getElementById("entry-date").value = entry.date || today();
+  document.getElementById("mood").value = entry.mood || "平静";
+  document.getElementById("tags").value = entry.tags || "";
+  document.getElementById("body").value = entry.body || "";
+}
+
+function markDirty(){
+  dirty = true;
+}
+
+function saveEntry(){
+  const entry = entries.find(item => item.id === activeId);
+  if(!entry){
+    alert("没有正在编辑的日记。");
+    return;
+  }
+
+  entry.title = document.getElementById("title").value.trim() || "未命名日记";
+  entry.date = document.getElementById("entry-date").value || today();
+  entry.mood = document.getElementById("mood").value;
+  entry.tags = document.getElementById("tags").value.trim();
+  entry.body = document.getElementById("body").value;
+  entry.updatedAt = new Date().toISOString();
+
+  persist();
+  dirty = false;
+  renderList();
+}
+
+function duplicateEntry(){
+  const entry = entries.find(item => item.id === activeId);
+  if(!entry) return;
+
+  const copy = {
+    ...entry,
+    id: uid(),
+    title: entry.title + " 副本",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  entries.unshift(copy);
+  activeId = copy.id;
+  persist();
+  renderList();
+  showEditor(copy);
+}
+
+function deleteEntry(){
+  const entry = entries.find(item => item.id === activeId);
+  if(!entry) return;
+  if(!confirm(`确定删除「${entry.title || "未命名日记"}」吗？`)) return;
+
+  entries = entries.filter(item => item.id !== activeId);
+  activeId = "";
+  persist();
+  dirty = false;
+  document.getElementById("editor").hidden = true;
+  document.getElementById("empty").hidden = false;
+  renderList();
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(entries, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `yunhe-diary-${today()}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(!Array.isArray(data)) throw new Error("invalid");
+      entries = data;
+      activeId = "";
+      persist();
+      renderList();
+      document.getElementById("editor").hidden = true;
+      document.getElementById("empty").hidden = false;
+    }catch(err){
+      alert("导入失败，请选择正确的日记 JSON 文件。");
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById("lock-copy").textContent = localStorage.getItem(PASSWORD_KEY)
+  ? "输入本机日记密码。"
+  : "第一次进入会把当前输入设置为本机日记密码。";
+</script>
+
+</body>
+</html>
+
