@@ -82,6 +82,7 @@
   background:#0b0b0b;
   color:#f2f2f2;
   padding:12px;
+  margin-bottom:14px;
 }
 </style>
 </head>
@@ -104,8 +105,11 @@
   <p class="intro">这里用于打开、检查和删除 Supabase 里的文章。</p>
 
   <div class="password-panel">
+    <label for="admin-name">数据管理员名称</label>
+    <input id="admin-name" type="text" autocomplete="username" placeholder="默认：admin">
+
     <label for="admin-password">管理员密码</label>
-    <input id="admin-password" type="password" autocomplete="current-password" placeholder="输入你原来 Vercel 后台用的密码">
+    <input id="admin-password" type="password" autocomplete="current-password" placeholder="输入 PUBLISH_PASSWORD 对应的密码">
   </div>
 
   <div id="status" class="status">正在加载文章...</div>
@@ -168,7 +172,14 @@ async function loadArticles(){
 
 async function deleteArticle(id, title){
   const name = title || `ID ${id}`;
+  const adminName = document.getElementById("admin-name").value.trim();
   const password = document.getElementById("admin-password").value.trim();
+
+  if(!adminName){
+    alert("请先输入数据管理员名称。");
+    document.getElementById("admin-name").focus();
+    return;
+  }
 
   if(!password){
     alert("请先输入管理员密码。");
@@ -187,6 +198,7 @@ async function deleteArticle(id, title){
     },
     body:JSON.stringify({
       id,
+      adminName,
       password
     })
   });
