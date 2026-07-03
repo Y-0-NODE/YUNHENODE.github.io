@@ -156,6 +156,10 @@ async function publish(id){
 
 /* 删除 */
 async function del(id){
+  const adminName = prompt("请输入数据管理员名称");
+
+  if(!adminName) return;
+
   const password = prompt("请输入管理员密码");
 
   if(!password) return;
@@ -167,6 +171,7 @@ async function del(id){
     },
     body:JSON.stringify({
       id,
+      adminName,
       password
     })
   });
