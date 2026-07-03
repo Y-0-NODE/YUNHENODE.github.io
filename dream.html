@@ -1,17 +1,52 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><title>梦境｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内部日记｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.diary-panel{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:24px;
+  margin-top:48px;
+  line-height:1.8;
+  color:#aaa;
+}
+
+.diary-panel strong{
+  color:#f2f2f2;
+}
+</style>
+</head>
+
 <body>
-<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="index.html">首页</a><a href="video.html">视频</a><a href="article.html">文章</a><a href="case.html">案例</a><a href="about.html">关于我</a></nav></header>
+
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="admin.html">后台首页</a>
+    <a href="article-manage.html">文章管理</a>
+    <a href="index.html">网站首页</a>
+  </nav>
+</header>
+
 <main class="home">
-<p class="eyebrow">RESEARCH / DREAM</p>
-<h1>梦境</h1>
-<p class="intro">这里收录梦境记录、象征结构、潜意识材料相关内容。</p>
-<div class="grid">
-<div class="card"><h2>记录</h2><p>梦境文本记录。</p></div>
-<div class="card"><h2>分析</h2><p>象征结构分析。</p></div>
-<div class="card"><h2>材料</h2><p>潜意识材料整理。</p></div>
-</div>
+  <p class="eyebrow">PRIVATE DIARY</p>
+  <h1>内部日记</h1>
+  <p class="intro">这个页面预留给你自己的私人记录系统。</p>
+
+  <div class="diary-panel">
+    <strong>下一步可以做成两种方式：</strong>
+    <br>
+    方式一：网页内部日记，登录后写入 Supabase 私有表。
+    <br>
+    方式二：电脑 App，本地保存日记，再同步到网站后台。
+    <br><br>
+    建议先做方式一，稳定后再接桌面 App。
+  </div>
 </main>
+
 </body>
 </html>
