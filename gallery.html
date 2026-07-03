@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>艺术摄影｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin-top:48px;
+}
+
+.work{
+  border:1px solid #2a2a2a;
+  background:#111;
+}
+
+.work img,
+.work video{
+  width:100%;
+  aspect-ratio:4/3;
+  object-fit:cover;
+  display:block;
+  background:#0b0b0b;
+}
+
+.work-info{
+  padding:16px;
+}
+
+.work-info h2{
+  font-size:20px;
+  margin:0 0 8px;
+}
+
+.work-info p{
+  color:#aaa;
+  line-height:1.7;
+  margin:0;
+}
+
+.status{
+  color:#888;
+  margin-top:32px;
+}
+
+@media(max-width:900px){
+  .gallery-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="video.html">视频</a>
+    <a href="article.html">文章</a>
+    <a href="gallery.html">艺术摄影</a>
+    <a href="about.html">关于我</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">PHOTO / MOVING IMAGE</p>
+  <h1>艺术摄影</h1>
+  <p class="intro">摄影作品、影像作品与视觉记录。</p>
+
+  <div id="status" class="status">正在加载作品...</div>
+  <section id="gallery" class="gallery-grid"></section>
+</main>
+
+<script>
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+fetch("./api/media-list")
+  .then(res => res.json())
+  .then(result => {
+    const list = Array.isArray(result.data) ? result.data : [];
+    const status = document.getElementById("status");
+    const gallery = document.getElementById("gallery");
+
+    if(!list.length){
+      status.textContent = "暂时没有作品。";
+      return;
+    }
+
+    status.textContent = "";
+    gallery.innerHTML = list.map(item => `
+      <article class="work">
+        ${item.kind === "video"
+          ? `<video src="${escapeHtml(item.url)}" controls playsinline></video>`
+          : `<img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.title || "作品")}">`}
+        <div class="work-info">
+          <h2>${escapeHtml(item.title || "未命名作品")}</h2>
+          <p>${escapeHtml(item.description || "")}</p>
+        </div>
+      </article>
+    `).join("");
+  })
+  .catch(() => {
+    document.getElementById("status").textContent = "作品加载失败。";
+  });
+</script>
+
+</body>
+</html>
