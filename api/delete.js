@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
       ? JSON.parse(req.body)
       : req.body;
 
-    const { id, password } = data || {};
+    const { id, adminName, password } = data || {};
 
     const adminPassword =
       process.env.ADMIN_PASSWORD ||
@@ -26,10 +26,22 @@ module.exports = async function handler(req, res) {
       process.env.SITE_PASSWORD ||
       process.env.PASSWORD;
 
+    const expectedAdminName =
+      process.env.DATA_ADMIN_NAME ||
+      process.env.ADMIN_NAME ||
+      "admin";
+
     if (!adminPassword) {
       return res.status(500).json({
         success: false,
         error: "管理员密码没有在 Vercel 环境变量里配置"
+      });
+    }
+
+    if (adminName !== expectedAdminName) {
+      return res.status(401).json({
+        success: false,
+        error: "数据管理员名称错误"
       });
     }
 
