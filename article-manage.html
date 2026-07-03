@@ -61,6 +61,28 @@
   margin-top:36px;
   line-height:1.7;
 }
+
+.password-panel{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:18px;
+  margin-top:36px;
+}
+
+.password-panel label{
+  display:block;
+  color:#aaa;
+  margin-bottom:10px;
+}
+
+.password-panel input{
+  width:100%;
+  max-width:420px;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
 </style>
 </head>
 
@@ -79,7 +101,12 @@
 <main class="home">
   <p class="eyebrow">ARTICLE MANAGEMENT</p>
   <h1>文章管理</h1>
-  <p class="intro">这里用于打开、检查和删除 Supabase 里的文章。删除文章时需要管理员密码。</p>
+  <p class="intro">这里用于打开、检查和删除 Supabase 里的文章。</p>
+
+  <div class="password-panel">
+    <label for="admin-password">管理员密码</label>
+    <input id="admin-password" type="password" autocomplete="current-password" placeholder="输入你原来 Vercel 后台用的密码">
+  </div>
 
   <div id="status" class="status">正在加载文章...</div>
   <div id="list" class="manage-list"></div>
@@ -141,13 +168,17 @@ async function loadArticles(){
 
 async function deleteArticle(id, title){
   const name = title || `ID ${id}`;
+  const password = document.getElementById("admin-password").value.trim();
+
+  if(!password){
+    alert("请先输入管理员密码。");
+    document.getElementById("admin-password").focus();
+    return;
+  }
+
   const ok = confirm(`确定删除「${name}」吗？删除后不能在网站里恢复。`);
 
   if(!ok) return;
-
-  const password = prompt("请输入管理员密码");
-
-  if(!password) return;
 
   const res = await fetch("/api/delete", {
     method:"POST",
