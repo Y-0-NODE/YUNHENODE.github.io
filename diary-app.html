@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>内部日记 App｜云鹤系统</title>
+<meta name="theme-color" content="#0b0b0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="云鹤日记">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="app-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="app-icon.svg">
 <style>
 *{
   box-sizing:border-box;
@@ -527,8 +534,13 @@ function importData(event){
 document.getElementById("lock-copy").textContent = localStorage.getItem(PASSWORD_KEY)
   ? "输入本机日记密码。"
   : "第一次进入会把当前输入设置为本机日记密码。";
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js");
+  });
+}
 </script>
 
 </body>
 </html>
-
