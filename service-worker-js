@@ -1,6 +1,7 @@
-const CACHE_NAME = "yunhe-diary-app-v1";
+const CACHE_NAME = "yunhe-diary-app-v3";
 const APP_SHELL = [
   "./",
+  "./diary-login.html",
   "./diary-app.html",
   "./diary.html",
   "./admin.html",
@@ -31,7 +32,15 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).catch(() => caches.match("./diary-app.html"));
+      if (cached) return cached;
+
+      return fetch(event.request).catch(() => {
+        if (event.request.mode === "navigate" && event.request.url.includes("diary-app.html")) {
+          return caches.match("./diary-app.html");
+        }
+
+        throw new Error("network unavailable");
+      });
     })
   );
 });
