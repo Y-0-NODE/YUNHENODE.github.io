@@ -2,6 +2,20 @@ const { createClient } = require("@supabase/supabase-js");
 
 const DELETE_API_VERSION = "delete-api-2026-07-03-check-after-delete-v2";
 
+function getSupabaseKeyRole() {
+  try {
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    const payload = key.split(".")[1];
+    if (!payload) return "missing-or-not-jwt";
+
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(Buffer.from(normalized, "base64").toString("utf8"));
+    return decoded.role || "unknown";
+  } catch (e) {
+    return "unreadable";
+  }
+}
+
 function checkAdmin(adminName, password) {
   if (!adminName || !password) {
     return {
@@ -40,7 +54,7 @@ async function findArticle(supabase, { id, slug, title }) {
   if (id) {
     const { data, error } = await supabase
       .from("contents")
-      .select("id,title,slug")
+      .select("*")
       .eq("id", id)
       .limit(1);
 
@@ -51,7 +65,7 @@ async function findArticle(supabase, { id, slug, title }) {
   if (slug) {
     const { data, error } = await supabase
       .from("contents")
-      .select("id,title,slug")
+      .select("*")
       .eq("slug", slug)
       .limit(2);
 
@@ -62,7 +76,7 @@ async function findArticle(supabase, { id, slug, title }) {
   if (title) {
     const { data, error } = await supabase
       .from("contents")
-      .select("id,title,slug")
+      .select("*")
       .eq("type", "article")
       .eq("title", title)
       .limit(2);
@@ -149,6 +163,15 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    const { error: backupError } = await supabase
+      .from("content_backups")
+      .insert({
+        content_id: found.article.id,
+        operation: "delete",
+        snapshot: found.article,
+        created_by: adminName
+      });
+
     const { error } = await supabase
       .from("contents")
       .delete()
@@ -175,9 +198,11 @@ module.exports = async function handler(req, res) {
     }
 
     if (remainingRows && remainingRows.length > 0) {
+      const role = getSupabaseKeyRole();
       return res.status(500).json({
         success: false,
-        error: `已经找到文章「${found.article.title}」，但删除后它仍然存在。请检查 SUPABASE_SERVICE_ROLE_KEY 是否真的是 service_role 密钥。`
+        supabaseKeyRole: role,
+        error: `已经找到文章「${found.article.title}」，但删除后它仍然存在。当前 SUPABASE_SERVICE_ROLE_KEY 角色是「${role}」。它必须是 service_role 才能删除 contents。`
       });
     }
 
@@ -185,6 +210,7 @@ module.exports = async function handler(req, res) {
       success: true,
       id: found.article.id,
       matchedBy: found.matchedBy,
+      backupWarning: backupError ? (backupError.message || backupError) : "",
       deleted: {
         id: found.article.id,
         title: found.article.title
