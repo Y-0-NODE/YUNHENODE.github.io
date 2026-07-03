@@ -259,7 +259,7 @@ async function deleteArticle(id, title){
     return;
   }
 
-  alert("已删除");
+  alert(`已删除：${result.deleted?.title || name}`);
   DATA = DATA.filter(item => String(item.id) !== String(id));
   render(DATA);
   reloadArticles();
