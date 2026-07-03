@@ -35,6 +35,8 @@ function checkAdmin(adminName, password) {
 }
 
 module.exports = async function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store");
+
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -76,10 +78,11 @@ module.exports = async function handler(req, res) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    const { error } = await supabase
+    const { data: deletedRows, error } = await supabase
       .from("contents")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .select("id,title");
 
     if (error) {
       return res.status(500).json({
@@ -88,9 +91,17 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    if (!deletedRows || deletedRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: `Supabase 没有找到 ID 为 ${id} 的文章，所以没有删除任何内容`
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      id
+      id,
+      deleted: deletedRows[0]
     });
 
   } catch (e) {
