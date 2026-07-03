@@ -2,189 +2,23 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>文章｜云鹤系统</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云鹤系统｜YUNHENODE</title>
+<link rel="stylesheet" href="style.css">
 <style>
-body{
-  margin:0;
-  background:#0a0a0a;
-  color:#eaeaea;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
+.latest{
+  margin-top:80px;
 }
 
-header{
-  display:flex;
-  justify-content:space-between;
-  padding:20px 40px;
-  border-bottom:1px solid #141414;
+.latest .grid{
+  margin-top:32px;
 }
 
-.logo{color:#aaa;font-size:13px;letter-spacing:2px;}
-
-nav a{
-  color:#777;
-  margin-left:16px;
-  text-decoration:none;
-  font-size:13px;
-}
-
-nav a:hover{color:#fff;}
-
-main{
-  max-width:1100px;
-  margin:0 auto;
-  padding:60px 40px;
-}
-
-h1{font-size:42px;margin:0;}
-.intro{color:#777;margin-top:10px;}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-top:40px;
-}
-
-.card{
-  border:1px solid #151515;
-  background:#0a0a0a;
-  padding:18px;
-  border-radius:10px;
-  text-decoration:none;
-  color:inherit;
-  transition:.2s;
-}
-
-.card:hover{
-  border-color:#2a2a2a;
-  transform:translateY(-2px);
-}
-
-.card span{
-  font-size:12px;
-  color:#666;
-}
-
-.card h2{
-  font-size:15px;
-  margin:10px 0;
-}
-
-.card p{
-  font-size:12px;
-  color:#666;
-}
-
-hr{
-  border:0;
-  border-top:1px solid #141414;
-  margin:50px 0;
-}
-
-.article-body{
-  line-height:1.8;
-  color:#ddd;
-  margin-top:20px;
+.status{
+  color:#888;
+  margin-top:24px;
 }
 </style>
-</head>
-<meta charset="UTF-8">
-<title>文章｜云鹤系统</title>
-
-<style>
-body{
-  margin:0;
-  background:#0a0a0a;
-  color:#eaeaea;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
-}
-
-header{
-  display:flex;
-  justify-content:space-between;
-  padding:20px 40px;
-  border-bottom:1px solid #141414;
-}
-
-.logo{color:#aaa;font-size:13px;letter-spacing:2px;}
-
-nav a{
-  color:#777;
-  margin-left:16px;
-  text-decoration:none;
-  font-size:13px;
-}
-
-nav a:hover{color:#fff;}
-
-main{
-  max-width:1100px;
-  margin:0 auto;
-  padding:60px 40px;
-}
-
-h1{font-size:42px;margin:0;}
-.intro{color:#777;margin-top:10px;}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-top:40px;
-}
-
-.card{
-  border:1px solid #151515;
-  background:#0a0a0a;
-  padding:18px;
-  border-radius:10px;
-  text-decoration:none;
-  color:inherit;
-  transition:.2s;
-}
-
-.card:hover{
-  border-color:#2a2a2a;
-  transform:translateY(-2px);
-}
-
-.card span{
-  font-size:12px;
-  color:#666;
-}
-
-.card h2{
-  font-size:15px;
-  margin:10px 0;
-}
-
-.card p{
-  font-size:12px;
-  color:#666;
-}
-
-hr{
-  border:0;
-  border-top:1px solid #141414;
-  margin:50px 0;
-}
-
-.article-body{
-  line-height:1.8;
-  color:#ddd;
-  margin-top:20px;
-}
-</style>
-</head>
-
-<body>
-  <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <title>云鹤系统｜YUNHENODE</title>
-  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -201,7 +35,6 @@ hr{
 </header>
 
 <main class="home">
-
   <section class="hero">
     <p class="eyebrow">个人内容系统 / 现实判断档案</p>
     <h1>云鹤系统</h1>
@@ -236,6 +69,12 @@ hr{
         <p>身份、方法、边界与合作方式。</p>
       </a>
     </div>
+  </section>
+
+  <section class="latest">
+    <h2>最新文章</h2>
+    <div id="latest-status" class="status">正在加载最新文章...</div>
+    <div id="latest" class="grid"></div>
   </section>
 
   <section style="margin-top:80px;">
@@ -291,8 +130,51 @@ hr{
       </a>
     </div>
   </section>
-
 </main>
+
+<script>
+const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
+const API = `${SUPABASE_URL}/rest/v1/contents?select=id,title,slug,intro,topic,type,created_at&type=eq.article&order=created_at.desc&limit=4`;
+
+function articleUrl(item){
+  if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
+  return `content.html?id=${encodeURIComponent(item.id)}`;
+}
+
+fetch(API, {
+  headers:{
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`
+  }
+})
+  .then(res => {
+    if(!res.ok) throw new Error("load failed");
+    return res.json();
+  })
+  .then(data => {
+    const box = document.getElementById("latest");
+    const status = document.getElementById("latest-status");
+    const list = Array.isArray(data) ? data : [];
+
+    if(!list.length){
+      status.textContent = "暂时没有文章。";
+      return;
+    }
+
+    status.textContent = "";
+    box.innerHTML = list.map(item => `
+      <a class="card" href="${articleUrl(item)}">
+        <span>${item.topic || "ARTICLE"}</span>
+        <h2>${item.title || "未命名文章"}</h2>
+        <p>${item.intro || ""}</p>
+      </a>
+    `).join("");
+  })
+  .catch(() => {
+    document.getElementById("latest-status").textContent = "最新文章加载失败，请检查 Supabase 配置。";
+  });
+</script>
 
 </body>
 </html>
