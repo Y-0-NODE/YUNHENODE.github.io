@@ -233,6 +233,12 @@ select{
   margin:10px 0;
 }
 
+.login-status{
+  min-height:22px;
+  color:#aaa;
+  line-height:1.6;
+}
+
 .file-input{
   display:none;
 }
@@ -258,9 +264,11 @@ select{
 <section id="lock" class="lock">
   <div class="lock-card">
     <h1>内部日记</h1>
-    <p id="lock-copy">输入本机日记密码。</p>
-    <input id="lock-password" type="password" autocomplete="current-password" placeholder="本机密码">
-    <button class="btn primary" type="button" onclick="unlock()">进入</button>
+    <p id="lock-copy">输入账户名称和密码。账户名称填写你的 Vercel 环境变量名，例如 YUNHE。</p>
+    <input id="lock-name" type="text" autocomplete="username" placeholder="账户名称，例如 YUNHE">
+    <input id="lock-password" type="password" autocomplete="current-password" placeholder="账户密码">
+    <button class="btn primary" type="button" onclick="unlock()">登录进入</button>
+    <div id="login-status" class="login-status"></div>
   </div>
 </section>
 
@@ -323,11 +331,27 @@ select{
 
 <script>
 const STORAGE_KEY = "yunhe.diary.entries.v1";
-const PASSWORD_KEY = "yunhe.diary.password.v1";
+const ACCOUNT_KEY = "yunhe.diary.account.v1";
 
 let entries = [];
 let activeId = "";
 let dirty = false;
+let accountName = "";
+let accountPassword = "";
+let cloudMode = false;
+
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeJsString(value){
+  return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
 
 function today(){
   return new Date().toISOString().slice(0, 10);
@@ -345,26 +369,69 @@ function persist(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 }
 
-function unlock(){
-  const input = document.getElementById("lock-password");
-  const password = input.value.trim();
-  const saved = localStorage.getItem(PASSWORD_KEY);
+function normalizeEntry(entry){
+  return {
+    id: entry.id || uid(),
+    title: entry.title || "未命名日记",
+    date: entry.date || entry.entry_date || today(),
+    mood: entry.mood || "平静",
+    tags: entry.tags || "",
+    body: entry.body || "",
+    createdAt: entry.createdAt || entry.created_at || new Date().toISOString(),
+    updatedAt: entry.updatedAt || entry.updated_at || new Date().toISOString()
+  };
+}
 
-  if(!password){
-    alert("请输入密码。");
+async function unlock(){
+  accountName = document.getElementById("lock-name").value.trim();
+  accountPassword = document.getElementById("lock-password").value.trim();
+  const status = document.getElementById("login-status");
+
+  if(!accountName){
+    alert("请输入账户名称。");
     return;
   }
 
-  if(!saved){
-    localStorage.setItem(PASSWORD_KEY, password);
-  }else if(password !== saved){
-    alert("密码不正确。");
+  if(!accountPassword){
+    alert("请输入账户密码。");
     return;
+  }
+
+  localStorage.setItem(ACCOUNT_KEY, accountName);
+  status.textContent = "正在登录...";
+
+  try{
+    const res = await fetch("./api/diary-list", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        adminName: accountName,
+        password: accountPassword
+      })
+    });
+
+    const result = await res.json().catch(() => ({}));
+
+    if(res.ok){
+      cloudMode = true;
+      entries = (result.data || []).map(normalizeEntry);
+      persist();
+      status.textContent = "";
+    }else{
+      cloudMode = false;
+      loadEntries();
+      status.textContent = result.error || "云端登录失败，已进入本机模式。";
+    }
+  }catch(err){
+    cloudMode = false;
+    loadEntries();
+    status.textContent = "当前离线或接口未部署，已进入本机模式。";
   }
 
   document.getElementById("lock").hidden = true;
   document.getElementById("app").hidden = false;
-  loadEntries();
   renderList();
   document.getElementById("current-date").textContent = today();
 }
@@ -395,9 +462,9 @@ function renderList(){
   document.getElementById("count").textContent = entries.length + " 篇";
 
   list.innerHTML = filtered.map(entry => `
-    <article class="entry-item ${entry.id === activeId ? "active" : ""}" onclick="openEntry('${entry.id}')">
-      <h2>${entry.title || "未命名日记"}</h2>
-      <p>${entry.date || ""} / ${entry.mood || ""}</p>
+    <article class="entry-item ${entry.id === activeId ? "active" : ""}" onclick="openEntry('${escapeJsString(entry.id)}')">
+      <h2>${escapeHtml(entry.title || "未命名日记")}</h2>
+      <p>${escapeHtml(entry.date || "")} / ${escapeHtml(entry.mood || "")}</p>
     </article>
   `).join("");
 }
@@ -419,6 +486,19 @@ function newEntry(){
   persist();
   renderList();
   showEditor(entry);
+}
+
+function collectEditorEntry(existing){
+  return {
+    id: existing?.id || activeId || uid(),
+    title: document.getElementById("title").value.trim() || "未命名日记",
+    date: document.getElementById("entry-date").value || today(),
+    mood: document.getElementById("mood").value,
+    tags: document.getElementById("tags").value.trim(),
+    body: document.getElementById("body").value,
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
 }
 
 function openEntry(id){
@@ -447,23 +527,44 @@ function markDirty(){
   dirty = true;
 }
 
-function saveEntry(){
-  const entry = entries.find(item => item.id === activeId);
-  if(!entry){
-    alert("没有正在编辑的日记。");
+async function saveEntry(){
+  const existing = entries.find(item => item.id === activeId);
+  const entry = collectEditorEntry(existing);
+
+  if(!entry.body.trim()){
+    alert("正文不能为空。");
     return;
   }
 
-  entry.title = document.getElementById("title").value.trim() || "未命名日记";
-  entry.date = document.getElementById("entry-date").value || today();
-  entry.mood = document.getElementById("mood").value;
-  entry.tags = document.getElementById("tags").value.trim();
-  entry.body = document.getElementById("body").value;
-  entry.updatedAt = new Date().toISOString();
+  if(existing){
+    Object.assign(existing, entry);
+  }else{
+    entries.unshift(entry);
+    activeId = entry.id;
+  }
 
   persist();
   dirty = false;
   renderList();
+
+  if(cloudMode){
+    const res = await fetch("./api/diary-save", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        adminName: accountName,
+        password: accountPassword,
+        entry
+      })
+    });
+
+    if(!res.ok){
+      const result = await res.json().catch(() => ({}));
+      alert(result.error || "云端保存失败，已保存在本机。");
+    }
+  }
 }
 
 function duplicateEntry(){
@@ -485,7 +586,7 @@ function duplicateEntry(){
   showEditor(copy);
 }
 
-function deleteEntry(){
+async function deleteEntry(){
   const entry = entries.find(item => item.id === activeId);
   if(!entry) return;
   if(!confirm(`确定删除「${entry.title || "未命名日记"}」吗？`)) return;
@@ -497,6 +598,25 @@ function deleteEntry(){
   document.getElementById("editor").hidden = true;
   document.getElementById("empty").hidden = false;
   renderList();
+
+  if(cloudMode){
+    const res = await fetch("./api/diary-delete", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        adminName: accountName,
+        password: accountPassword,
+        id: entry.id
+      })
+    });
+
+    if(!res.ok){
+      const result = await res.json().catch(() => ({}));
+      alert(result.error || "云端删除失败，本机已删除。");
+    }
+  }
 }
 
 function exportData(){
@@ -531,9 +651,7 @@ function importData(event){
   reader.readAsText(file);
 }
 
-document.getElementById("lock-copy").textContent = localStorage.getItem(PASSWORD_KEY)
-  ? "输入本机日记密码。"
-  : "第一次进入会把当前输入设置为本机日记密码。";
+document.getElementById("lock-name").value = localStorage.getItem(ACCOUNT_KEY) || "YUNHE";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
