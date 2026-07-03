@@ -79,7 +79,7 @@
 <main class="home">
   <p class="eyebrow">ARTICLE MANAGEMENT</p>
   <h1>文章管理</h1>
-  <p class="intro">这里用于打开、检查和删除 Supabase 里的文章。</p>
+  <p class="intro">这里用于打开、检查和删除 Supabase 里的文章。删除文章时需要管理员密码。</p>
 
   <div id="status" class="status">正在加载文章...</div>
   <div id="list" class="manage-list"></div>
@@ -145,22 +145,32 @@ async function deleteArticle(id, title){
 
   if(!ok) return;
 
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/contents?id=eq.${encodeURIComponent(id)}`, {
-    method:"DELETE",
+  const password = prompt("请输入管理员密码");
+
+  if(!password) return;
+
+  const res = await fetch("/api/delete", {
+    method:"POST",
     headers:{
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`
-    }
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      id,
+      password
+    })
   });
 
+  const result = await res.json().catch(() => ({}));
+
   if(!res.ok){
-    alert("删除失败。可能是 Supabase 没有开放删除权限。");
+    alert(result.error || "删除失败，请检查管理员密码或 Vercel 环境变量。");
     return;
   }
 
   alert("已删除");
   DATA = DATA.filter(item => String(item.id) !== String(id));
   render(DATA);
+  loadArticles();
 }
 
 loadArticles();
