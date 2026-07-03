@@ -200,45 +200,6 @@ select{
   line-height:1.8;
 }
 
-.lock{
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  padding:24px;
-}
-
-.lock-card{
-  width:min(460px,100%);
-  border:1px solid #2a2a2a;
-  background:#111;
-  padding:28px;
-}
-
-.lock-card h1{
-  margin:0 0 10px;
-  font-size:28px;
-}
-
-.lock-card p{
-  color:#aaa;
-  line-height:1.7;
-}
-
-.lock-card input{
-  width:100%;
-  border:1px solid #303030;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:13px;
-  margin:10px 0;
-}
-
-.login-status{
-  min-height:22px;
-  color:#aaa;
-  line-height:1.6;
-}
-
 .file-input{
   display:none;
 }
@@ -261,18 +222,7 @@ select{
 </head>
 <body>
 
-<section id="lock" class="lock">
-  <div class="lock-card">
-    <h1>内部日记</h1>
-    <p id="lock-copy">输入账户名称和密码。账户名称填写你的 Vercel 环境变量名，例如 YUNHE。</p>
-    <input id="lock-name" type="text" autocomplete="username" placeholder="账户名称，例如 YUNHE">
-    <input id="lock-password" type="password" autocomplete="current-password" placeholder="账户密码">
-    <button class="btn primary" type="button" onclick="unlock()">登录进入</button>
-    <div id="login-status" class="login-status"></div>
-  </div>
-</section>
-
-<section id="app" class="app" hidden>
+<section id="app" class="app">
   <aside class="sidebar">
     <div class="brand">
       <h1>内部日记</h1>
@@ -333,6 +283,7 @@ select{
 <script>
 const STORAGE_KEY = "yunhe.diary.entries.v1";
 const ACCOUNT_KEY = "yunhe.diary.account.v1";
+const SESSION_KEY = "yunhe.diary.session.v1";
 
 let entries = [];
 let activeId = "";
@@ -340,6 +291,7 @@ let dirty = false;
 let accountName = "";
 let accountPassword = "";
 let cloudMode = false;
+let autoSaveTimer = null;
 
 function escapeHtml(value){
   return String(value || "")
@@ -387,24 +339,8 @@ function normalizeEntry(entry){
   };
 }
 
-async function unlock(){
-  accountName = document.getElementById("lock-name").value.trim();
-  accountPassword = document.getElementById("lock-password").value.trim();
-  const status = document.getElementById("login-status");
-
-  if(!accountName){
-    alert("请输入账户名称。");
-    return;
-  }
-
-  if(!accountPassword){
-    alert("请输入账户密码。");
-    return;
-  }
-
-  localStorage.setItem(ACCOUNT_KEY, accountName);
-  status.textContent = "正在登录...";
-
+async function loadFromCloud(){
+  setSyncMode("正在连接 Supabase...");
   try{
     const res = await fetch("./api/diary-list", {
       method:"POST",
@@ -430,32 +366,26 @@ async function unlock(){
 
       entries = Array.from(merged.values());
       persist();
-      status.textContent = "";
       setSyncMode("云端模式：已连接 Supabase");
     }else{
       cloudMode = false;
       loadEntries();
-      status.textContent = result.error || "云端登录失败，已进入本机模式。";
-      setSyncMode("本机模式：云端还没连上");
+      setSyncMode(result.error || "云端登录失败，已进入本机模式。");
     }
   }catch(err){
     cloudMode = false;
     loadEntries();
-    status.textContent = "当前离线或接口未部署，已进入本机模式。";
-    setSyncMode("本机模式：云端接口不可用");
+    setSyncMode("没有连到云端接口，当前先使用本机草稿。");
   }
 
-  document.getElementById("lock").hidden = true;
-  document.getElementById("app").hidden = false;
   renderList();
   document.getElementById("current-date").textContent = today();
 }
 
 function lockApp(){
   activeId = "";
-  document.getElementById("app").hidden = true;
-  document.getElementById("lock").hidden = false;
-  document.getElementById("lock-password").value = "";
+  sessionStorage.removeItem(SESSION_KEY);
+  window.location.href = "diary-login.html";
 }
 
 function renderList(){
@@ -547,13 +477,22 @@ function markDirty(){
     persist();
     renderList();
   }
+
+  scheduleCloudSave();
 }
 
-async function saveEntry(){
+function scheduleCloudSave(){
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    if(activeId) saveEntry(true);
+  }, 1200);
+}
+
+async function saveEntry(silent = false){
   const existing = entries.find(item => item.id === activeId);
   const entry = collectEditorEntry(existing);
 
-  if(!entry.body.trim()){
+  if(!entry.body.trim() && !entry.title.trim()){
     alert("正文不能为空。");
     return;
   }
@@ -585,7 +524,7 @@ async function saveEntry(){
 
     if(!res.ok){
       const result = await res.json().catch(() => ({}));
-      alert(result.error || "云端保存失败，已保存在本机。");
+      if(!silent) alert(result.error || "云端保存失败，已保存在本机。");
       setSyncMode("本机已保存，云端保存失败");
     }else{
       setSyncMode("云端模式：已保存");
@@ -679,7 +618,23 @@ function importData(event){
   reader.readAsText(file);
 }
 
-document.getElementById("lock-name").value = localStorage.getItem(ACCOUNT_KEY) || "YUNHE";
+function boot(){
+  const session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
+
+  if(!session?.adminName || !session?.password){
+    window.location.href = "diary-login.html";
+    return;
+  }
+
+  accountName = session.adminName;
+  accountPassword = session.password;
+  localStorage.setItem(ACCOUNT_KEY, accountName);
+  loadEntries();
+  renderList();
+  loadFromCloud();
+}
+
+boot();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
