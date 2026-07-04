@@ -1,5 +1,5 @@
-const { checkAdmin, requireSupabaseEnv } = require("./_auth");
-const { supabaseRequest } = require("./_supabase-rest");
+const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
+const { supabaseRequest } = require("../lib/_supabase-rest");
 
 const DELETE_API_VERSION = "delete-api-rest-2026-07-04-v1";
 
