@@ -1,12 +1,7 @@
 {
-  "name": "yunhe-wechat-proxy",
+  "name": "api",
   "version": "1.0.0",
-  "private": true,
-  "type": "commonjs",
-  "scripts": {
-    "start": "node wechat-proxy-server.js"
-  },
   "dependencies": {
-    "express": "^4.18.3"
+    "@supabase/supabase-js": "^2.39.0"
   }
 }
