@@ -66,6 +66,13 @@ button,input{font:inherit}
   margin-top:16px;
   line-height:1.6;
 }
+
+.help{
+  color:#777;
+  font-size:13px;
+  line-height:1.7;
+  margin-top:14px;
+}
 </style>
 </head>
 <body>
@@ -81,6 +88,7 @@ button,input{font:inherit}
 
   <button type="button" onclick="login()">登录并进入日记</button>
   <div id="status" class="status"></div>
+  <div class="help">如果刚修改过 Vercel 环境变量，需要重新部署后才会生效。</div>
 </main>
 
 <script>
@@ -113,10 +121,22 @@ async function login(){
       body:JSON.stringify({ adminName, password })
     });
 
-    const result = await res.json().catch(() => ({}));
+    const text = await res.text();
+    let result = {};
+
+    try{
+      result = text ? JSON.parse(text) : {};
+    }catch(err){
+      result = {};
+    }
 
     if(!res.ok){
-      status.textContent = result.error || "登录失败，请检查 Vercel 环境变量和数据库表。";
+      if(res.status === 404){
+        status.textContent = "登录失败：api/diary-list 没有部署到 Vercel。请确认 GitHub 里有 api/diary-list.js，并重新部署。";
+        return;
+      }
+
+      status.textContent = result.error || `登录失败：接口返回 ${res.status}。请打开 /api/diary-list 检查接口是否已更新。`;
       return;
     }
 
