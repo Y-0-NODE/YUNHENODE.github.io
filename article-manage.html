@@ -222,6 +222,10 @@ let DATA = [];
 let ADMIN_NAME = "";
 let ADMIN_PASSWORD = "";
 let EDITING_ID = "";
+const PAGE_PARAMS = new URLSearchParams(location.search);
+const TARGET_ID = PAGE_PARAMS.get("id") || "";
+const TARGET_SLUG = PAGE_PARAMS.get("slug") || "";
+const TARGET_TITLE = PAGE_PARAMS.get("title") || "";
 
 function articleUrl(item){
   if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
@@ -317,6 +321,7 @@ async function login(){
   document.getElementById("login-status").textContent = "";
   DATA = Array.isArray(result.data) ? result.data : [];
   render(DATA);
+  openTargetFromUrl();
 }
 
 async function reloadArticles(){
@@ -355,6 +360,23 @@ function openEditor(id){
   document.getElementById("edit-body").value = item.body || "";
   document.getElementById("editor-panel").classList.remove("hidden");
   document.getElementById("editor-panel").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+function openTargetFromUrl(){
+  if(!TARGET_ID && !TARGET_SLUG && !TARGET_TITLE) return;
+
+  const target = DATA.find(item => {
+    return String(item.id) === String(TARGET_ID)
+      || (TARGET_SLUG && String(item.slug || "") === String(TARGET_SLUG))
+      || (TARGET_TITLE && String(item.title || "") === String(TARGET_TITLE));
+  });
+
+  if(!target){
+    document.getElementById("status").textContent = "已登录，但没有在列表里找到从文章页带来的那篇文章。";
+    return;
+  }
+
+  openEditor(target.id);
 }
 
 function closeEditor(){
