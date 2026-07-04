@@ -1,41 +1,16 @@
-const { createClient } = require("@supabase/supabase-js");
-
-function checkAdmin(adminName, password) {
-  if (!adminName || !password) {
-    return {
-      ok: false,
-      status: 400,
-      error: "请填写数据管理员名称和密码"
-    };
-  }
-
-  // 你在 Vercel 里新增的环境变量名就是管理员名称。
-  // 例如：环境变量名 YUNHE，值是密码；页面登录时名称填 YUNHE。
-  const passwordFromNamedVariable = process.env[adminName];
-  const fallbackPassword = process.env.PUBLISH_PASSWORD;
-  const expectedPassword = passwordFromNamedVariable || fallbackPassword;
-
-  if (!expectedPassword) {
-    return {
-      ok: false,
-      status: 500,
-      error: `Vercel 里没有找到名为 ${adminName} 的环境变量，也没有找到 PUBLISH_PASSWORD`
-    };
-  }
-
-  if (password !== expectedPassword) {
-    return {
-      ok: false,
-      status: 401,
-      error: "数据管理员名称或密码错误"
-    };
-  }
-
-  return { ok: true };
-}
+const { checkAdmin, requireSupabaseEnv } = require("./_auth");
+const { supabaseRequest } = require("./_supabase-rest");
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
+
+  if (req.method === "GET") {
+    return res.status(200).json({
+      success: true,
+      version: "admin-list-rest-2026-07-04-v1",
+      message: "文章管理列表接口已部署。POST 登录后读取 contents 表。"
+    });
+  }
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -45,54 +20,26 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const data = typeof req.body === "string"
-      ? JSON.parse(req.body)
-      : req.body;
+    const data = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const auth = checkAdmin(data?.adminName, data?.password);
+    if (!auth.ok) return res.status(auth.status).json({ success: false, error: auth.error });
 
-    const { adminName, password } = data || {};
-    const auth = checkAdmin(adminName, password);
+    const env = requireSupabaseEnv();
+    if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
-    if (!auth.ok) {
-      return res.status(auth.status).json({
-        success: false,
-        error: auth.error
-      });
-    }
-
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return res.status(500).json({
-        success: false,
-        error: "Vercel 缺少 SUPABASE_URL 或 SUPABASE_SERVICE_ROLE_KEY，请确认它们已添加到 Production 环境并重新部署"
-      });
-    }
-
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
+    const contents = await supabaseRequest(
+      "/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at&type=eq.article&order=created_at.desc"
     );
-
-    const { data: contents, error } = await supabase
-      .from("contents")
-      .select("id,title,slug,intro,body,type,topic,created_at")
-      .eq("type", "article")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      return res.status(500).json({
-        success: false,
-        error
-      });
-    }
 
     return res.status(200).json({
       success: true,
-      data: contents || []
+      data: Array.isArray(contents) ? contents : []
     });
-
   } catch (e) {
     return res.status(500).json({
       success: false,
-      error: e.message
+      error: e.message,
+      detail: e.data || null
     });
   }
 };
