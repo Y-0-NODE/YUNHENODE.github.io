@@ -13,6 +13,18 @@ function requireWechatEnv() {
   return { ok: true };
 }
 
+function explainWechatError(message = "") {
+  if (message.includes("invalid appid")) {
+    return "微信返回 invalid appid：Vercel 里的 WECHAT_APP_ID 不是公众号后台真正的 AppID。注意 gh_29c8bc4a87bf 是公众号原始 ID，不是 AppID。请登录微信公众平台，在“设置与开发 -> 基本配置”复制 AppID 到 WECHAT_APP_ID。";
+  }
+
+  if (message.includes("invalid appsecret") || message.includes("secret")) {
+    return "微信返回 AppSecret 错误：请登录微信公众平台，在“设置与开发 -> 基本配置”重新复制 AppSecret 到 WECHAT_APP_SECRET，并重新部署 Vercel。";
+  }
+
+  return message;
+}
+
 function classifyArticle(title = "", digest = "") {
   const text = `${title} ${digest}`;
   const rules = [
@@ -44,7 +56,7 @@ async function getAccessToken() {
   const data = await response.json();
 
   if (!response.ok || !data.access_token) {
-    throw new Error(data.errmsg || "获取微信公众号 access_token 失败");
+    throw new Error(explainWechatError(data.errmsg || "获取微信公众号 access_token 失败"));
   }
 
   return data.access_token;
@@ -64,7 +76,7 @@ async function fetchNewsMaterials(accessToken) {
   const data = await response.json();
 
   if (!response.ok || data.errcode) {
-    throw new Error(data.errmsg || "读取微信公众号图文素材失败");
+    throw new Error(explainWechatError(data.errmsg || "读取微信公众号图文素材失败"));
   }
 
   return Array.isArray(data.item) ? data.item : [];
