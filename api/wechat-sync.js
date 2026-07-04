@@ -2,11 +2,15 @@ const { createClient } = require("@supabase/supabase-js");
 const { checkAdmin, requireSupabaseEnv } = require("./_auth");
 
 function requireWechatEnv() {
+  if (process.env.WECHAT_PROXY_URL && process.env.WECHAT_PROXY_SECRET) {
+    return { ok: true };
+  }
+
   if (!process.env.WECHAT_APP_ID || !process.env.WECHAT_APP_SECRET) {
     return {
       ok: false,
       status: 500,
-      error: "Vercel 缺少 WECHAT_APP_ID 或 WECHAT_APP_SECRET。需要先登录微信公众平台复制 AppID 和 AppSecret。"
+      error: "Vercel 缺少微信配置。直接连接需要 WECHAT_APP_ID 和 WECHAT_APP_SECRET；固定服务器中转需要 WECHAT_PROXY_URL 和 WECHAT_PROXY_SECRET。"
     };
   }
 
@@ -82,6 +86,29 @@ async function fetchNewsMaterials(accessToken) {
   return Array.isArray(data.item) ? data.item : [];
 }
 
+async function fetchMaterialsFromProxy() {
+  const response = await fetch(process.env.WECHAT_PROXY_URL.replace(/\/$/, "") + "/wechat/materials", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Yunhe-Proxy-Secret": process.env.WECHAT_PROXY_SECRET
+    },
+    body: JSON.stringify({
+      type: "news",
+      offset: 0,
+      count: 20
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "固定服务器中转读取公众号素材失败");
+  }
+
+  return Array.isArray(data.items) ? data.items : [];
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -100,8 +127,9 @@ module.exports = async function handler(req, res) {
     const wechatEnv = requireWechatEnv();
     if (!wechatEnv.ok) return res.status(wechatEnv.status).json({ success: false, error: wechatEnv.error });
 
-    const accessToken = await getAccessToken();
-    const materials = await fetchNewsMaterials(accessToken);
+    const materials = process.env.WECHAT_PROXY_URL
+      ? await fetchMaterialsFromProxy()
+      : await fetchNewsMaterials(await getAccessToken());
     const rows = [];
 
     materials.forEach((material) => {
