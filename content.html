@@ -41,12 +41,43 @@ h1{
   font-size:15px;
   white-space:pre-wrap;
 }
+
+.article-tools{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:22px 0 34px;
+  padding:14px;
+  border:1px solid #242424;
+  background:#101010;
+}
+
+.article-tools a{
+  border:1px solid #303030;
+  color:#e6e6e6;
+  padding:9px 12px;
+}
+
+.article-tools a:hover{
+  background:#1c1c1c;
+}
+
+@media(max-width:700px){
+  body{
+    padding:22px;
+  }
+
+  h1{
+    font-size:28px;
+  }
+}
 </style>
 </head>
 
 <body>
 
 <a href="article-list.html">返回列表</a>
+<div id="article-tools" class="article-tools" hidden></div>
 
 <h1 id="title">加载中...</h1>
 <p id="intro"></p>
@@ -98,11 +129,28 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body&${query}&limit=1
   document.getElementById("title").innerText = post.title || "无标题";
   document.getElementById("intro").innerText = post.intro || "";
   document.getElementById("body").innerHTML = post.body || "";
+  renderArticleTools(post);
 })
 .catch(err => {
   console.error(err);
   setTitle("加载失败");
 });
+
+function renderArticleTools(post){
+  const tools = document.getElementById("article-tools");
+  const manageParams = new URLSearchParams();
+
+  if(id) manageParams.set("id", id);
+  if(slug) manageParams.set("slug", slug);
+  if(post.title) manageParams.set("title", post.title);
+
+  tools.hidden = false;
+  tools.innerHTML = `
+    <a href="article-manage.html?${manageParams.toString()}">编辑/删除这篇文章</a>
+    <a href="article-manage.html">文章管理后台</a>
+    <a href="publish.html">新建文章</a>
+  `;
+}
 </script>
 
 </body>
