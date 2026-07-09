@@ -47,9 +47,10 @@ a{
 }
 
 .reading-shell{
-  width:min(1160px,100%);
-  margin:0 auto;
-  padding:32px 36px 104px;
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:32px clamp(24px,5vw,104px) 104px;
 }
 
 .article-tools{
@@ -96,7 +97,8 @@ a{
 }
 
 h1{
-  font-size:clamp(34px,6vw,64px);
+  max-width:1500px;
+  font-size:clamp(42px,6.6vw,92px);
   line-height:1.05;
   margin:0;
   letter-spacing:0;
@@ -107,13 +109,14 @@ h1{
   font-size:18px;
   line-height:1.85;
   margin:24px 0 48px;
-  max-width:880px;
+  max-width:1120px;
 }
 
 .article-body{
   display:grid;
   gap:0;
-  max-width:980px;
+  width:100%;
+  max-width:none;
 }
 
 .doc-title{
@@ -146,6 +149,7 @@ h1{
   line-height:1.95;
   margin:0 0 14px;
   white-space:pre-wrap;
+  max-width:1180px;
 }
 
 .numbered{
@@ -156,6 +160,7 @@ h1{
   font-size:16px;
   line-height:1.85;
   margin:0 0 8px;
+  max-width:1180px;
 }
 
 .numbered span{
@@ -168,6 +173,7 @@ h1{
   font-size:14px;
   line-height:1.8;
   margin:0 0 18px;
+  max-width:1180px;
 }
 
 .empty{
@@ -175,6 +181,8 @@ h1{
 }
 
 .media-block{
+  width:100%;
+  max-width:1480px;
   margin:34px 0 42px;
 }
 
@@ -198,6 +206,10 @@ h1{
 @media(max-width:700px){
   .reading-shell{
     padding:28px 18px 64px;
+  }
+
+  h1{
+    font-size:clamp(34px,12vw,52px);
   }
 
   .article-tools{
