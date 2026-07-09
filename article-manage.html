@@ -155,14 +155,15 @@
     <a href="index.html">首页</a>
     <a href="article.html">文章</a>
     <a href="article-list.html">文章列表</a>
+    <a href="case-list.html">案例列表</a>
     <a href="publish.html">新建内容</a>
   </nav>
 </header>
 
 <main class="home">
-  <p class="eyebrow">ARTICLE MANAGEMENT</p>
-  <h1>文章管理</h1>
-  <p class="intro">先登录数据管理员账户，再管理和删除文章。</p>
+  <p id="page-eyebrow" class="eyebrow">ARTICLE MANAGEMENT</p>
+  <h1 id="page-title">文章管理</h1>
+  <p id="page-intro" class="intro">先登录数据管理员账户，再管理和删除文章。</p>
 
   <section id="login-panel" class="login-panel">
     <label for="admin-name">数据管理员名称</label>
@@ -181,7 +182,7 @@
     </div>
 
     <section id="editor-panel" class="editor-panel hidden">
-      <p class="eyebrow">EDIT ARTICLE</p>
+      <p id="editor-eyebrow" class="eyebrow">EDIT ARTICLE</p>
       <h2 id="editor-heading">编辑文章</h2>
 
       <label for="edit-title">标题</label>
@@ -199,6 +200,7 @@
         <option value="消费">消费</option>
         <option value="艺术">艺术</option>
         <option value="空间">空间</option>
+        <option value="技术">技术</option>
         <option value="梦境">梦境</option>
         <option value="未分类">未分类</option>
       </select>
@@ -212,7 +214,7 @@
       </div>
     </section>
 
-    <div id="status" class="status">正在加载文章...</div>
+    <div id="status" class="status">正在加载内容...</div>
     <div id="list" class="manage-list"></div>
   </section>
 </main>
@@ -223,9 +225,19 @@ let ADMIN_NAME = "";
 let ADMIN_PASSWORD = "";
 let EDITING_ID = "";
 const PAGE_PARAMS = new URLSearchParams(location.search);
+const CONTENT_TYPE = PAGE_PARAMS.get("type") === "case" ? "case" : "article";
+const TYPE_LABEL = CONTENT_TYPE === "case" ? "案例" : "文章";
 const TARGET_ID = PAGE_PARAMS.get("id") || "";
 const TARGET_SLUG = PAGE_PARAMS.get("slug") || "";
 const TARGET_TITLE = PAGE_PARAMS.get("title") || "";
+
+function applyPageMode(){
+  document.title = `${TYPE_LABEL}管理｜云鹤系统`;
+  document.getElementById("page-eyebrow").textContent = CONTENT_TYPE === "case" ? "CASE MANAGEMENT" : "ARTICLE MANAGEMENT";
+  document.getElementById("page-title").textContent = `${TYPE_LABEL}管理`;
+  document.getElementById("page-intro").textContent = `先登录数据管理员账户，再管理和删除${TYPE_LABEL}。`;
+  document.getElementById("editor-eyebrow").textContent = CONTENT_TYPE === "case" ? "EDIT CASE" : "EDIT ARTICLE";
+}
 
 function articleUrl(item){
   if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
@@ -238,7 +250,7 @@ function render(list){
   box.innerHTML = "";
 
   if(!list.length){
-    status.textContent = "暂时没有文章。";
+    status.textContent = `暂时没有${TYPE_LABEL}。`;
     return;
   }
 
@@ -246,12 +258,12 @@ function render(list){
   box.innerHTML = list.map(item => `
     <div class="manage-item">
       <div class="meta">${item.topic || "未分类"} / ${item.type || "article"} / ID ${item.id}</div>
-      <h2>${item.title || "未命名文章"}</h2>
+      <h2>${item.title || `未命名${TYPE_LABEL}`}</h2>
       <p>${item.intro || ""}</p>
       <div class="actions">
-        <a href="${articleUrl(item)}">打开文章</a>
-        <button type="button" onclick="openEditor('${item.id}')">编辑文章</button>
-        <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除文章</button>
+        <a href="${articleUrl(item)}">打开${TYPE_LABEL}</a>
+        <button type="button" onclick="openEditor('${item.id}')">编辑${TYPE_LABEL}</button>
+        <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除${TYPE_LABEL}</button>
       </div>
     </div>
   `).join("");
@@ -303,7 +315,8 @@ async function login(){
     },
     body:JSON.stringify({
       adminName: ADMIN_NAME,
-      password: ADMIN_PASSWORD
+      password: ADMIN_PASSWORD,
+      type: CONTENT_TYPE
     })
   });
 
@@ -332,7 +345,8 @@ async function reloadArticles(){
     },
     body:JSON.stringify({
       adminName: ADMIN_NAME,
-      password: ADMIN_PASSWORD
+      password: ADMIN_PASSWORD,
+      type: CONTENT_TYPE
     })
   });
 
@@ -348,12 +362,12 @@ function openEditor(id){
   const item = DATA.find(row => String(row.id) === String(id));
 
   if(!item){
-    alert("没有找到这篇文章，请刷新管理页。");
+    alert(`没有找到这篇${TYPE_LABEL}，请刷新管理页。`);
     return;
   }
 
   EDITING_ID = String(item.id);
-  document.getElementById("editor-heading").textContent = `编辑文章：${item.title || "未命名文章"}`;
+  document.getElementById("editor-heading").textContent = `编辑${TYPE_LABEL}：${item.title || `未命名${TYPE_LABEL}`}`;
   document.getElementById("edit-title").value = item.title || "";
   document.getElementById("edit-intro").value = item.intro || "";
   document.getElementById("edit-topic").value = item.topic || "未分类";
@@ -372,7 +386,7 @@ function openTargetFromUrl(){
   });
 
   if(!target){
-    document.getElementById("status").textContent = "已登录，但没有在列表里找到从文章页带来的那篇文章。";
+    document.getElementById("status").textContent = `已登录，但没有在列表里找到从详情页带来的那篇${TYPE_LABEL}。`;
     return;
   }
 
@@ -386,7 +400,7 @@ function closeEditor(){
 
 async function saveEdit(){
   if(!EDITING_ID){
-    alert("没有正在编辑的文章。");
+    alert(`没有正在编辑的${TYPE_LABEL}。`);
     return;
   }
 
@@ -429,7 +443,7 @@ async function deleteArticle(id, encodedSlug, encodedTitle){
   const slug = decodeURIComponent(encodedSlug || "");
   const title = decodeURIComponent(encodedTitle || "");
   const name = title || slug || `ID ${id}`;
-  const ok = confirm(`确定删除「${name}」吗？删除后不能在网站里恢复。`);
+  const ok = confirm(`确定删除${TYPE_LABEL}「${name}」吗？删除后不能在网站里恢复。`);
 
   if(!ok) return;
 
@@ -459,6 +473,8 @@ async function deleteArticle(id, encodedSlug, encodedTitle){
   render(DATA);
   reloadArticles();
 }
+
+applyPageMode();
 </script>
 
 </body>
