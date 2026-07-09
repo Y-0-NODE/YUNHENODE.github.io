@@ -6,6 +6,7 @@ const DELETE_API_VERSION = "delete-api-rest-2026-07-04-v1";
 function getSupabaseKeyRole() {
   try {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    if (key.startsWith("sb_secret_")) return "secret-key";
     const payload = key.split(".")[1];
     if (!payload) return "missing-or-not-jwt";
 
