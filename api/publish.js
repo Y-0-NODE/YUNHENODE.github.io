@@ -1,100 +1,65 @@
-const { createClient } = require("@supabase/supabase-js");
+const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
+const { supabaseRequest } = require("../lib/_supabase-rest");
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+function makeSlug(title) {
+  return String(title || "content")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\u4e00-\u9fa5-]/g, "")
+    .slice(0, 80) + "-" + Date.now();
+}
 
 module.exports = async function handler(req, res) {
-  console.log("➡️ publish called");
+  res.setHeader("Cache-Control", "no-store");
 
   if (req.method !== "POST") {
-    return res.status(405).json({
-      success: false,
-      error: "Only POST allowed"
-    });
+    return res.status(405).json({ success: false, error: "Only POST allowed" });
   }
 
   try {
-    const data = typeof req.body === "string"
-      ? JSON.parse(req.body)
-      : req.body;
+    const data = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const auth = checkAdmin(data?.adminName, data?.password);
+    if (!auth.ok) return res.status(auth.status).json({ success: false, error: auth.error });
 
-    console.log("📦 INPUT DATA:", data);
+    const env = requireSupabaseEnv();
+    if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
-    const {
-      title,
-      intro,
-      body,
-      video,
-      type,
-      topic
-    } = data;
+    const title = String(data?.title || "").trim();
+    const body = String(data?.body || "").trim();
 
-    // =========================
-    // 1️⃣ 必填检查
-    // =========================
     if (!title || !body) {
-      return res.status(400).json({
-        success: false,
-        error: "title / body 必填"
-      });
+      return res.status(400).json({ success: false, error: "标题和正文不能为空" });
     }
 
-    // =========================
-    // 2️⃣ slug 生成
-    // =========================
-  const slug = title
-  .toLowerCase()
-  .replace(/\s+/g, "-")
-  .replace(/[^a-z0-9\u4e00-\u9fa5-]/g, "")
-  + "-" + Date.now();
-    // =========================
-    // 3️⃣ 写入 Supabase（统一标准写法）
-    // =========================
-    const { data: result, error } = await supabase
-      .from("contents")
-      .insert([
-        {
-          title,
-          intro: intro || "",
-          body,
-          video: video || "",
-          type: type || "article",
-          topic: topic || "未分类",
-          slug,
-          created_at: new Date().toISOString()
-        }
-      ])
-      .select();
+    const slug = makeSlug(title);
+    const inserted = await supabaseRequest("/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({
+        title,
+        intro: data?.intro || "",
+        body,
+        video: data?.video || "",
+        type: data?.type || "article",
+        topic: data?.topic || "未分类",
+        slug,
+        created_at: new Date().toISOString()
+      })
+    });
 
-    if (error) {
-      console.error("❌ SUPABASE ERROR:", error);
-
-      return res.status(500).json({
-        success: false,
-        step: "supabase_insert",
-        error
-      });
-    }
-
-    // =========================
-    // 4️⃣ 返回统一结构（前端依赖这个）
-    // =========================
     return res.status(200).json({
       success: true,
       message: "发布成功",
       slug,
       url: `/content.html?slug=${slug}`,
-      data: result
+      data: inserted?.[0] || null
     });
-
   } catch (e) {
-    console.error("❌ SERVER ERROR:", e);
-
     return res.status(500).json({
       success: false,
-      error: e.message
+      error: e.message,
+      detail: e.data || null
     });
   }
 };
