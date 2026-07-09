@@ -12,32 +12,34 @@ body{
 
 .about-shell{
   width:100%;
-  padding:150px clamp(22px,5vw,96px) 96px;
+  padding:132px clamp(22px,5vw,88px) 96px;
 }
 
 .about-hero{
-  max-width:1320px;
-  margin:0 auto 72px;
+  max-width:1180px;
+  margin:0 auto 64px;
 }
 
 .about-hero h1{
-  max-width:1180px;
-  font-size:clamp(48px,8vw,132px);
-  line-height:0.96;
+  max-width:860px;
+  font-size:clamp(46px,5.5vw,82px);
+  line-height:1.04;
   letter-spacing:0;
-  margin:18px 0 28px;
+  margin:18px 0 24px;
 }
 
 .about-hero .intro{
-  max-width:920px;
-  font-size:clamp(18px,2.1vw,28px);
+  max-width:800px;
+  font-size:clamp(17px,1.45vw,21px);
+  line-height:1.9;
+  color:#c7c7c7;
 }
 
 .about-layout{
   display:grid;
-  grid-template-columns:240px minmax(0,1fr);
-  gap:54px;
-  max-width:1320px;
+  grid-template-columns:220px minmax(0,1fr);
+  gap:52px;
+  max-width:1180px;
   margin:0 auto;
 }
 
@@ -53,9 +55,7 @@ body{
 .section-nav a{
   color:#858585;
   text-decoration:none;
-  font-size:13px;
-  letter-spacing:1px;
-  padding:10px 0;
+  padding:12px 0;
   border-bottom:1px solid #222;
 }
 
@@ -64,11 +64,32 @@ body{
   color:#fff;
 }
 
+.section-nav strong{
+  display:block;
+  font-size:14px;
+  line-height:1.3;
+  letter-spacing:0;
+}
+
+.section-nav span{
+  display:block;
+  margin-top:4px;
+  color:#666;
+  font-size:10px;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+}
+
+.section-nav a:hover span,
+.section-nav a.active span{
+  color:#8d8d8d;
+}
+
 .roadmap{
-  margin-bottom:70px;
+  margin-bottom:64px;
   border-top:1px solid #222;
   border-bottom:1px solid #222;
-  padding:32px 0;
+  padding:28px 0 30px;
 }
 
 .roadmap-head{
@@ -76,9 +97,21 @@ body{
   justify-content:space-between;
   gap:24px;
   color:#888;
+  font-size:12px;
+  letter-spacing:1.6px;
+  margin-bottom:24px;
+}
+
+.roadmap-head strong{
+  display:block;
+  color:#d6d6d6;
   font-size:13px;
-  letter-spacing:2px;
-  margin-bottom:28px;
+  letter-spacing:0;
+  margin-bottom:4px;
+}
+
+.roadmap-head span{
+  display:block;
 }
 
 .route{
@@ -93,40 +126,40 @@ body{
   position:absolute;
   left:0;
   right:0;
-  top:22px;
+  top:12px;
   height:1px;
   background:#2a2a2a;
 }
 
 .route-step{
   position:relative;
-  padding-top:54px;
-  min-height:138px;
+  padding-top:40px;
+  min-height:116px;
   color:#aaa;
 }
 
 .route-step::before{
   content:"";
   position:absolute;
-  top:14px;
+  top:5px;
   left:0;
-  width:18px;
-  height:18px;
+  width:13px;
+  height:13px;
   border:1px solid #555;
   background:#0b0b0b;
+  border-radius:50%;
 }
 
 .route-step.active::before{
-  background:#f2f2f2;
-  border-color:#f2f2f2;
-  box-shadow:0 0 28px rgba(255,255,255,0.24);
+  background:#d8d8d8;
+  border-color:#d8d8d8;
 }
 
 .route-step strong{
   display:block;
   color:#f2f2f2;
-  font-size:18px;
-  margin-bottom:10px;
+  font-size:16px;
+  margin-bottom:8px;
 }
 
 .route-step span{
@@ -155,16 +188,16 @@ body{
 }
 
 .about-section h2{
-  font-size:clamp(30px,4.2vw,64px);
-  line-height:1.08;
-  margin:0 0 24px;
+  font-size:clamp(30px,3.2vw,46px);
+  line-height:1.15;
+  margin:0 0 22px;
 }
 
 .about-section p{
-  max-width:900px;
+  max-width:780px;
   color:#cfcfcf;
-  font-size:18px;
-  line-height:2;
+  font-size:16px;
+  line-height:1.95;
 }
 
 .split-grid{
@@ -176,9 +209,9 @@ body{
 
 .mini-card{
   border:1px solid #2a2a2a;
-  background:#111;
-  padding:24px;
-  min-height:170px;
+  background:#101010;
+  padding:22px;
+  min-height:146px;
 }
 
 .mini-card span{
@@ -188,8 +221,8 @@ body{
 }
 
 .mini-card h3{
-  font-size:26px;
-  margin:28px 0 12px;
+  font-size:21px;
+  margin:24px 0 10px;
 }
 
 .mini-card p,
@@ -213,14 +246,14 @@ body{
 
 .field{
   border:1px solid #2a2a2a;
-  background:#111;
-  padding:22px;
-  min-height:160px;
+  background:#101010;
+  padding:20px;
+  min-height:148px;
 }
 
 .field h3{
-  font-size:24px;
-  margin:18px 0 12px;
+  font-size:21px;
+  margin:16px 0 10px;
 }
 
 .field p{
@@ -244,7 +277,7 @@ body{
 
 .flow-item strong{
   display:block;
-  font-size:24px;
+  font-size:21px;
   margin-bottom:12px;
 }
 
@@ -263,11 +296,28 @@ body{
 
 .contact-line a,
 .contact-line span{
+  display:grid;
+  gap:6px;
+  min-width:168px;
   border:1px solid #2a2a2a;
   color:#f2f2f2;
   text-decoration:none;
-  padding:11px 14px;
-  background:#111;
+  padding:14px 16px;
+  background:#101010;
+}
+
+.contact-line strong{
+  color:#777;
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.contact-line em{
+  color:#f0f0f0;
+  font-size:15px;
+  font-style:normal;
+  letter-spacing:0;
 }
 
 @media(max-width:980px){
@@ -307,12 +357,12 @@ body{
 
   .route-step{
     min-height:auto;
-    padding:20px 0 20px 40px;
+    padding:18px 0 18px 32px;
     border-top:1px solid #222;
   }
 
   .route-step::before{
-    top:23px;
+    top:22px;
     left:0;
   }
 }
@@ -333,28 +383,28 @@ body{
 
 <main class="about-shell">
   <section class="about-hero">
-    <p class="eyebrow">ABOUT SYSTEM</p>
+    <p class="eyebrow">关于云鹤系统 / ABOUT</p>
     <h1>关于我</h1>
     <p class="intro">云鹤系统（YUNHE SYSTEM）是一个持续运行的个人内容系统，用于记录现实观察、结构分析、案例判断与长期研究。</p>
   </section>
 
   <section class="about-layout">
     <nav class="section-nav" id="section-nav">
-      <a href="#identity">Identity</a>
-      <a href="#method">Method</a>
-      <a href="#fields">Research Fields</a>
-      <a href="#structure">Content Structure</a>
-      <a href="#guide">Reading Guide</a>
-      <a href="#collaboration">Collaboration</a>
-      <a href="#boundary">Boundary</a>
-      <a href="#update">Update</a>
-      <a href="#contact">Contact</a>
+      <a href="#identity"><strong>我是谁</strong><span>Identity</span></a>
+      <a href="#method"><strong>我的方法</strong><span>Method</span></a>
+      <a href="#fields"><strong>研究方向</strong><span>Research</span></a>
+      <a href="#structure"><strong>内容组成</strong><span>Structure</span></a>
+      <a href="#guide"><strong>如何阅读</strong><span>Guide</span></a>
+      <a href="#collaboration"><strong>合作方式</strong><span>Collaboration</span></a>
+      <a href="#boundary"><strong>内容边界</strong><span>Boundary</span></a>
+      <a href="#update"><strong>更新方式</strong><span>Update</span></a>
+      <a href="#contact"><strong>联系方式</strong><span>Contact</span></a>
     </nav>
 
     <div>
       <section class="roadmap" aria-label="阅读路线图">
         <div class="roadmap-head">
-          <span>READING ROUTE</span>
+          <span><strong>阅读路线</strong>READING ROUTE</span>
           <span>首页 → 研究主题 → 文章 → 案例 → 视频 → 关于我</span>
         </div>
         <div class="route" id="route">
@@ -446,11 +496,11 @@ body{
         <h2>联系方式</h2>
         <p>如需合作，可通过以下方式联系。后续可以在这里补充具体链接。</p>
         <div class="contact-line">
-          <span>Email</span>
-          <span>Behance</span>
-          <span>GitHub</span>
-          <span>公众号</span>
-          <span>小红书</span>
+          <a href="mailto:YUNHE-ZK@outlook.com"><strong>Email</strong><em>YUNHE-ZK@outlook.com</em></a>
+          <span><strong>Behance</strong><em>云鹤系统</em></span>
+          <span><strong>GitHub</strong><em>YUNHENODE</em></span>
+          <span><strong>公众号</strong><em>云鹤系统</em></span>
+          <span><strong>小红书</strong><em>云鹤系统</em></span>
         </div>
       </section>
     </div>
