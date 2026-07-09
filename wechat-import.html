@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公众号导入｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.workspace{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,0.72fr);
+  gap:24px;
+  margin-top:44px;
+}
+
+.panel,
+.preview{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+}
+
+.panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.panel input,
+.panel textarea,
+.panel select{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.panel textarea{
+  min-height:120px;
+  line-height:1.75;
+  resize:vertical;
+}
+
+#raw{
+  min-height:280px;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+}
+
+.actions button,
+.actions a{
+  border:1px solid #2a2a2a;
+  background:#151515;
+  color:#f2f2f2;
+  padding:10px 14px;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.actions .primary{
+  background:#f2f2f2;
+  color:#0b0b0b;
+  font-weight:700;
+}
+
+.preview{
+  position:sticky;
+  top:96px;
+  align-self:start;
+}
+
+.preview pre{
+  white-space:pre-wrap;
+  line-height:1.8;
+  color:#d8d8d8;
+  margin:0;
+}
+
+.status{
+  color:#aaa;
+  margin-top:16px;
+  line-height:1.7;
+}
+
+@media(max-width:900px){
+  .workspace,
+  .row{
+    grid-template-columns:1fr;
+  }
+
+  .preview{
+    position:relative;
+    top:auto;
+  }
+}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="admin.html">后台首页</a>
+    <a href="article-list.html">文章列表</a>
+    <a href="case-list.html">案例列表</a>
+    <a href="video-list.html">视频列表</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">WECHAT IMPORT</p>
+  <h1>公众号导入</h1>
+  <p class="intro">复制公众号内容，自动匹配网站板块和主题分类，再保存到网站数据库。</p>
+
+  <section class="workspace">
+    <form class="panel" onsubmit="event.preventDefault(); publishImport();">
+      <div class="row">
+        <div>
+          <label for="admin-name">管理员名称</label>
+          <input id="admin-name" value="YUNHE" autocomplete="username">
+        </div>
+        <div>
+          <label for="admin-password">管理员密码</label>
+          <input id="admin-password" type="password" autocomplete="current-password">
+        </div>
+      </div>
+
+      <label for="source-url">公众号原文链接</label>
+      <input id="source-url" placeholder="https://mp.weixin.qq.com/s/...">
+
+      <label for="raw">粘贴公众号内容</label>
+      <textarea id="raw" oninput="autoFill()" placeholder="把公众号文章标题、摘要、正文复制到这里。第一行通常会被识别为标题。"></textarea>
+
+      <div class="row">
+        <div>
+          <label for="type">网站板块</label>
+          <select id="type" onchange="renderPreview()">
+            <option value="auto">自动判断</option>
+            <option value="article">文章</option>
+            <option value="case">案例</option>
+            <option value="video">视频</option>
+          </select>
+        </div>
+        <div>
+          <label for="topic">主题分类</label>
+          <select id="topic" onchange="renderPreview()">
+            <option value="auto">自动判断</option>
+            <option value="平台">平台</option>
+            <option value="品牌">品牌</option>
+            <option value="城市">城市</option>
+            <option value="组织">组织</option>
+            <option value="消费">消费</option>
+            <option value="艺术">艺术</option>
+            <option value="空间">空间</option>
+            <option value="技术">技术</option>
+            <option value="梦境">梦境</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="title">标题</label>
+      <input id="title" oninput="renderPreview()">
+
+      <label for="intro">一句简介</label>
+      <textarea id="intro" oninput="renderPreview()"></textarea>
+
+      <label for="media-url">图片 / 视频地址</label>
+      <input id="media-url" oninput="renderPreview()" placeholder="可选。视频文章可以粘贴视频地址，图片也可以作为正文媒体插入。">
+
+      <label for="body">整理后的正文</label>
+      <textarea id="body" oninput="renderPreview()"></textarea>
+
+      <div class="actions">
+        <button class="primary" type="submit">保存到网站数据库</button>
+        <button type="button" onclick="autoFill(true)">重新自动整理</button>
+        <button type="button" onclick="copyPreview()">复制整理文本</button>
+        <a href="admin.html">返回后台</a>
+      </div>
+
+      <div id="status" class="status"></div>
+    </form>
+
+    <article class="preview">
+      <p class="eyebrow">IMPORT PREVIEW</p>
+      <h2>导入预览</h2>
+      <pre id="preview">粘贴公众号内容后，这里会出现整理结果。</pre>
+    </article>
+  </section>
+</main>
+
+<script>
+const TOPIC_RULES = [
+  ["技术", ["github", "supabase", "vercel", "codex", "api", "h5", "网站", "架构", "模块", "部署", "数据库", "系统"]],
+  ["平台", ["apple", "账号", "微信", "公众号", "小程序", "平台", "系统", "后台"]],
+  ["品牌", ["品牌", "logo", "视觉", "包装", "定位", "传播"]],
+  ["城市", ["城市", "街区", "地方", "社区", "公共", "现场"]],
+  ["组织", ["组织", "公司", "团队", "机构", "协作"]],
+  ["消费", ["消费", "用户", "产品", "购买", "服务", "体验"]],
+  ["艺术", ["艺术", "摄影", "影像", "展览", "作品", "图像"]],
+  ["空间", ["空间", "建筑", "场地", "室内", "装置"]],
+  ["梦境", ["梦", "梦境", "潜意识", "象征"]]
+];
+
+function cleanLines(text){
+  return String(text || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean)
+    .filter(line => !/^阅读原文$|^微信扫一扫$|^长按识别/.test(line));
+}
+
+function detectTopic(text){
+  const lower = String(text || "").toLowerCase();
+  const found = TOPIC_RULES.find(([, words]) => words.some(word => lower.includes(word)));
+  return found ? found[0] : "平台";
+}
+
+function detectType(text){
+  const lower = String(text || "").toLowerCase();
+
+  if(/case\s*\d+|problem|analysis|decision|validation|案例|问题|分析|决策|验证|排查流程|沟通策略/.test(lower)){
+    return "case";
+  }
+
+  if(/视频|视频号|影像|片段|短片|纪录|vlog|movie|film/.test(lower)){
+    return "video";
+  }
+
+  return "article";
+}
+
+function firstSentence(text){
+  const line = cleanLines(text).find(item => item.length > 8) || "";
+  return line.replace(/[。！？].*$/, "。").slice(0, 90);
+}
+
+function normalizeBody(lines, sourceUrl, mediaUrl, type){
+  const bodyLines = [...lines];
+  const title = bodyLines.shift() || "";
+  const intro = bodyLines[0] || "";
+  const body = [];
+
+  body.push(title);
+  body.push("");
+  if(intro && intro !== title) body.push(intro, "");
+
+  bodyLines.forEach(line => {
+    if(/^(\d+[.、]|Problem|Analysis|Decision|Validation|系统分析|排查流程|沟通策略|GitHub|Supabase|Vercel|Codex)/i.test(line)){
+      body.push(line);
+    } else {
+      body.push(line);
+    }
+  });
+
+  if(mediaUrl){
+    const label = type === "video" ? "视频" : "图片";
+    body.push("", `[${label}: ${title || "公众号素材"}](${mediaUrl})`);
+  }
+
+  if(sourceUrl){
+    body.push("", `原文链接：${sourceUrl}`);
+  }
+
+  return body.join("\n").trim();
+}
+
+function getResolved(){
+  const raw = document.getElementById("raw").value;
+  const sourceUrl = document.getElementById("source-url").value.trim();
+  const mediaUrl = document.getElementById("media-url").value.trim();
+  const lines = cleanLines(raw);
+  const rawText = lines.join("\n");
+  const selectedType = document.getElementById("type").value;
+  const selectedTopic = document.getElementById("topic").value;
+  const type = selectedType === "auto" ? detectType(rawText) : selectedType;
+  const topic = selectedTopic === "auto" ? detectTopic(rawText) : selectedTopic;
+  const title = document.getElementById("title").value.trim() || lines[0] || "未命名公众号内容";
+  const intro = document.getElementById("intro").value.trim() || firstSentence(lines.slice(1).join("\n")) || "公众号内容导入。";
+  const body = document.getElementById("body").value.trim() || normalizeBody(lines, sourceUrl, mediaUrl, type);
+
+  return { type, topic, title, intro, body, sourceUrl, mediaUrl };
+}
+
+function autoFill(force){
+  const raw = document.getElementById("raw").value;
+  const lines = cleanLines(raw);
+  if(!lines.length){
+    renderPreview();
+    return;
+  }
+
+  const rawText = lines.join("\n");
+  const type = detectType(rawText);
+  const topic = detectTopic(rawText);
+
+  if(force || !document.getElementById("title").value.trim()){
+    document.getElementById("title").value = lines[0] || "";
+  }
+
+  if(force || !document.getElementById("intro").value.trim()){
+    document.getElementById("intro").value = firstSentence(lines.slice(1).join("\n")) || "";
+  }
+
+  if(force || document.getElementById("type").value === "auto"){
+    document.getElementById("type").value = type;
+  }
+
+  if(force || document.getElementById("topic").value === "auto"){
+    document.getElementById("topic").value = topic;
+  }
+
+  if(force || !document.getElementById("body").value.trim()){
+    document.getElementById("body").value = normalizeBody(lines, document.getElementById("source-url").value.trim(), document.getElementById("media-url").value.trim(), type);
+  }
+
+  renderPreview();
+}
+
+function renderPreview(){
+  const data = getResolved();
+  document.getElementById("preview").textContent = [
+    `板块：${data.type}`,
+    `主题：${data.topic}`,
+    `标题：${data.title}`,
+    `简介：${data.intro}`,
+    "",
+    data.body
+  ].join("\n");
+}
+
+async function copyPreview(){
+  await navigator.clipboard.writeText(getResolved().body);
+  document.getElementById("status").textContent = "已复制整理后的正文。";
+}
+
+async function publishImport(){
+  const status = document.getElementById("status");
+  const adminName = document.getElementById("admin-name").value.trim();
+  const password = document.getElementById("admin-password").value.trim();
+  const data = getResolved();
+
+  if(!adminName || !password){
+    status.textContent = "请填写管理员名称和密码。";
+    return;
+  }
+
+  if(!data.title || !data.body){
+    status.textContent = "请先粘贴公众号内容，或填写标题和正文。";
+    return;
+  }
+
+  status.textContent = "正在保存到网站数据库...";
+
+  const res = await fetch("/api/publish", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      adminName,
+      password,
+      title:data.title,
+      intro:data.intro,
+      body:data.body,
+      type:data.type,
+      topic:data.topic,
+      video:data.type === "video" ? data.mediaUrl || data.sourceUrl : ""
+    })
+  });
+
+  const result = await res.json().catch(() => ({}));
+
+  if(!res.ok){
+    status.textContent = result.error || "保存失败，请检查管理员密码或 Vercel 环境变量。";
+    return;
+  }
+
+  status.innerHTML = `保存成功。<a href="${result.url}">打开内容</a>`;
+}
+
+renderPreview();
+</script>
+</body>
+</html>
