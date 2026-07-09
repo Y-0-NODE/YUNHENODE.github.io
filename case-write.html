@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>撰写案例｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.workspace{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,0.8fr);
+  gap:24px;
+  margin-top:40px;
+}
+
+.panel,
+.preview{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+}
+
+.panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.panel input,
+.panel textarea,
+.panel select{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.panel textarea{
+  min-height:120px;
+  line-height:1.7;
+  resize:vertical;
+}
+
+.section-fields{
+  display:grid;
+  gap:12px;
+  margin-top:18px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.actions button,
+.actions a{
+  border:1px solid #2a2a2a;
+  background:#151515;
+  color:#f2f2f2;
+  padding:10px 14px;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.actions .primary{
+  background:#f2f2f2;
+  color:#0b0b0b;
+  font-weight:700;
+}
+
+.preview{
+  position:sticky;
+  top:96px;
+  align-self:start;
+  white-space:pre-wrap;
+  line-height:1.85;
+  color:#d8d8d8;
+}
+
+.preview h2{
+  margin-top:0;
+}
+
+.status{
+  color:#aaa;
+  margin-top:16px;
+  line-height:1.7;
+}
+
+@media(max-width:900px){
+  .workspace{
+    grid-template-columns:1fr;
+  }
+
+  .preview{
+    position:relative;
+    top:auto;
+  }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="case.html">案例首页</a>
+    <a href="case-list.html">案例列表</a>
+    <a href="admin.html">后台首页</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">CASE WRITER</p>
+  <h1>撰写案例</h1>
+  <p class="intro">选择模板，填写材料，生成结构稳定、极简清晰的案例文本。</p>
+
+  <section class="workspace">
+    <form class="panel" onsubmit="event.preventDefault(); saveCase();">
+      <label for="admin-name">管理员名称</label>
+      <input id="admin-name" value="YUNHE" autocomplete="username">
+
+      <label for="admin-password">管理员密码</label>
+      <input id="admin-password" type="password" autocomplete="current-password">
+
+      <label for="template">案例模板</label>
+      <select id="template" onchange="applyTemplate()">
+        <option value="bo">Case 001 / BO H5 Modular Upgrade</option>
+        <option value="apple">Case 002 / Apple 幽灵账号问题</option>
+        <option value="architecture">Case 003 / 网站架构</option>
+      </select>
+
+      <label for="title">标题</label>
+      <input id="title" oninput="renderPreview()">
+
+      <label for="intro">一句简介</label>
+      <textarea id="intro" oninput="renderPreview()"></textarea>
+
+      <label for="topic">主题</label>
+      <select id="topic" onchange="renderPreview()">
+        <option value="平台">平台</option>
+        <option value="品牌">品牌</option>
+        <option value="城市">城市</option>
+        <option value="组织">组织</option>
+        <option value="消费">消费</option>
+        <option value="艺术">艺术</option>
+        <option value="空间">空间</option>
+        <option value="技术">技术</option>
+      </select>
+
+      <div id="section-fields" class="section-fields"></div>
+
+      <div class="actions">
+        <button class="primary" type="submit">保存案例</button>
+        <button type="button" onclick="copyPreview()">复制生成文本</button>
+        <a href="case-list.html">查看案例列表</a>
+      </div>
+      <div id="status" class="status"></div>
+    </form>
+
+    <article class="preview">
+      <h2>生成预览</h2>
+      <div id="preview"></div>
+    </article>
+  </section>
+</main>
+
+<script>
+const TEMPLATES = {
+  bo:{
+    title:"Case 001 / BO H5 Modular Upgrade",
+    intro:"围绕 H5 模块升级的结构化判断与验证记录。",
+    topic:"技术",
+    sections:["Problem（问题）","Analysis（分析）","Decision（决策）","Validation（验证）"]
+  },
+  apple:{
+    title:"Case 002 / Apple 幽灵账号问题",
+    intro:"围绕异常账号、系统排查和沟通处理的案例记录。",
+    topic:"平台",
+    sections:["系统分析","排查流程","沟通策略"]
+  },
+  architecture:{
+    title:"Case 003 / 网站架构",
+    intro:"记录网站从代码、数据、部署到协作工具的基础架构。",
+    topic:"技术",
+    sections:["GitHub","Supabase","Vercel","Codex"]
+  }
+};
+
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function applyTemplate(){
+  const template = TEMPLATES[document.getElementById("template").value];
+  document.getElementById("title").value = template.title;
+  document.getElementById("intro").value = template.intro;
+  document.getElementById("topic").value = template.topic;
+  document.getElementById("section-fields").innerHTML = template.sections.map((name, index) => `
+    <label for="section-${index}">${escapeHtml(name)}</label>
+    <textarea id="section-${index}" data-section="${escapeHtml(name)}" oninput="renderPreview()" placeholder="填写 ${escapeHtml(name)}"></textarea>
+  `).join("");
+  renderPreview();
+}
+
+function buildCaseText(){
+  const title = document.getElementById("title").value.trim();
+  const intro = document.getElementById("intro").value.trim();
+  const topic = document.getElementById("topic").value;
+  const sections = Array.from(document.querySelectorAll("[data-section]"));
+  const body = [
+    title,
+    "",
+    intro,
+    "",
+    `主题：${topic}`,
+    "",
+    ...sections.flatMap(item => {
+      const label = item.dataset.section;
+      const value = item.value.trim() || "待填写";
+      return [label, value, ""];
+    })
+  ];
+
+  return body.join("\n").trim();
+}
+
+function renderPreview(){
+  document.getElementById("preview").textContent = buildCaseText();
+}
+
+async function copyPreview(){
+  await navigator.clipboard.writeText(buildCaseText());
+  document.getElementById("status").textContent = "已复制生成文本。";
+}
+
+async function saveCase(){
+  const status = document.getElementById("status");
+  const title = document.getElementById("title").value.trim();
+  const intro = document.getElementById("intro").value.trim();
+  const body = buildCaseText();
+
+  if(!title || !body){
+    status.textContent = "标题和正文不能为空。";
+    return;
+  }
+
+  status.textContent = "正在保存案例...";
+
+  const res = await fetch("/api/publish", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      adminName:document.getElementById("admin-name").value.trim(),
+      password:document.getElementById("admin-password").value.trim(),
+      title,
+      intro,
+      body,
+      type:"case",
+      topic:document.getElementById("topic").value
+    })
+  });
+
+  const result = await res.json().catch(() => ({}));
+
+  if(!res.ok){
+    status.textContent = result.error || "保存失败。";
+    return;
+  }
+
+  status.innerHTML = `保存成功。<a href="${result.url}">打开案例</a>`;
+}
+
+applyTemplate();
+</script>
+</body>
+</html>
