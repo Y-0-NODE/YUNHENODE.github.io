@@ -54,6 +54,7 @@ a{
 }
 
 .article-tools{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:flex-start;
@@ -64,8 +65,20 @@ a{
   min-height:48px;
   margin-bottom:86px;
   padding:0 0 14px;
-  border-bottom:5px solid rgba(255,255,255,0.18);
+  border-bottom:1px solid rgba(255,255,255,0.16);
+  box-shadow:0 1px 0 rgba(255,255,255,0.035);
   color:var(--muted);
+}
+
+.article-tools::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-2px;
+  width:100%;
+  height:1px;
+  background:linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04) 72%, rgba(255,255,255,0));
+  pointer-events:none;
 }
 
 .article-tools a{
@@ -233,7 +246,7 @@ h1{
 <body>
 <main class="reading-shell">
   <nav class="article-tools">
-    <a href="article-list.html">返回列表</a>
+    <a id="back-link" href="article-list.html">返回列表</a>
     <span id="manage-tools" hidden></span>
   </nav>
 
@@ -424,16 +437,22 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic&${que
 function renderArticleTools(post){
   const tools = document.getElementById("manage-tools");
   const manageParams = new URLSearchParams();
+  const contentType = post.type === "case" ? "case" : "article";
+  const typeLabel = contentType === "case" ? "案例" : "文章";
+  const listUrl = contentType === "case" ? "case-list.html" : "article-list.html";
+  const createUrl = contentType === "case" ? "case-write.html" : "publish.html";
+  document.getElementById("back-link").href = listUrl;
 
   if(id) manageParams.set("id", id);
   if(slug) manageParams.set("slug", slug);
   if(post.title) manageParams.set("title", post.title);
+  manageParams.set("type", contentType);
 
   tools.hidden = false;
   tools.innerHTML = `
-    <a href="article-manage.html?${manageParams.toString()}">编辑/删除</a>
-    <a href="article-manage.html">管理后台</a>
-    <a href="publish.html">新建</a>
+    <a href="article-manage.html?${manageParams.toString()}">编辑/删除${typeLabel}</a>
+    <a href="article-manage.html?type=${contentType}">${typeLabel}管理</a>
+    <a href="${createUrl}">新建${typeLabel}</a>
   `;
 }
 </script>
