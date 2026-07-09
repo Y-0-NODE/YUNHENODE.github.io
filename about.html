@@ -3,112 +3,491 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>后台｜云鹤系统</title>
+<title>关于我｜云鹤系统</title>
 <link rel="stylesheet" href="style.css">
 <style>
-.admin-grid{
-  margin-top:56px;
+body{
+  background:#0b0b0b;
 }
 
-.admin-note{
+.about-shell{
+  width:100%;
+  padding:150px clamp(22px,5vw,96px) 96px;
+}
+
+.about-hero{
+  max-width:1320px;
+  margin:0 auto 72px;
+}
+
+.about-hero h1{
+  max-width:1180px;
+  font-size:clamp(48px,8vw,132px);
+  line-height:0.96;
+  letter-spacing:0;
+  margin:18px 0 28px;
+}
+
+.about-hero .intro{
+  max-width:920px;
+  font-size:clamp(18px,2.1vw,28px);
+}
+
+.about-layout{
+  display:grid;
+  grid-template-columns:240px minmax(0,1fr);
+  gap:54px;
+  max-width:1320px;
+  margin:0 auto;
+}
+
+.section-nav{
+  position:sticky;
+  top:100px;
+  align-self:start;
+  display:grid;
+  gap:8px;
+  padding-top:6px;
+}
+
+.section-nav a{
+  color:#858585;
+  text-decoration:none;
+  font-size:13px;
+  letter-spacing:1px;
+  padding:10px 0;
+  border-bottom:1px solid #222;
+}
+
+.section-nav a:hover,
+.section-nav a.active{
+  color:#fff;
+}
+
+.roadmap{
+  margin-bottom:70px;
+  border-top:1px solid #222;
+  border-bottom:1px solid #222;
+  padding:32px 0;
+}
+
+.roadmap-head{
+  display:flex;
+  justify-content:space-between;
+  gap:24px;
+  color:#888;
+  font-size:13px;
+  letter-spacing:2px;
+  margin-bottom:28px;
+}
+
+.route{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:12px;
+}
+
+.route::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:22px;
+  height:1px;
+  background:#2a2a2a;
+}
+
+.route-step{
+  position:relative;
+  padding-top:54px;
+  min-height:138px;
+  color:#aaa;
+}
+
+.route-step::before{
+  content:"";
+  position:absolute;
+  top:14px;
+  left:0;
+  width:18px;
+  height:18px;
+  border:1px solid #555;
+  background:#0b0b0b;
+}
+
+.route-step.active::before{
+  background:#f2f2f2;
+  border-color:#f2f2f2;
+  box-shadow:0 0 28px rgba(255,255,255,0.24);
+}
+
+.route-step strong{
+  display:block;
+  color:#f2f2f2;
+  font-size:18px;
+  margin-bottom:10px;
+}
+
+.route-step span{
+  display:block;
+  line-height:1.65;
+  font-size:13px;
+}
+
+.about-section{
+  scroll-margin-top:96px;
+  padding:56px 0;
+  border-top:1px solid #222;
+}
+
+.about-section:first-of-type{
+  border-top:0;
+  padding-top:0;
+}
+
+.section-label{
+  color:#777;
+  font-size:12px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+
+.about-section h2{
+  font-size:clamp(30px,4.2vw,64px);
+  line-height:1.08;
+  margin:0 0 24px;
+}
+
+.about-section p{
+  max-width:900px;
+  color:#cfcfcf;
+  font-size:18px;
+  line-height:2;
+}
+
+.split-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+  margin-top:28px;
+}
+
+.mini-card{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:24px;
+  min-height:170px;
+}
+
+.mini-card span{
+  color:#777;
+  font-size:12px;
+  letter-spacing:1px;
+}
+
+.mini-card h3{
+  font-size:26px;
+  margin:28px 0 12px;
+}
+
+.mini-card p,
+.mini-card li{
+  color:#aaa;
+  font-size:15px;
+  line-height:1.8;
+}
+
+.mini-card ul{
+  padding-left:18px;
+  margin:0;
+}
+
+.field-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-top:32px;
+}
+
+.field{
   border:1px solid #2a2a2a;
   background:#111;
   padding:22px;
-  margin-top:56px;
+  min-height:160px;
+}
+
+.field h3{
+  font-size:24px;
+  margin:18px 0 12px;
+}
+
+.field p{
   color:#aaa;
+  font-size:14px;
+  line-height:1.75;
+  margin:0;
+}
+
+.content-flow{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-top:32px;
+}
+
+.flow-item{
+  border-top:1px solid #333;
+  padding-top:18px;
+}
+
+.flow-item strong{
+  display:block;
+  font-size:24px;
+  margin-bottom:12px;
+}
+
+.flow-item p{
+  color:#aaa;
+  font-size:15px;
   line-height:1.8;
+}
+
+.contact-line{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:28px;
+}
+
+.contact-line a,
+.contact-line span{
+  border:1px solid #2a2a2a;
+  color:#f2f2f2;
+  text-decoration:none;
+  padding:11px 14px;
+  background:#111;
+}
+
+@media(max-width:980px){
+  .about-shell{
+    padding:48px 18px 70px;
+  }
+
+  .about-layout{
+    grid-template-columns:1fr;
+    gap:36px;
+  }
+
+  .section-nav{
+    position:relative;
+    top:auto;
+    display:flex;
+    overflow-x:auto;
+    gap:18px;
+    padding-bottom:8px;
+  }
+
+  .section-nav a{
+    white-space:nowrap;
+    border-bottom:0;
+  }
+
+  .route,
+  .split-grid,
+  .field-grid,
+  .content-flow{
+    grid-template-columns:1fr;
+  }
+
+  .route::before{
+    display:none;
+  }
+
+  .route-step{
+    min-height:auto;
+    padding:20px 0 20px 40px;
+    border-top:1px solid #222;
+  }
+
+  .route-step::before{
+    top:23px;
+    left:0;
+  }
 }
 </style>
 </head>
 
 <body>
-
 <header class="topbar">
-  <div class="logo">YUNHENODE CMS</div>
+  <div class="logo">YUNHENODE</div>
   <nav>
-    <a href="index.html">网站首页</a>
-    <a href="publish.html">新建内容</a>
-    <a href="wechat-import.html">公众号导入</a>
-    <a href="article-manage.html">文章管理</a>
-    <a href="case-write.html">案例撰写</a>
-    <a href="media-manage.html">作品上传</a>
-    <a href="design-settings.html">设计设置</a>
-    <a href="diary.html">内部日记</a>
-    <a href="maintenance.html">维护</a>
+    <a href="index.html">首页</a>
+    <a href="video.html">视频</a>
+    <a href="article.html">文章</a>
+    <a href="case.html">案例</a>
+    <a href="about.html">关于我</a>
   </nav>
 </header>
 
-<main class="home">
-  <p class="eyebrow">ADMIN CENTER</p>
-  <h1>后台</h1>
-  <p class="intro">集中管理发布、文章、草稿与内部记录。</p>
+<main class="about-shell">
+  <section class="about-hero">
+    <p class="eyebrow">ABOUT SYSTEM</p>
+    <h1>关于我</h1>
+    <p class="intro">云鹤系统（YUNHE SYSTEM）是一个持续运行的个人内容系统，用于记录现实观察、结构分析、案例判断与长期研究。</p>
+  </section>
 
-  <div class="grid admin-grid">
-    <a class="card" href="publish.html">
-      <span>01</span>
-      <h2>新建内容</h2>
-      <p>发布文章、视频、案例。</p>
-    </a>
+  <section class="about-layout">
+    <nav class="section-nav" id="section-nav">
+      <a href="#identity">Identity</a>
+      <a href="#method">Method</a>
+      <a href="#fields">Research Fields</a>
+      <a href="#structure">Content Structure</a>
+      <a href="#guide">Reading Guide</a>
+      <a href="#collaboration">Collaboration</a>
+      <a href="#boundary">Boundary</a>
+      <a href="#update">Update</a>
+      <a href="#contact">Contact</a>
+    </nav>
 
-    <a class="card" href="article-manage.html">
-      <span>02</span>
-      <h2>文章管理</h2>
-      <p>搜索、编辑、删除文章。</p>
-    </a>
+    <div>
+      <section class="roadmap" aria-label="阅读路线图">
+        <div class="roadmap-head">
+          <span>READING ROUTE</span>
+          <span>首页 → 研究主题 → 文章 → 案例 → 视频 → 关于我</span>
+        </div>
+        <div class="route" id="route">
+          <div class="route-step active"><strong>首页</strong><span>理解云鹤系统的整体入口。</span></div>
+          <div class="route-step"><strong>研究主题</strong><span>从品牌、平台、城市、组织等方向进入。</span></div>
+          <div class="route-step"><strong>文章</strong><span>阅读方法论、结构分析与系统记录。</span></div>
+          <div class="route-step"><strong>案例</strong><span>查看问题、分析、判断和验证。</span></div>
+          <div class="route-step"><strong>视频</strong><span>补充阶段性的表达与观察过程。</span></div>
+          <div class="route-step"><strong>关于我</strong><span>理解网站边界、合作方式与更新机制。</span></div>
+        </div>
+      </section>
 
-    <a class="card" href="wechat-import.html">
-      <span>03</span>
-      <h2>公众号导入</h2>
-      <p>粘贴公众号内容，自动匹配板块和主题并保存。</p>
-    </a>
+      <section id="identity" class="about-section">
+        <div class="section-label">Identity</div>
+        <h2>我是谁</h2>
+        <p>我是云鹤系统的建立者。我的工作并不是提供结论，而是观察现实、拆解结构、建立判断。相比表达观点，我更关注一个系统如何运行，一个结构为什么形成，一个问题为什么发生，一个组织为什么失效，一个品牌为什么增长，一个平台为什么改变规则。</p>
+        <div class="split-grid">
+          <article class="mini-card"><span>POSITION</span><h3>持续性系统研究</h3><p>这不是即时评论，而是对现实结构的长期记录和反复修订。</p></article>
+          <article class="mini-card"><span>FOCUS</span><h3>结构而非态度</h3><p>重点不是站队，而是说明为什么、依据是什么、系统如何运行。</p></article>
+        </div>
+      </section>
 
-    <a class="card" href="article-draft.html">
-      <span>04</span>
-      <h2>草稿箱</h2>
-      <p>检查未发布内容。</p>
-    </a>
+      <section id="method" class="about-section">
+        <div class="section-label">Method</div>
+        <h2>我的方法</h2>
+        <p>云鹤系统主要采用结构化研究方式。每一个内容都会经历不同层级的分析，从观察到拆解，再到判断与验证。</p>
+        <div class="split-grid">
+          <article class="mini-card"><span>01</span><h3>观察</h3><p>记录现实事件。不预设结论。观察真实发生。</p></article>
+          <article class="mini-card"><span>02</span><h3>拆解</h3><p>把复杂问题拆成品牌、平台、组织、用户、规则、流程、权限、空间、行为等模块。</p></article>
+          <article class="mini-card"><span>03</span><h3>判断</h3><p>建立判断。不是站队，而是说明为什么、依据是什么、系统如何运行。</p></article>
+          <article class="mini-card"><span>04</span><h3>验证</h3><p>持续跟踪现实变化，修正判断，增加新的案例，建立长期记录。</p></article>
+        </div>
+      </section>
 
-    <a class="card" href="diary.html">
-      <span>05</span>
-      <h2>内部日记</h2>
-      <p>进入私人记录和本机日记 App。</p>
-    </a>
+      <section id="fields" class="about-section">
+        <div class="section-label">Research Fields</div>
+        <h2>研究方向</h2>
+        <p>网站主要围绕以下主题展开。每一个主题都可以进入文章、案例和视频三个层级。</p>
+        <div class="field-grid">
+          <article class="field"><span>01</span><h3>品牌</h3><p>品牌结构、商业系统、用户路径、产品关系、消费行为、品牌定位。</p></article>
+          <article class="field"><span>02</span><h3>平台</h3><p>平台规则、审核机制、客服系统、退出机制、权限关系、数字治理。</p></article>
+          <article class="field"><span>03</span><h3>城市</h3><p>城市运行、公共系统、空间关系、基础设施、居民行为、公共服务。</p></article>
+          <article class="field"><span>04</span><h3>组织</h3><p>组织结构、岗位关系、系统失效、流程设计、管理机制、协作方式。</p></article>
+          <article class="field"><span>05</span><h3>消费</h3><p>消费体验、价格判断、服务路径、产品分析、用户决策、商业案例。</p></article>
+          <article class="field"><span>06</span><h3>艺术</h3><p>视觉系统、文本表达、作品分析、展览观察、创作结构、表达方式。</p></article>
+          <article class="field"><span>07</span><h3>空间</h3><p>住宅、街区、场所、公共空间、身体感知、环境关系。</p></article>
+          <article class="field"><span>08</span><h3>梦境</h3><p>梦境记录、象征结构、潜意识材料、记忆关系、个人观察。</p></article>
+        </div>
+      </section>
 
-    <a class="card" href="media-manage.html">
-      <span>06</span>
-      <h2>作品上传</h2>
-      <p>上传摄影作品和影像作品。</p>
-    </a>
+      <section id="structure" class="about-section">
+        <div class="section-label">Content Structure</div>
+        <h2>内容组成</h2>
+        <p>整个网站由视频、文章、案例与关于我四部分组成。它们不是孤立栏目，而是同一套研究系统里的不同表达层级。</p>
+        <div class="content-flow">
+          <div class="flow-item"><strong>视频</strong><p>记录阶段性表达，包括观察、案例、事件、研究过程和公开分享。</p></div>
+          <div class="flow-item"><strong>文章</strong><p>完整的文字分析，包含方法论、结构分析、系统记录和长期研究。</p></div>
+          <div class="flow-item"><strong>案例</strong><p>现实事件整理，包括问题、分析、判断、验证，采用持续更新方式维护。</p></div>
+          <div class="flow-item"><strong>关于我</strong><p>介绍网站运行方式、研究范围、合作边界和内容说明。</p></div>
+        </div>
+      </section>
 
-    <a class="card" href="backup.html">
-      <span>07</span>
-      <h2>数据备份</h2>
-      <p>导出网站内容、日记和作品索引。</p>
-    </a>
+      <section id="guide" class="about-section">
+        <div class="section-label">Reading Guide</div>
+        <h2>如何阅读</h2>
+        <p>本网站并不是按照发布时间组织内容。建议按照研究主题阅读。同一个主题可能持续更新数月甚至数年，文章之间互相关联，案例之间也会形成完整系统。</p>
+      </section>
 
-    <a class="card" href="case-write.html">
-      <span>08</span>
-      <h2>案例撰写</h2>
-      <p>选择模板，生成极简案例文本并保存。</p>
-    </a>
+      <section id="collaboration" class="about-section">
+        <div class="section-label">Collaboration</div>
+        <h2>合作方式</h2>
+        <p>目前主要提供品牌分析、平台研究、组织结构分析、商业系统观察、案例研究、内容咨询与长期合作。如果研究方向一致，可以进一步交流合作。</p>
+      </section>
 
-    <a class="card" href="maintenance.html">
-      <span>09</span>
-      <h2>维护与防御</h2>
-      <p>检查权限、备份、安全头和部署限制。</p>
-    </a>
+      <section id="boundary" class="about-section">
+        <div class="section-label">Boundary</div>
+        <h2>内容边界</h2>
+        <p>本站所有内容均为原创。所有案例均记录于对应时间节点。判断可能随着现实变化持续修订。未经授权不得进行商业转载。引用内容请注明来源。</p>
+      </section>
 
-    <a class="card" href="design-settings.html">
-      <span>10</span>
-      <h2>设计设置</h2>
-      <p>自定义阅读页主题、强调色和背景图。</p>
-    </a>
-  </div>
+      <section id="update" class="about-section">
+        <div class="section-label">Update</div>
+        <h2>更新方式</h2>
+        <p>云鹤系统持续更新，包括新增文章、新增案例、新增视频、补充历史内容、修订已有判断。更新不会按照固定周期，而是根据研究进展持续推进。</p>
+      </section>
 
-  <div class="admin-note">
-    管理后台使用 Vercel 环境变量进行验证。管理员名称填写环境变量名，例如 YUNHE；密码填写该环境变量对应的值。
-  </div>
+      <section id="contact" class="about-section">
+        <div class="section-label">Contact</div>
+        <h2>联系方式</h2>
+        <p>如需合作，可通过以下方式联系。后续可以在这里补充具体链接。</p>
+        <div class="contact-line">
+          <span>Email</span>
+          <span>Behance</span>
+          <span>GitHub</span>
+          <span>公众号</span>
+          <span>小红书</span>
+        </div>
+      </section>
+    </div>
+  </section>
 </main>
 
+<script>
+const navLinks = Array.from(document.querySelectorAll(".section-nav a"));
+const sections = navLinks.map(link => document.querySelector(link.getAttribute("href")));
+const routeSteps = Array.from(document.querySelectorAll(".route-step"));
+
+function updateActiveSection(){
+  const y = window.scrollY + 150;
+  let activeIndex = 0;
+
+  sections.forEach((section, index) => {
+    if(section && section.offsetTop <= y) activeIndex = index;
+  });
+
+  navLinks.forEach((link, index) => link.classList.toggle("active", index === activeIndex));
+}
+
+function updateRoute(){
+  const route = document.getElementById("route");
+  const rect = route.getBoundingClientRect();
+  const progress = Math.min(1, Math.max(0, (window.innerHeight * 0.72 - rect.top) / Math.max(1, rect.height)));
+  const activeCount = Math.max(1, Math.ceil(progress * routeSteps.length));
+  routeSteps.forEach((step, index) => step.classList.toggle("active", index < activeCount));
+}
+
+window.addEventListener("scroll", () => {
+  updateActiveSection();
+  updateRoute();
+});
+
+updateActiveSection();
+updateRoute();
+</script>
 </body>
 </html>
