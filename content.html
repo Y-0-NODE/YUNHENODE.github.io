@@ -57,16 +57,14 @@ a{
   display:flex;
   align-items:center;
   justify-content:flex-start;
-  gap:8px;
+  gap:18px;
   flex-wrap:wrap;
-  width:fit-content;
+  width:100%;
   max-width:100%;
-  min-height:44px;
-  margin-bottom:72px;
-  padding:6px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:rgba(255,255,255,0.035);
-  backdrop-filter:blur(16px);
+  min-height:48px;
+  margin-bottom:86px;
+  padding:0 0 14px;
+  border-bottom:2px solid rgba(255,255,255,0.18);
   color:var(--muted);
 }
 
@@ -74,9 +72,9 @@ a{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:32px;
-  border:1px solid transparent;
-  padding:0 12px;
+  min-height:34px;
+  border-bottom:2px solid transparent;
+  padding:0 2px;
   font-size:13px;
   line-height:1;
   white-space:nowrap;
@@ -84,8 +82,7 @@ a{
 
 .article-tools a:hover{
   color:var(--text);
-  border-color:rgba(255,255,255,0.18);
-  background:rgba(255,255,255,0.06);
+  border-bottom-color:var(--text);
 }
 
 .kicker{
