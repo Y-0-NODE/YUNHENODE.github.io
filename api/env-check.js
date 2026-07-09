@@ -3,7 +3,10 @@ module.exports = async function handler(req, res) {
     "SUPABASE_URL",
     "SUPABASE_SERVICE_ROLE_KEY",
     "YUNHE",
-    "PUBLISH_PASSWORD"
+    "PUBLISH_PASSWORD",
+    "WECHAT_APP_ID",
+    "WECHAT_APP_SECRET",
+    "WECHAT_ACCOUNT_ID"
   ];
 
   const present = {};
@@ -16,9 +19,12 @@ module.exports = async function handler(req, res) {
 
   try {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+    if (key.startsWith("sb_secret_")) {
+      supabaseKeyRole = "secret-key";
+    }
     const payload = key.split(".")[1];
 
-    if (payload) {
+    if (payload && supabaseKeyRole !== "secret-key") {
       const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
       const decoded = JSON.parse(Buffer.from(normalized, "base64").toString("utf8"));
       supabaseKeyRole = decoded.role || "unknown";
