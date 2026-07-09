@@ -4,84 +4,180 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>文章详情｜云鹤系统</title>
-
 <style>
+:root{
+  color-scheme:dark;
+  --bg:#090909;
+  --surface:#101010;
+  --line:#252525;
+  --text:#eeeeee;
+  --muted:#9a9a9a;
+  --soft:#cfcfcf;
+}
+
+*{
+  box-sizing:border-box;
+}
+
 body{
-  background:#0a0a0a;
-  color:#eaeaea;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
-  padding:40px;
-  max-width:900px;
-  margin:0 auto;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;
 }
 
 a{
-  color:#888;
+  color:inherit;
   text-decoration:none;
 }
 
-a:hover{
-  color:#fff;
-}
-
-h1{
-  font-size:34px;
-  margin-bottom:10px;
-}
-
-#intro{
-  color:#777;
-  margin-bottom:30px;
-  line-height:1.6;
-}
-
-#body{
-  color:#dcdcdc;
-  line-height:1.8;
-  font-size:15px;
-  white-space:pre-wrap;
+.reading-shell{
+  width:min(920px,100%);
+  margin:0 auto;
+  padding:42px 24px 96px;
 }
 
 .article-tools{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
-  margin:22px 0 34px;
-  padding:14px;
-  border:1px solid #242424;
-  background:#101010;
+  margin-bottom:56px;
+  color:var(--muted);
 }
 
 .article-tools a{
-  border:1px solid #303030;
-  color:#e6e6e6;
-  padding:9px 12px;
+  border-bottom:1px solid transparent;
+  padding:6px 0;
+  font-size:14px;
 }
 
 .article-tools a:hover{
-  background:#1c1c1c;
+  color:var(--text);
+  border-bottom-color:var(--text);
+}
+
+.kicker{
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+
+h1{
+  font-size:clamp(34px,6vw,64px);
+  line-height:1.05;
+  margin:0;
+  letter-spacing:0;
+}
+
+#intro{
+  color:var(--soft);
+  font-size:18px;
+  line-height:1.85;
+  margin:24px 0 48px;
+  max-width:760px;
+}
+
+.article-body{
+  display:grid;
+  gap:0;
+}
+
+.doc-title{
+  font-size:30px;
+  line-height:1.25;
+  font-weight:800;
+  margin:20px 0 26px;
+}
+
+.section-title{
+  font-size:22px;
+  line-height:1.35;
+  font-weight:800;
+  margin:42px 0 14px;
+  padding-top:28px;
+  border-top:1px solid var(--line);
+}
+
+.sub-title{
+  color:var(--soft);
+  font-size:16px;
+  line-height:1.5;
+  font-weight:700;
+  margin:24px 0 8px;
+}
+
+.paragraph{
+  color:#d8d8d8;
+  font-size:16px;
+  line-height:1.95;
+  margin:0 0 14px;
+  white-space:pre-wrap;
+}
+
+.numbered{
+  display:grid;
+  grid-template-columns:28px 1fr;
+  gap:10px;
+  color:#dcdcdc;
+  font-size:16px;
+  line-height:1.85;
+  margin:0 0 8px;
+}
+
+.numbered span{
+  color:var(--muted);
+}
+
+.meta-line{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.8;
+  margin:0 0 18px;
+}
+
+.empty{
+  color:var(--muted);
 }
 
 @media(max-width:700px){
-  body{
-    padding:22px;
+  .reading-shell{
+    padding:28px 18px 64px;
   }
 
-  h1{
-    font-size:28px;
+  .article-tools{
+    margin-bottom:36px;
+  }
+
+  #intro{
+    font-size:16px;
+    margin-bottom:34px;
+  }
+
+  .doc-title{
+    font-size:24px;
+  }
+
+  .section-title{
+    font-size:19px;
   }
 }
 </style>
 </head>
 
 <body>
+<main class="reading-shell">
+  <nav class="article-tools">
+    <a href="article-list.html">返回列表</a>
+    <span id="manage-tools" hidden></span>
+  </nav>
 
-<a href="article-list.html">返回列表</a>
-<div id="article-tools" class="article-tools" hidden></div>
-
-<h1 id="title">加载中...</h1>
-<p id="intro"></p>
-<div id="body"></div>
+  <p class="kicker">YUNHENODE / CONTENT</p>
+  <h1 id="title">加载中...</h1>
+  <p id="intro"></p>
+  <article id="body" class="article-body"></article>
+</main>
 
 <script>
 const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
@@ -91,14 +187,64 @@ const params = new URLSearchParams(location.search);
 const slug = params.get("slug");
 const id = params.get("id");
 
+const SECTION_RE = /^(Problem|Analysis|Decision|Validation|系统分析|排查流程|沟通策略|GitHub|Supabase|Vercel|Codex)(（[^）]+）|\([^)]*\))?$/i;
+const META_RE = /^(主题|类型|编号|状态|日期)：/;
+
 function setTitle(text){
   document.getElementById("title").innerText = text;
+}
+
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 function buildQuery(){
   if(slug) return `slug=eq.${encodeURIComponent(slug)}`;
   if(id) return `id=eq.${encodeURIComponent(id)}`;
   return "";
+}
+
+function lineType(line, index){
+  if(index === 0 && /^Case\s+\d+/i.test(line)) return "doc-title";
+  if(SECTION_RE.test(line)) return "section-title";
+  if(META_RE.test(line)) return "meta-line";
+  if(/^\d+[.、]/.test(line)) return "numbered";
+  if(line.length <= 18 && /[:：]$/.test(line)) return "sub-title";
+  return "paragraph";
+}
+
+function renderBody(raw){
+  const lines = String(raw || "")
+    .replace(/\r\n/g,"\n")
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  if(!lines.length){
+    document.getElementById("body").innerHTML = `<p class="empty">暂无正文。</p>`;
+    return;
+  }
+
+  document.getElementById("body").innerHTML = lines.map((line, index) => {
+    const type = lineType(line, index);
+    const safe = escapeHtml(line);
+
+    if(type === "numbered"){
+      const match = safe.match(/^(\d+[.、])\s*(.*)$/);
+      return `<p class="numbered"><span>${match?.[1] || ""}</span><b>${match?.[2] || safe}</b></p>`;
+    }
+
+    if(type === "doc-title") return `<h2 class="doc-title">${safe}</h2>`;
+    if(type === "section-title") return `<h3 class="section-title">${safe}</h3>`;
+    if(type === "sub-title") return `<h4 class="sub-title">${safe}</h4>`;
+    if(type === "meta-line") return `<p class="meta-line">${safe}</p>`;
+    return `<p class="paragraph">${safe}</p>`;
+  }).join("");
 }
 
 const query = buildQuery();
@@ -108,7 +254,7 @@ if(!query){
   throw new Error("missing article id");
 }
 
-fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body&${query}&limit=1`, {
+fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic&${query}&limit=1`, {
   headers:{
     apikey: SUPABASE_KEY,
     Authorization: `Bearer ${SUPABASE_KEY}`
@@ -125,10 +271,10 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body&${query}&limit=1
   }
 
   const post = data[0];
-
+  document.querySelector(".kicker").innerText = `YUNHENODE / ${post.type || "CONTENT"} / ${post.topic || "未分类"}`;
   document.getElementById("title").innerText = post.title || "无标题";
   document.getElementById("intro").innerText = post.intro || "";
-  document.getElementById("body").innerHTML = post.body || "";
+  renderBody(post.body || "");
   renderArticleTools(post);
 })
 .catch(err => {
@@ -137,7 +283,7 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body&${query}&limit=1
 });
 
 function renderArticleTools(post){
-  const tools = document.getElementById("article-tools");
+  const tools = document.getElementById("manage-tools");
   const manageParams = new URLSearchParams();
 
   if(id) manageParams.set("id", id);
@@ -146,12 +292,11 @@ function renderArticleTools(post){
 
   tools.hidden = false;
   tools.innerHTML = `
-    <a href="article-manage.html?${manageParams.toString()}">编辑/删除这篇文章</a>
-    <a href="article-manage.html">文章管理后台</a>
-    <a href="publish.html">新建文章</a>
+    <a href="article-manage.html?${manageParams.toString()}">编辑/删除</a>
+    <a href="article-manage.html">管理后台</a>
+    <a href="publish.html">新建</a>
   `;
 }
 </script>
-
 </body>
 </html>
