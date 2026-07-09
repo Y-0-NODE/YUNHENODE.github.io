@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>维护与防御｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.checklist{
+  display:grid;
+  gap:14px;
+  margin-top:40px;
+}
+
+.item{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+}
+
+.item h2{
+  margin:0 0 10px;
+  font-size:22px;
+}
+
+.item p{
+  color:#aaa;
+  line-height:1.7;
+  margin:0;
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="admin.html">后台首页</a>
+    <a href="backup.html">数据备份</a>
+    <a href="index.html">网站首页</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">MAINTENANCE</p>
+  <h1>维护与防御</h1>
+  <p class="intro">基础防护、数据备份、发布权限和部署健康检查。</p>
+
+  <section class="checklist">
+    <article class="item">
+      <h2>写入权限</h2>
+      <p>发布、编辑、删除都必须使用管理员名称和密码，通过 Vercel 环境变量验证。</p>
+    </article>
+
+    <article class="item">
+      <h2>数据库密钥</h2>
+      <p>`SUPABASE_SERVICE_ROLE_KEY` 必须是真正的 service_role 密钥。它只放在 Vercel 后端环境变量，不写在网页里。</p>
+    </article>
+
+    <article class="item">
+      <h2>删除前备份</h2>
+      <p>文章删除接口会尝试把删除前快照写入 `content_backups`，方便后续恢复。</p>
+    </article>
+
+    <article class="item">
+      <h2>备份导出</h2>
+      <p>后台的“数据备份”可以导出文章、日记、作品索引和删除备份。</p>
+    </article>
+
+    <article class="item">
+      <h2>安全响应头</h2>
+      <p>Vercel 会发送基础安全响应头，减少浏览器侧的常见风险。</p>
+    </article>
+
+    <article class="item">
+      <h2>函数数量</h2>
+      <p>当前 Vercel Hobby 最多 12 个函数。公众号自动同步已暂停，避免再次超过限制。</p>
+    </article>
+  </section>
+</main>
+</body>
+</html>
