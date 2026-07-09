@@ -27,8 +27,9 @@ module.exports = async function handler(req, res) {
     const env = requireSupabaseEnv();
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
+    const requestedType = data?.type === "case" ? "case" : "article";
     const contents = await supabaseRequest(
-      "/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at&type=eq.article&order=created_at.desc"
+      `/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at&type=eq.${requestedType}&order=created_at.desc`
     );
 
     return res.status(200).json({
