@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设计设置｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.settings{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,0.8fr);
+  gap:24px;
+  margin-top:42px;
+}
+
+.panel,
+.sample{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+}
+
+.panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.panel input,
+.panel select{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.actions button,
+.actions a{
+  border:1px solid #2a2a2a;
+  background:#151515;
+  color:#f2f2f2;
+  padding:10px 14px;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.actions .primary{
+  background:#f2f2f2;
+  color:#0b0b0b;
+  font-weight:700;
+}
+
+.sample{
+  min-height:360px;
+  background-size:cover;
+  background-position:center;
+}
+
+.sample h2{
+  font-size:42px;
+  margin:0 0 18px;
+}
+
+.sample h3{
+  font-size:26px;
+  margin:34px 0 12px;
+}
+
+.sample p{
+  color:#ccc;
+  line-height:1.8;
+}
+
+.status{
+  color:#aaa;
+  margin-top:16px;
+}
+
+@media(max-width:900px){
+  .settings{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="admin.html">后台首页</a>
+    <a href="media-manage.html">上传背景图</a>
+    <a href="content.html">内容页</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">DESIGN SETTINGS</p>
+  <h1>设计设置</h1>
+  <p class="intro">保存你的阅读页主题、强调色和背景图。背景图可以先在“作品上传”里上传，再把图片地址贴进来。</p>
+
+  <section class="settings">
+    <div class="panel">
+      <label for="theme">主题</label>
+      <select id="theme" onchange="previewDesign()">
+        <option value="dark">深色极简</option>
+        <option value="light">白色纸面</option>
+      </select>
+
+      <label for="accent">强调色</label>
+      <input id="accent" type="color" value="#ffffff" oninput="previewDesign()">
+
+      <label for="background-url">背景图 URL</label>
+      <input id="background-url" placeholder="https://.../image.jpg" oninput="previewDesign()">
+
+      <label for="background-opacity">背景图强度</label>
+      <input id="background-opacity" type="range" min="0" max="0.75" step="0.05" value="0.18" oninput="previewDesign()">
+
+      <div class="actions">
+        <button class="primary" type="button" onclick="saveDesign()">保存设计</button>
+        <button type="button" onclick="resetDesign()">恢复默认</button>
+        <a href="media-manage.html">上传背景图</a>
+      </div>
+
+      <div id="status" class="status"></div>
+    </div>
+
+    <article id="sample" class="sample">
+      <p class="eyebrow">SAMPLE</p>
+      <h2>Case 001 / BO H5 Modular Upgrade</h2>
+      <p>围绕 H5 模块升级的结构化判断与验证记录。</p>
+      <h3>Problem（问题）</h3>
+      <p>这里展示一级、二级、正文之间的视觉差异。</p>
+    </article>
+  </section>
+</main>
+
+<script>
+const KEY = "yunhe.site.design.v1";
+
+function currentDesign(){
+  return {
+    theme:document.getElementById("theme").value,
+    accent:document.getElementById("accent").value,
+    backgroundUrl:document.getElementById("background-url").value.trim(),
+    backgroundOpacity:document.getElementById("background-opacity").value
+  };
+}
+
+function applyForm(design){
+  document.getElementById("theme").value = design.theme || "dark";
+  document.getElementById("accent").value = design.accent || "#ffffff";
+  document.getElementById("background-url").value = design.backgroundUrl || "";
+  document.getElementById("background-opacity").value = design.backgroundOpacity || "0.18";
+}
+
+function previewDesign(){
+  const design = currentDesign();
+  const sample = document.getElementById("sample");
+  const isLight = design.theme === "light";
+
+  sample.style.backgroundColor = isLight ? "#f6f4ef" : "#111";
+  sample.style.color = isLight ? "#111" : "#f2f2f2";
+  sample.style.borderColor = isLight ? "#d9d4c8" : "#2a2a2a";
+  sample.style.backgroundImage = design.backgroundUrl
+    ? `linear-gradient(rgba(${isLight ? "246,244,239" : "17,17,17"},${1 - Number(design.backgroundOpacity)}), rgba(${isLight ? "246,244,239" : "17,17,17"},${1 - Number(design.backgroundOpacity)})), url("${design.backgroundUrl}")`
+    : "none";
+  sample.querySelector("h3").style.color = design.accent;
+}
+
+function saveDesign(){
+  localStorage.setItem(KEY, JSON.stringify(currentDesign()));
+  document.getElementById("status").textContent = "已保存。打开内容页后会应用到这台设备。";
+}
+
+function resetDesign(){
+  localStorage.removeItem(KEY);
+  applyForm({});
+  previewDesign();
+  document.getElementById("status").textContent = "已恢复默认。";
+}
+
+applyForm(JSON.parse(localStorage.getItem(KEY) || "{}"));
+previewDesign();
+</script>
+</body>
+</html>
