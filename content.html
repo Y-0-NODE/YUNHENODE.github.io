@@ -13,6 +13,9 @@
   --text:#eeeeee;
   --muted:#9a9a9a;
   --soft:#cfcfcf;
+  --accent:#ffffff;
+  --bg-image:none;
+  --bg-opacity:0.18;
 }
 
 *{
@@ -21,9 +24,21 @@
 
 body{
   margin:0;
-  background:var(--bg);
+  background-color:var(--bg);
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:linear-gradient(rgba(9,9,9,calc(1 - var(--bg-opacity))), rgba(9,9,9,calc(1 - var(--bg-opacity)))), var(--bg-image);
+  background-size:cover;
+  background-position:center;
+  opacity:1;
+  z-index:-1;
 }
 
 a{
@@ -92,20 +107,20 @@ h1{
 }
 
 .section-title{
-  font-size:22px;
+  font-size:26px;
   line-height:1.35;
   font-weight:800;
-  margin:42px 0 14px;
-  padding-top:28px;
+  margin:52px 0 18px;
+  padding-top:34px;
   border-top:1px solid var(--line);
 }
 
 .sub-title{
   color:var(--soft);
-  font-size:16px;
+  font-size:19px;
   line-height:1.5;
   font-weight:700;
-  margin:24px 0 8px;
+  margin:30px 0 10px;
 }
 
 .paragraph{
@@ -118,8 +133,8 @@ h1{
 
 .numbered{
   display:grid;
-  grid-template-columns:28px 1fr;
-  gap:10px;
+  grid-template-columns:34px 1fr;
+  gap:12px;
   color:#dcdcdc;
   font-size:16px;
   line-height:1.85;
@@ -127,7 +142,8 @@ h1{
 }
 
 .numbered span{
-  color:var(--muted);
+  color:var(--accent);
+  font-weight:800;
 }
 
 .meta-line{
@@ -160,7 +176,7 @@ h1{
   }
 
   .section-title{
-    font-size:19px;
+    font-size:22px;
   }
 }
 </style>
@@ -187,8 +203,28 @@ const params = new URLSearchParams(location.search);
 const slug = params.get("slug");
 const id = params.get("id");
 
+const SITE_DESIGN_KEY = "yunhe.site.design.v1";
 const SECTION_RE = /^(Problem|Analysis|Decision|Validation|系统分析|排查流程|沟通策略|GitHub|Supabase|Vercel|Codex)(（[^）]+）|\([^)]*\))?$/i;
 const META_RE = /^(主题|类型|编号|状态|日期)：/;
+
+function applyDesign(){
+  const design = JSON.parse(localStorage.getItem(SITE_DESIGN_KEY) || "{}");
+  const root = document.documentElement;
+
+  if(design.theme === "light"){
+    root.style.setProperty("--bg", "#f6f4ef");
+    root.style.setProperty("--surface", "#ffffff");
+    root.style.setProperty("--line", "#d9d4c8");
+    root.style.setProperty("--text", "#111111");
+    root.style.setProperty("--muted", "#6d6a63");
+    root.style.setProperty("--soft", "#333333");
+    root.style.colorScheme = "light";
+  }
+
+  if(design.accent) root.style.setProperty("--accent", design.accent);
+  if(design.backgroundUrl) root.style.setProperty("--bg-image", `url("${design.backgroundUrl}")`);
+  if(design.backgroundOpacity) root.style.setProperty("--bg-opacity", design.backgroundOpacity);
+}
 
 function setTitle(text){
   document.getElementById("title").innerText = text;
@@ -211,10 +247,11 @@ function buildQuery(){
 
 function lineType(line, index){
   if(index === 0 && /^Case\s+\d+/i.test(line)) return "doc-title";
+  if(/^#{1,3}\s+/.test(line)) return "markdown-heading";
   if(SECTION_RE.test(line)) return "section-title";
   if(META_RE.test(line)) return "meta-line";
   if(/^\d+[.、]/.test(line)) return "numbered";
-  if(line.length <= 18 && /[:：]$/.test(line)) return "sub-title";
+  if(line.length <= 28 && /[:：]$/.test(line)) return "sub-title";
   return "paragraph";
 }
 
@@ -239,6 +276,14 @@ function renderBody(raw){
       return `<p class="numbered"><span>${match?.[1] || ""}</span><b>${match?.[2] || safe}</b></p>`;
     }
 
+    if(type === "markdown-heading"){
+      const level = (line.match(/^#+/) || [""])[0].length;
+      const text = escapeHtml(line.replace(/^#{1,3}\s+/, ""));
+      if(level === 1) return `<h2 class="doc-title">${text}</h2>`;
+      if(level === 2) return `<h3 class="section-title">${text}</h3>`;
+      return `<h4 class="sub-title">${text}</h4>`;
+    }
+
     if(type === "doc-title") return `<h2 class="doc-title">${safe}</h2>`;
     if(type === "section-title") return `<h3 class="section-title">${safe}</h3>`;
     if(type === "sub-title") return `<h4 class="sub-title">${safe}</h4>`;
@@ -246,6 +291,8 @@ function renderBody(raw){
     return `<p class="paragraph">${safe}</p>`;
   }).join("");
 }
+
+applyDesign();
 
 const query = buildQuery();
 
