@@ -2,64 +2,112 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>关于我｜云鹤系统</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台｜云鹤系统</title>
 <link rel="stylesheet" href="style.css">
+<style>
+.admin-grid{
+  margin-top:56px;
+}
+
+.admin-note{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+  margin-top:56px;
+  color:#aaa;
+  line-height:1.8;
+}
+</style>
 </head>
 
 <body>
 
 <header class="topbar">
-  <div class="logo">YUNHENODE</div>
+  <div class="logo">YUNHENODE CMS</div>
   <nav>
-    <a href="index.html">首页</a>
-    <a href="video.html">视频</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-    <a href="about.html">关于我</a>
+    <a href="index.html">网站首页</a>
+    <a href="publish.html">新建内容</a>
+    <a href="wechat-import.html">公众号导入</a>
+    <a href="article-manage.html">文章管理</a>
+    <a href="case-write.html">案例撰写</a>
+    <a href="media-manage.html">作品上传</a>
+    <a href="design-settings.html">设计设置</a>
+    <a href="diary.html">内部日记</a>
+    <a href="maintenance.html">维护</a>
   </nav>
 </header>
 
 <main class="home">
+  <p class="eyebrow">ADMIN CENTER</p>
+  <h1>后台</h1>
+  <p class="intro">集中管理发布、文章、草稿与内部记录。</p>
 
-<p class="eyebrow">ABOUT SYSTEM</p>
-<h1>关于我</h1>
-<p class="intro">这里管理身份介绍、方法说明、合作方式与联系入口。</p>
+  <div class="grid admin-grid">
+    <a class="card" href="publish.html">
+      <span>01</span>
+      <h2>新建内容</h2>
+      <p>发布文章、视频、案例。</p>
+    </a>
 
-<div class="grid">
-  <a class="card" href="about-profile.html">
-    <span>01</span>
-    <h2>身份介绍</h2>
-    <p>说明我是谁、我在做什么。</p>
-  </a>
+    <a class="card" href="article-manage.html">
+      <span>02</span>
+      <h2>文章管理</h2>
+      <p>搜索、编辑、删除文章。</p>
+    </a>
 
-  <a class="card" href="about-method.html">
-    <span>02</span>
-    <h2>方法说明</h2>
-    <p>说明我的观察方法与判断系统。</p>
-  </a>
+    <a class="card" href="wechat-import.html">
+      <span>03</span>
+      <h2>公众号导入</h2>
+      <p>粘贴公众号内容，自动匹配板块和主题并保存。</p>
+    </a>
 
-  <a class="card" href="about-cooperation.html">
-    <span>03</span>
-    <h2>合作方式</h2>
-    <p>说明咨询、合作、项目入口。</p>
-  </a>
+    <a class="card" href="article-draft.html">
+      <span>04</span>
+      <h2>草稿箱</h2>
+      <p>检查未发布内容。</p>
+    </a>
 
-  <a class="card" href="about-contact.html">
-    <span>04</span>
-    <h2>联系入口</h2>
-    <p>放邮箱、平台账号或联系规则。</p>
-  </a>
-</div>
+    <a class="card" href="diary.html">
+      <span>05</span>
+      <h2>内部日记</h2>
+      <p>进入私人记录和本机日记 App。</p>
+    </a>
 
-<hr>
+    <a class="card" href="media-manage.html">
+      <span>06</span>
+      <h2>作品上传</h2>
+      <p>上传摄影作品和影像作品。</p>
+    </a>
 
-<h2>当前说明</h2>
+    <a class="card" href="backup.html">
+      <span>07</span>
+      <h2>数据备份</h2>
+      <p>导出网站内容、日记和作品索引。</p>
+    </a>
 
-<div class="card">
-  <h2>云鹤系统</h2>
-  <p>一个用于存放视频、文字、案例与现实判断的个人内容系统。</p>
-</div>
+    <a class="card" href="case-write.html">
+      <span>08</span>
+      <h2>案例撰写</h2>
+      <p>选择模板，生成极简案例文本并保存。</p>
+    </a>
 
+    <a class="card" href="maintenance.html">
+      <span>09</span>
+      <h2>维护与防御</h2>
+      <p>检查权限、备份、安全头和部署限制。</p>
+    </a>
+
+    <a class="card" href="design-settings.html">
+      <span>10</span>
+      <h2>设计设置</h2>
+      <p>自定义阅读页主题、强调色和背景图。</p>
+    </a>
+  </div>
+
+  <div class="admin-note">
+    管理后台使用 Vercel 环境变量进行验证。管理员名称填写环境变量名，例如 YUNHE；密码填写该环境变量对应的值。
+  </div>
 </main>
 
 </body>
