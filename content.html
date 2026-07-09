@@ -54,7 +54,6 @@ a{
 }
 
 .article-tools{
-  position:relative;
   display:flex;
   align-items:center;
   justify-content:flex-start;
@@ -65,20 +64,8 @@ a{
   min-height:48px;
   margin-bottom:86px;
   padding:0 0 14px;
-  border-bottom:1px solid rgba(255,255,255,0.16);
-  box-shadow:0 1px 0 rgba(255,255,255,0.035);
+  border-bottom:1px solid #222;
   color:var(--muted);
-}
-
-.article-tools::after{
-  content:"";
-  position:absolute;
-  left:0;
-  bottom:-2px;
-  width:100%;
-  height:1px;
-  background:linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04) 72%, rgba(255,255,255,0));
-  pointer-events:none;
 }
 
 .article-tools a{
