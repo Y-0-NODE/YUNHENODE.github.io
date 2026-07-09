@@ -1,37 +1,78 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><title>案例列表｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例列表｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.status{
+  color:#888;
+  margin-top:32px;
+  line-height:1.7;
+}
+</style>
+</head>
 <body>
-<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="case.html">返回案例</a><a href="admin.html">后台</a></nav></header>
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="case.html">返回案例</a>
+    <a href="case-write.html">撰写案例</a>
+    <a href="admin.html">后台</a>
+  </nav>
+</header>
 
 <main class="home">
-<p class="eyebrow">CASE / LIST</p>
-<h1>案例列表</h1>
-<p class="intro">这里显示所有已经发布的案例内容。</p>
-<div id="list" class="grid"></div>
+  <p class="eyebrow">CASE / LIST</p>
+  <h1>案例列表</h1>
+  <p class="intro">这里显示所有已经保存的案例内容。</p>
+  <div id="status" class="status">正在加载案例...</div>
+  <div id="list" class="grid"></div>
 </main>
 
 <script>
-async function loadCases(){
-  const res = await fetch("content-list.json");
-  const data = await res.json();
-  const cases = data.filter(item => item.type === "case");
-  const box = document.getElementById("list");
+const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
+const API = `${SUPABASE_URL}/rest/v1/contents?select=id,title,slug,intro,topic,type,created_at&type=eq.case&order=created_at.desc`;
 
-  if(!cases.length){
-    box.innerHTML = "<p>暂无案例。</p>";
-    return;
-  }
-
-  box.innerHTML = cases.map(item => `
-    <a class="card" href="${item.url}">
-      <span>${item.topic || item.tag || "CASE"}</span>
-      <h2>${item.title}</h2>
-      <p>${item.intro}</p>
-    </a>
-  `).join("");
+function caseUrl(item){
+  if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
+  return `content.html?id=${encodeURIComponent(item.id)}`;
 }
-loadCases();
+
+fetch(API, {
+  headers:{
+    apikey:SUPABASE_KEY,
+    Authorization:`Bearer ${SUPABASE_KEY}`
+  }
+})
+  .then(res => {
+    if(!res.ok) throw new Error("load failed");
+    return res.json();
+  })
+  .then(data => {
+    const cases = Array.isArray(data) ? data : [];
+    const box = document.getElementById("list");
+    const status = document.getElementById("status");
+
+    if(!cases.length){
+      status.textContent = "暂无案例。";
+      return;
+    }
+
+    status.textContent = "";
+    box.innerHTML = cases.map(item => `
+      <a class="card" href="${caseUrl(item)}">
+        <span>${item.topic || "CASE"}</span>
+        <h2>${item.title || "未命名案例"}</h2>
+        <p>${item.intro || ""}</p>
+      </a>
+    `).join("");
+  })
+  .catch(() => {
+    document.getElementById("status").textContent = "案例加载失败，请检查 Supabase 配置。";
+  });
 </script>
 </body>
 </html>
