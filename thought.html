@@ -7,9 +7,9 @@
 <link rel="stylesheet" href="style.css">
 <style>
 .thought-shell{
-  max-width:980px;
+  max-width:920px;
   margin:0 auto;
-  padding:140px 28px 80px;
+  padding:130px 24px 80px;
 }
 
 .profile{
@@ -53,7 +53,7 @@
   position:relative;
   border:1px solid #242424;
   background:#101010;
-  padding:24px;
+  padding:22px;
 }
 
 .post-meta{
@@ -68,8 +68,8 @@
 .post-body{
   white-space:pre-wrap;
   color:#e6e6e6;
-  font-size:18px;
-  line-height:1.85;
+  font-size:17px;
+  line-height:1.78;
 }
 
 .post img,
@@ -98,11 +98,52 @@
 
 @media(max-width:760px){
   .thought-shell{
-    padding:42px 18px 60px;
+    padding:24px 12px 52px;
   }
 
   .profile{
-    grid-template-columns:1fr;
+    grid-template-columns:54px minmax(0,1fr);
+    gap:14px;
+    padding-bottom:22px;
+  }
+
+  .avatar{
+    width:54px;
+    height:54px;
+  }
+
+  .profile h1{
+    font-size:28px;
+    margin-bottom:4px;
+  }
+
+  .profile p{
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  .feed{
+    gap:12px;
+    margin-top:22px;
+  }
+
+  .post{
+    padding:16px;
+  }
+
+  .post-meta{
+    font-size:12px;
+    margin-bottom:10px;
+  }
+
+  .post-body{
+    font-size:15px;
+    line-height:1.75;
+  }
+
+  .visitor-note{
+    font-size:14px;
+    margin-top:28px;
   }
 }
 </style>
