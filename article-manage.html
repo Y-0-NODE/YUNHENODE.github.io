@@ -215,8 +215,27 @@
       <label for="edit-title">标题</label>
       <input id="edit-title" type="text">
 
-      <label for="edit-intro">简介</label>
+      <label for="edit-subtitle">副标题</label>
+      <input id="edit-subtitle" type="text" placeholder="大标题下面的说明文字">
+
+      <label for="edit-intro">摘要 / 卡片说明</label>
       <textarea id="edit-intro"></textarea>
+
+      <div class="media-row">
+        <div>
+          <label for="edit-original-date">原始撰写时间</label>
+          <input id="edit-original-date" type="date">
+        </div>
+        <div>
+          <label for="edit-source">内容来源</label>
+          <select id="edit-source">
+            <option value="本站撰写">本站撰写</option>
+            <option value="公众号导入">公众号导入</option>
+            <option value="内部日记整理">内部日记整理</option>
+            <option value="外部链接摘录">外部链接摘录</option>
+          </select>
+        </div>
+      </div>
 
       <label for="edit-topic">主题</label>
       <select id="edit-topic">
@@ -309,6 +328,30 @@ function articleUrl(item){
   return `content.html?id=${encodeURIComponent(item.id)}`;
 }
 
+function splitTitle(title){
+  const text = String(title || "").trim();
+  const match = text.match(/^(.*?)\s*(——|—|-)\s*(.+)$/);
+  if(!match) return { title:text, subtitle:"" };
+  return {
+    title:match[1].trim() || text,
+    subtitle:match[3].trim()
+  };
+}
+
+function readMeta(body){
+  const match = String(body || "").match(/<!--yunhe-meta:([\s\S]*?)-->\s*$/m);
+  if(!match) return {};
+  try{
+    return JSON.parse(match[1]);
+  }catch(e){
+    return {};
+  }
+}
+
+function cleanBody(body){
+  return String(body || "").replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "").trim();
+}
+
 function render(list){
   const box = document.getElementById("list");
   const status = document.getElementById("status");
@@ -323,8 +366,8 @@ function render(list){
   box.innerHTML = list.map(item => `
     <div class="manage-item">
       <div class="meta">${item.topic || "未分类"} / ${item.type || "article"} / ID ${item.id}</div>
-      <h2>${item.title || `未命名${TYPE_LABEL}`}</h2>
-      <p>${item.intro || ""}</p>
+      <h2>${splitTitle(item.title).title || `未命名${TYPE_LABEL}`}</h2>
+      <p>${splitTitle(item.title).subtitle || item.intro || ""}</p>
       <div class="actions">
         <a href="${articleUrl(item)}">打开${TYPE_LABEL}</a>
         <button type="button" onclick="openEditor('${item.id}')">编辑${TYPE_LABEL}</button>
@@ -432,11 +475,16 @@ function openEditor(id){
   }
 
   EDITING_ID = String(item.id);
-  document.getElementById("editor-heading").textContent = `编辑${TYPE_LABEL}：${item.title || `未命名${TYPE_LABEL}`}`;
-  document.getElementById("edit-title").value = item.title || "";
+  const titleParts = splitTitle(item.title);
+  const meta = readMeta(item.body);
+  document.getElementById("editor-heading").textContent = `编辑${TYPE_LABEL}：${titleParts.title || `未命名${TYPE_LABEL}`}`;
+  document.getElementById("edit-title").value = titleParts.title || "";
+  document.getElementById("edit-subtitle").value = meta.subtitle || titleParts.subtitle || "";
   document.getElementById("edit-intro").value = item.intro || "";
+  document.getElementById("edit-original-date").value = meta.originalDate || "";
+  document.getElementById("edit-source").value = meta.source || "本站撰写";
   document.getElementById("edit-topic").value = item.topic || "未分类";
-  document.getElementById("edit-body").value = item.body || "";
+  document.getElementById("edit-body").value = cleanBody(item.body || "");
   document.getElementById("media-caption").value = "";
   document.getElementById("media-url").value = "";
   document.getElementById("media-file").value = "";
@@ -595,7 +643,10 @@ async function saveEdit(){
   const payload = {
     id: EDITING_ID,
     title: document.getElementById("edit-title").value.trim(),
+    subtitle: document.getElementById("edit-subtitle").value.trim(),
     intro: document.getElementById("edit-intro").value.trim(),
+    originalDate: document.getElementById("edit-original-date").value,
+    source: document.getElementById("edit-source").value,
     topic: document.getElementById("edit-topic").value,
     body: document.getElementById("edit-body").value.trim(),
     adminName: ADMIN_NAME,
