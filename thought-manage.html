@@ -412,22 +412,33 @@ function canvasToBlob(canvas, type, quality){
 async function compressImage(file, options){
   if(!file.type.startsWith("image/")) return { file, compressed:false };
 
-  const maxSize = options.maxSize || 1600;
-  const quality = options.quality || 0.86;
   const prefix = options.prefix || "image";
   const outputType = "image/jpeg";
+  const targetBytes = options.targetBytes || Infinity;
+  const steps = options.steps || [
+    { maxSize:options.maxSize || 1600, quality:options.quality || 0.86 }
+  ];
   const image = await imageFromFile(file);
-  const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
-  const width = Math.max(1, Math.round(image.width * scale));
-  const height = Math.max(1, Math.round(image.height * scale));
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#0b0b0b";
-  ctx.fillRect(0, 0, width, height);
-  ctx.drawImage(image, 0, 0, width, height);
-  const blob = await canvasToBlob(canvas, outputType, quality);
+  let bestBlob = null;
+
+  for(const step of steps){
+    const maxSize = step.maxSize || options.maxSize || 1600;
+    const quality = step.quality || options.quality || 0.86;
+    const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+    const width = Math.max(1, Math.round(image.width * scale));
+    const height = Math.max(1, Math.round(image.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#0b0b0b";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    bestBlob = await canvasToBlob(canvas, outputType, quality);
+    if(bestBlob.size <= targetBytes) break;
+  }
+
+  const blob = bestBlob;
   const name = `${prefix}-${Date.now()}.jpg`;
   const uploadFile = typeof File === "function"
     ? new File([blob], name, { type:outputType })
@@ -514,7 +525,17 @@ async function uploadAvatar(){
 
   try{
     status.textContent = "正在压缩头像...";
-    const image = await compressImage(file, { maxSize:512, quality:0.82, prefix:"avatar" });
+    const image = await compressImage(file, {
+      prefix:"avatar",
+      targetBytes:60 * 1024,
+      steps:[
+        { maxSize:512, quality:0.82 },
+        { maxSize:360, quality:0.76 },
+        { maxSize:240, quality:0.70 },
+        { maxSize:180, quality:0.66 },
+        { maxSize:128, quality:0.62 }
+      ]
+    });
     status.textContent = image.compressed
       ? `头像已压缩：${formatBytes(image.originalSize)} → ${formatBytes(image.newSize)}，正在上传...`
       : "正在上传头像...";
@@ -555,7 +576,17 @@ async function uploadPostImage(){
 
   try{
     status.textContent = "正在压缩随笔图片...";
-    const image = await compressImage(file, { maxSize:1800, quality:0.86, prefix:"thought" });
+    const image = await compressImage(file, {
+      prefix:"thought",
+      targetBytes:900 * 1024,
+      steps:[
+        { maxSize:1800, quality:0.86 },
+        { maxSize:1400, quality:0.82 },
+        { maxSize:1100, quality:0.78 },
+        { maxSize:900, quality:0.72 },
+        { maxSize:720, quality:0.68 }
+      ]
+    });
     status.textContent = image.compressed
       ? `图片已压缩：${formatBytes(image.originalSize)} → ${formatBytes(image.newSize)}，正在上传...`
       : "正在上传图片...";
