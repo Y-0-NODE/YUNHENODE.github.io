@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="云鹤系统公开访客入口：文章、案例、影像、摄影作品与关于云鹤系统。">
+<title>访客入口｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.visitor-shell{
+  width:100%;
+  max-width:1180px;
+  margin:0 auto;
+  padding:150px clamp(20px,5vw,56px) 90px;
+}
+
+.visitor-hero{
+  min-height:46vh;
+  display:grid;
+  align-content:center;
+  border-bottom:1px solid #292929;
+  padding-bottom:54px;
+}
+
+.visitor-hero h1{
+  max-width:980px;
+  margin:16px 0 20px;
+  font-size:clamp(52px,8vw,112px);
+  line-height:0.98;
+  letter-spacing:0;
+}
+
+.visitor-hero p{
+  max-width:760px;
+  color:#cfcfcf;
+  font-size:20px;
+  line-height:1.8;
+}
+
+.visitor-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  margin-top:46px;
+}
+
+.visitor-card{
+  display:block;
+  min-height:230px;
+  border:1px solid #2a2a2a;
+  background:#101010;
+  color:#f2f2f2;
+  text-decoration:none;
+  padding:26px;
+}
+
+.visitor-card span{
+  color:#777;
+  font-size:13px;
+}
+
+.visitor-card h2{
+  margin:46px 0 14px;
+  font-size:clamp(30px,4vw,52px);
+  line-height:1.08;
+  letter-spacing:0;
+}
+
+.visitor-card p{
+  color:#aaa;
+  line-height:1.75;
+  max-width:520px;
+}
+
+.visitor-note{
+  margin-top:52px;
+  border-top:1px solid #292929;
+  padding-top:20px;
+  color:#8f8f8f;
+  font-size:14px;
+  line-height:1.8;
+}
+
+@media(max-width:760px){
+  .visitor-shell{
+    padding:34px 14px 58px;
+  }
+
+  .visitor-hero{
+    min-height:auto;
+    padding-bottom:34px;
+  }
+
+  .visitor-hero h1{
+    font-size:44px;
+  }
+
+  .visitor-hero p{
+    font-size:16px;
+  }
+
+  .visitor-grid{
+    grid-template-columns:1fr;
+    margin-top:28px;
+  }
+
+  .visitor-card{
+    min-height:170px;
+    padding:20px;
+  }
+
+  .visitor-card h2{
+    margin-top:34px;
+  }
+}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="visitor.html">访客入口</a>
+    <a href="article-list.html">文章</a>
+    <a href="case-list.html">案例</a>
+    <a href="gallery.html">作品</a>
+    <a href="about.html">关于</a>
+  </nav>
+</header>
+
+<main class="visitor-shell">
+  <section class="visitor-hero">
+    <p class="eyebrow">PUBLIC VISITOR ENTRY</p>
+    <h1>云鹤系统公开入口</h1>
+    <p>这里是给外部访客阅读的公开页面，只展示文章、案例、作品与系统说明。内部日记不开放，随笔进入邮箱账户机制后再开放给注册访客。</p>
+  </section>
+
+  <section class="visitor-grid" aria-label="公开内容入口">
+    <a class="visitor-card" href="article-list.html">
+      <span>01 / PUBLIC ARTICLES</span>
+      <h2>文章</h2>
+      <p>结构分析、现实观察、长期研究与方法记录。</p>
+    </a>
+
+    <a class="visitor-card" href="case-list.html">
+      <span>02 / CASE ARCHIVE</span>
+      <h2>案例</h2>
+      <p>问题、分析、决策、验证，以及现实事件整理。</p>
+    </a>
+
+    <a class="visitor-card" href="gallery.html">
+      <span>03 / VISUAL WORKS</span>
+      <h2>作品</h2>
+      <p>摄影作品、影像作品与视觉记录。</p>
+    </a>
+
+    <a class="visitor-card" href="about.html">
+      <span>04 / ABOUT SYSTEM</span>
+      <h2>关于</h2>
+      <p>云鹤系统的身份、方法、内容边界与联系方式。</p>
+    </a>
+  </section>
+
+  <p class="visitor-note">
+    访客入口不显示内部日记和私人随笔。当前站点部署在 Vercel，国内访问可能受线路影响；本页面已经尽量做成轻量静态入口，但如果 Vercel 域名本身无法连接，仍需要后续增加国内可访问的域名或镜像托管。
+  </p>
+</main>
+</body>
+</html>
