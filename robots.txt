@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /diary.html
+Disallow: /diary-app.html
+Disallow: /diary-login.html
+Disallow: /thought.html
+Disallow: /thought-manage.html
+Disallow: /thought-profile.html
+Disallow: /admin.html
+Disallow: /article-manage.html
+Disallow: /publish.html
+Disallow: /media-manage.html
+Disallow: /backup.html
+Disallow: /wechat-import.html
+
+Sitemap: https://yunhenode-github-io-qwu7.vercel.app/sitemap.xml
