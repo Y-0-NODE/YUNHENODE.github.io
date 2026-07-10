@@ -96,8 +96,8 @@
     <input id="file" type="file" accept="image/*,video/*">
 
     <button type="button" onclick="uploadMedia()">上传作品</button>
-    <div id="status" class="status">现在使用直传 Supabase：大文件不会先经过 Vercel。</div>
-    <div class="hint">4K 视频能不能上传，主要看你的 Supabase 存储容量、单文件限制和网络稳定性。建议先用短视频测试。</div>
+    <div id="status" class="status">图片会先自动压缩再上传；视频会保持原文件直传。</div>
+    <div class="hint">如果 4K 视频仍然上传失败，通常是 Supabase 免费容量、单文件限制或网络稳定性，不是数据库表字段问题。图片会自动压缩通过。</div>
   </section>
 </main>
 
@@ -106,8 +106,81 @@
 const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
 
+function formatBytes(bytes){
+  if(!bytes && bytes !== 0) return "";
+  if(bytes < 1024) return `${bytes} B`;
+  if(bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function imageFromFile(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("图片读取失败，请换 JPG / PNG / WebP 图片。"));
+    };
+    img.src = url;
+  });
+}
+
+function canvasToBlob(canvas, type, quality){
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if(blob) resolve(blob);
+      else reject(new Error("图片压缩失败。"));
+    }, type, quality);
+  });
+}
+
+async function compressImageForUpload(file){
+  if(!file.type.startsWith("image/")) return { file, changed:false };
+
+  const image = await imageFromFile(file);
+  const steps = [
+    { maxSize:2200, quality:0.86 },
+    { maxSize:1800, quality:0.82 },
+    { maxSize:1400, quality:0.78 },
+    { maxSize:1100, quality:0.72 },
+    { maxSize:900, quality:0.68 }
+  ];
+  let blob = null;
+
+  for(const step of steps){
+    const scale = Math.min(1, step.maxSize / Math.max(image.width, image.height));
+    const width = Math.max(1, Math.round(image.width * scale));
+    const height = Math.max(1, Math.round(image.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#0b0b0b";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    blob = await canvasToBlob(canvas, "image/jpeg", step.quality);
+    if(blob.size <= 900 * 1024) break;
+  }
+
+  const name = `${file.name.replace(/\.[^.]+$/, "") || "image"}-compressed.jpg`;
+  const nextFile = typeof File === "function"
+    ? new File([blob], name, { type:"image/jpeg" })
+    : Object.assign(blob, { name });
+
+  return {
+    file:nextFile,
+    changed:true,
+    originalSize:file.size,
+    newSize:blob.size
+  };
+}
+
 async function uploadMedia(){
-  const file = document.getElementById("file").files[0];
+  const selectedFile = document.getElementById("file").files[0];
   const status = document.getElementById("status");
   const adminName = document.getElementById("admin-name").value.trim();
   const password = document.getElementById("admin-password").value.trim();
@@ -115,7 +188,7 @@ async function uploadMedia(){
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
 
-  if(!file){
+  if(!selectedFile){
     alert("请选择文件。");
     return;
   }
@@ -130,7 +203,24 @@ async function uploadMedia(){
     return;
   }
 
-  status.textContent = "正在申请上传通道...";
+  let file = selectedFile;
+
+  try{
+    if(kind === "photo" && selectedFile.type.startsWith("image/")){
+      status.textContent = "正在压缩图片...";
+      const compressed = await compressImageForUpload(selectedFile);
+      file = compressed.file;
+      if(compressed.changed){
+        status.textContent = `图片已压缩：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在申请上传通道...`;
+      }
+    }else{
+      status.textContent = "正在申请上传通道...";
+    }
+  }catch(e){
+    status.textContent = e.message || "图片压缩失败。";
+    return;
+  }
+
   const signRes = await fetch("./api/media-sign-upload", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
@@ -138,8 +228,8 @@ async function uploadMedia(){
       adminName,
       password,
       kind,
-      fileName: file.name,
-      contentType: file.type
+      fileName:file.name,
+      contentType:file.type || "application/octet-stream"
     })
   });
 
