@@ -19,6 +19,23 @@
   padding:22px;
 }
 
+.profile-avatar-row{
+  display:grid;
+  grid-template-columns:84px minmax(0,1fr);
+  gap:16px;
+  align-items:center;
+  margin-top:14px;
+}
+
+.avatar-preview{
+  width:84px;
+  height:84px;
+  border:1px solid #333;
+  border-radius:50%;
+  background:#151515;
+  object-fit:cover;
+}
+
 .login{
   max-width:560px;
   margin-top:32px;
@@ -58,6 +75,34 @@ textarea{
   gap:10px;
   flex-wrap:wrap;
   margin-top:16px;
+}
+
+.media-tools{
+  display:grid;
+  gap:12px;
+  margin-top:18px;
+  padding:16px;
+  border:1px solid #292929;
+  background:#0d0d0d;
+}
+
+.media-tools .two-fields{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(180px,0.6fr);
+  gap:12px;
+}
+
+.emoji-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.emoji-row button{
+  min-width:42px;
+  padding:8px 10px;
+  font-size:20px;
+  line-height:1;
 }
 
 button,
@@ -148,6 +193,10 @@ button.danger{
   .dashboard{
     grid-template-columns:1fr;
   }
+
+  .media-tools .two-fields{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
@@ -186,8 +235,19 @@ button.danger{
         <label for="profile-name">显示名称</label>
         <input id="profile-name" value="云鹤系统">
 
+        <label for="profile-avatar-file">头像</label>
+        <div class="profile-avatar-row">
+          <img id="profile-avatar-preview" class="avatar-preview" src="app-icon.svg" alt="头像预览">
+          <div>
+            <input id="profile-avatar-file" type="file" accept="image/*">
+            <div class="actions">
+              <button type="button" onclick="uploadAvatar()">上传头像</button>
+            </div>
+          </div>
+        </div>
+
         <label for="profile-avatar">头像图片地址</label>
-        <input id="profile-avatar" placeholder="https://...">
+        <input id="profile-avatar" placeholder="上传头像后会自动填写，也可以粘贴 https://..." oninput="updateAvatarPreview()">
 
         <label for="profile-signature">签名</label>
         <textarea id="profile-signature" placeholder="写一句显示在随笔页上方的话"></textarea>
@@ -195,12 +255,46 @@ button.danger{
         <div class="actions">
           <button type="button" onclick="saveProfile()">保存资料</button>
         </div>
+        <div id="profile-status" class="status"></div>
       </section>
 
       <section class="panel" style="margin-top:18px;">
         <h2 id="composer-title">写随笔</h2>
         <label for="post-body">内容</label>
-        <textarea id="post-body" placeholder="写一条短记录。支持粘贴图片或视频链接，也支持 [图片:说明](https://...) 这种格式。"></textarea>
+        <textarea id="post-body" placeholder="写一条短记录。可以直接输入苹果系统表情，也可以上传图片后自动插入。"></textarea>
+
+        <div class="media-tools">
+          <div>
+            <label for="post-image-file">随笔图片</label>
+            <input id="post-image-file" type="file" accept="image/*">
+          </div>
+          <div class="two-fields">
+            <div>
+              <label for="post-image-caption">图片说明</label>
+              <input id="post-image-caption" placeholder="例如：现场记录、草图、截图">
+            </div>
+            <div>
+              <label for="post-media-url">已有图片 / 视频地址</label>
+              <input id="post-media-url" placeholder="https://...">
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" onclick="uploadPostImage()">上传图片并插入</button>
+            <button type="button" onclick="insertMediaUrl()">插入已有地址</button>
+          </div>
+          <div>
+            <label>常用表情</label>
+            <div class="emoji-row" aria-label="常用表情">
+              <button type="button" onclick="insertEmoji('🌿')">🌿</button>
+              <button type="button" onclick="insertEmoji('✨')">✨</button>
+              <button type="button" onclick="insertEmoji('📍')">📍</button>
+              <button type="button" onclick="insertEmoji('📝')">📝</button>
+              <button type="button" onclick="insertEmoji('💭')">💭</button>
+              <button type="button" onclick="insertEmoji('🖼️')">🖼️</button>
+            </div>
+          </div>
+          <div id="post-media-status" class="status"></div>
+        </div>
 
         <label for="post-visibility">发布模式</label>
         <select id="post-visibility">
@@ -228,6 +322,7 @@ button.danger{
   </section>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 let ADMIN_NAME = "";
 let ADMIN_PASSWORD = "";
@@ -275,6 +370,222 @@ function parseProfile(row){
   }catch(e){
     return {};
   }
+}
+
+function updateAvatarPreview(){
+  const url = document.getElementById("profile-avatar").value.trim() || "app-icon.svg";
+  document.getElementById("profile-avatar-preview").src = url;
+}
+
+function formatBytes(bytes){
+  if(!bytes && bytes !== 0) return "";
+  if(bytes < 1024) return `${bytes} B`;
+  if(bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function imageFromFile(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("图片读取失败"));
+    };
+    img.src = url;
+  });
+}
+
+function canvasToBlob(canvas, type, quality){
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if(blob) resolve(blob);
+      else reject(new Error("图片压缩失败"));
+    }, type, quality);
+  });
+}
+
+async function compressImage(file, options){
+  if(!file.type.startsWith("image/")) return { file, compressed:false };
+
+  const maxSize = options.maxSize || 1600;
+  const quality = options.quality || 0.86;
+  const prefix = options.prefix || "image";
+  const outputType = "image/jpeg";
+  const image = await imageFromFile(file);
+  const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#0b0b0b";
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(image, 0, 0, width, height);
+  const blob = await canvasToBlob(canvas, outputType, quality);
+  const name = `${prefix}-${Date.now()}.jpg`;
+  const uploadFile = typeof File === "function"
+    ? new File([blob], name, { type:outputType })
+    : Object.assign(blob, { name });
+
+  return { file:uploadFile, compressed:true, originalSize:file.size, newSize:blob.size };
+}
+
+function insertTextToPost(text){
+  const textarea = document.getElementById("post-body");
+  const start = textarea.selectionStart || 0;
+  const end = textarea.selectionEnd || 0;
+  const before = textarea.value.slice(0, start);
+  const after = textarea.value.slice(end);
+  textarea.value = `${before}${text}${after}`;
+  const position = start + text.length;
+  textarea.focus();
+  textarea.setSelectionRange(position, position);
+}
+
+function insertEmoji(emoji){
+  insertTextToPost(emoji);
+}
+
+async function signedUpload(file, options){
+  const signRes = await fetch("./api/media-sign-upload", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      adminName:ADMIN_NAME,
+      password:ADMIN_PASSWORD,
+      kind:options.kind || "photo",
+      fileName:file.name,
+      contentType:file.type || "application/octet-stream"
+    })
+  });
+
+  const sign = await signRes.json().catch(() => ({}));
+  if(!signRes.ok) throw new Error(sign.error || "申请上传通道失败。");
+
+  const client = window.supabase.createClient("https://ndraugyrdnecqqcyfzjt.supabase.co", "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM");
+  const uploadResult = await client.storage
+    .from(sign.bucket)
+    .uploadToSignedUrl(sign.path, sign.token, file);
+
+  if(uploadResult.error) throw new Error(uploadResult.error.message || "上传失败。");
+
+  await fetch("./api/media-record", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      adminName:ADMIN_NAME,
+      password:ADMIN_PASSWORD,
+      kind:options.kind || "photo",
+      title:options.title || file.name,
+      description:options.description || "",
+      fileName:file.name,
+      path:sign.path,
+      url:sign.publicUrl
+    })
+  }).catch(() => null);
+
+  return sign.publicUrl;
+}
+
+async function uploadAvatar(){
+  const status = document.getElementById("profile-status");
+  const file = document.getElementById("profile-avatar-file").files[0];
+
+  if(!ADMIN_NAME || !ADMIN_PASSWORD){
+    status.textContent = "请先登录随笔系统。";
+    return;
+  }
+
+  if(!file){
+    status.textContent = "请先选择头像图片。";
+    return;
+  }
+
+  if(!window.supabase){
+    status.textContent = "上传组件还没加载好，请刷新页面后再试。";
+    return;
+  }
+
+  try{
+    status.textContent = "正在压缩头像...";
+    const image = await compressImage(file, { maxSize:512, quality:0.82, prefix:"avatar" });
+    status.textContent = image.compressed
+      ? `头像已压缩：${formatBytes(image.originalSize)} → ${formatBytes(image.newSize)}，正在上传...`
+      : "正在上传头像...";
+
+    const url = await signedUpload(image.file, {
+      kind:"photo",
+      title:"随笔头像",
+      description:"从随笔管理页上传的头像"
+    });
+
+    document.getElementById("profile-avatar").value = url;
+    updateAvatarPreview();
+    status.textContent = "头像已上传。记得点击“保存资料”。";
+  }catch(e){
+    status.textContent = e.message || "头像上传失败。";
+  }
+}
+
+async function uploadPostImage(){
+  const status = document.getElementById("post-media-status");
+  const file = document.getElementById("post-image-file").files[0];
+  const caption = document.getElementById("post-image-caption").value.trim() || "随笔图片";
+
+  if(!ADMIN_NAME || !ADMIN_PASSWORD){
+    status.textContent = "请先登录随笔系统。";
+    return;
+  }
+
+  if(!file){
+    status.textContent = "请先选择一张图片。";
+    return;
+  }
+
+  if(!window.supabase){
+    status.textContent = "上传组件还没加载好，请刷新页面后再试。";
+    return;
+  }
+
+  try{
+    status.textContent = "正在压缩随笔图片...";
+    const image = await compressImage(file, { maxSize:1800, quality:0.86, prefix:"thought" });
+    status.textContent = image.compressed
+      ? `图片已压缩：${formatBytes(image.originalSize)} → ${formatBytes(image.newSize)}，正在上传...`
+      : "正在上传图片...";
+
+    const url = await signedUpload(image.file, {
+      kind:"photo",
+      title:caption,
+      description:"从随笔管理页插入的图片"
+    });
+
+    insertTextToPost(`\n\n[图片:${caption}](${url})\n\n`);
+    status.textContent = "图片已上传并插入正文。记得点击“发布 / 保存”。";
+  }catch(e){
+    status.textContent = e.message || "图片上传失败。";
+  }
+}
+
+function insertMediaUrl(){
+  const status = document.getElementById("post-media-status");
+  const url = document.getElementById("post-media-url").value.trim();
+  const caption = document.getElementById("post-image-caption").value.trim() || "媒体";
+
+  if(!url){
+    status.textContent = "请先填写图片或视频地址。";
+    return;
+  }
+
+  const isVideo = /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(url);
+  insertTextToPost(`\n\n[${isVideo ? "视频" : "图片"}:${caption}](${url})\n\n`);
+  status.textContent = "地址已插入正文。记得点击“发布 / 保存”。";
 }
 
 async function adminList(type){
@@ -326,6 +637,8 @@ async function reloadAll(){
   document.getElementById("profile-name").value = profile.name || "云鹤系统";
   document.getElementById("profile-avatar").value = profile.avatar || "";
   document.getElementById("profile-signature").value = profile.signature || "";
+  document.getElementById("profile-status").textContent = "";
+  updateAvatarPreview();
   renderPosts();
 }
 
