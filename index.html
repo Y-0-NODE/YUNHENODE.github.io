@@ -88,7 +88,7 @@
   <section class="latest">
     <h2>最新文章</h2>
     <div id="latest-status" class="status">正在加载最新文章...</div>
-    <div id="latest" class="grid"></div>
+    <div id="latest" class="grid latest-article-grid"></div>
   </section>
 
   <section style="margin-top:80px;">
@@ -156,6 +156,16 @@ function articleUrl(item){
   return `content.html?id=${encodeURIComponent(item.id)}`;
 }
 
+function splitTitle(title){
+  const text = String(title || "").trim();
+  const match = text.match(/^(.*?)\s*(——|—|-)\s*(.+)$/);
+  if(!match) return { title:text, subtitle:"" };
+  return {
+    title:match[1].trim() || text,
+    subtitle:match[3].trim()
+  };
+}
+
 fetch(API, {
   headers:{
     apikey: SUPABASE_KEY,
@@ -178,10 +188,11 @@ fetch(API, {
 
     status.textContent = "";
     box.innerHTML = list.map(item => `
-      <a class="card" href="${articleUrl(item)}">
+      <a class="card article-card" href="${articleUrl(item)}">
         <span>${item.topic || "ARTICLE"}</span>
-        <h2>${item.title || "未命名文章"}</h2>
-        <p>${item.intro || ""}</p>
+        <h2>${splitTitle(item.title).title || "未命名文章"}</h2>
+        <p class="subtitle">${splitTitle(item.title).subtitle || item.intro || ""}</p>
+        ${splitTitle(item.title).subtitle && item.intro ? `<p class="excerpt">${item.intro}</p>` : ""}
       </a>
     `).join("");
   })
