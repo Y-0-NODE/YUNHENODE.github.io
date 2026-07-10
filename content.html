@@ -105,8 +105,31 @@ h1{
   color:var(--soft);
   font-size:18px;
   line-height:1.85;
-  margin:24px 0 48px;
+  margin:18px 0 16px;
   max-width:1120px;
+}
+
+#subtitle{
+  color:var(--soft);
+  font-size:clamp(22px,2.4vw,34px);
+  line-height:1.35;
+  font-weight:700;
+  margin:18px 0 22px;
+  max-width:1280px;
+}
+
+.article-meta-footer,
+.article-meta-top{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+  margin:0 0 48px;
+}
+
+.article-meta-footer{
+  margin:56px 0 0;
+  padding-top:18px;
+  border-top:1px solid var(--line);
 }
 
 .article-body{
@@ -239,8 +262,11 @@ h1{
 
   <p class="kicker">YUNHENODE / CONTENT</p>
   <h1 id="title">加载中...</h1>
+  <p id="subtitle"></p>
   <p id="intro"></p>
+  <p id="meta-top" class="article-meta-top"></p>
   <article id="body" class="article-body"></article>
+  <p id="meta-footer" class="article-meta-footer"></p>
 </main>
 
 <script>
@@ -285,6 +311,51 @@ function escapeHtml(value){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
+}
+
+function splitTitle(title){
+  const text = String(title || "").trim();
+  const match = text.match(/^(.*?)\s*(——|—|-)\s*(.+)$/);
+  if(!match) return { title:text, subtitle:"" };
+  return {
+    title:match[1].trim() || text,
+    subtitle:match[3].trim()
+  };
+}
+
+function readMeta(raw){
+  const match = String(raw || "").match(/<!--yunhe-meta:([\s\S]*?)-->\s*$/m);
+  if(!match) return {};
+  try{
+    return JSON.parse(match[1]);
+  }catch(e){
+    return {};
+  }
+}
+
+function cleanBody(raw){
+  return String(raw || "").replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "").trim();
+}
+
+function formatDate(value){
+  if(!value) return "";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("zh-CN", {
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  });
+}
+
+function renderMeta(meta, createdAt){
+  const items = [];
+  if(meta.originalDate) items.push(`原始撰写时间：${formatDate(meta.originalDate)}`);
+  if(createdAt) items.push(`入库时间：${formatDate(createdAt)}`);
+  if(meta.source) items.push(`来源：${meta.source}`);
+  const text = items.join("　/　");
+  document.getElementById("meta-top").textContent = text;
+  document.getElementById("meta-footer").textContent = text ? `记录信息：${text}` : "";
 }
 
 function buildQuery(){
@@ -393,7 +464,7 @@ if(!query){
   throw new Error("missing article id");
 }
 
-fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic&${query}&limit=1`, {
+fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic,created_at&${query}&limit=1`, {
   headers:{
     apikey: SUPABASE_KEY,
     Authorization: `Bearer ${SUPABASE_KEY}`
@@ -410,10 +481,15 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic&${que
   }
 
   const post = data[0];
+  const parts = splitTitle(post.title);
+  const meta = readMeta(post.body || "");
+  const subtitle = meta.subtitle || parts.subtitle || "";
   document.querySelector(".kicker").innerText = `YUNHENODE / ${post.type || "CONTENT"} / ${post.topic || "未分类"}`;
-  document.getElementById("title").innerText = post.title || "无标题";
-  document.getElementById("intro").innerText = post.intro || "";
-  renderBody(post.body || "");
+  document.getElementById("title").innerText = parts.title || "无标题";
+  document.getElementById("subtitle").innerText = subtitle;
+  document.getElementById("intro").innerText = post.intro && post.intro !== subtitle ? post.intro : "";
+  renderMeta(meta, post.created_at);
+  renderBody(cleanBody(post.body || ""));
   renderArticleTools(post);
 })
 .catch(err => {
