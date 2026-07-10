@@ -1,6 +1,9 @@
 {
   "name": "api",
   "version": "1.0.0",
+  "scripts": {
+    "sync:gallery": "node scripts/sync-local-gallery.js"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
   }
