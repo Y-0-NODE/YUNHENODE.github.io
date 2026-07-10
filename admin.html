@@ -3,611 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>随笔管理｜云鹤系统</title>
+<title>后台｜云鹤系统</title>
 <link rel="stylesheet" href="style.css">
 <style>
-.manage-shell{
-  max-width:1120px;
-  margin:0 auto;
-  padding:140px 28px 80px;
+.admin-grid{
+  margin-top:56px;
 }
 
-.panel,
-.post-card{
-  border:1px solid #292929;
-  background:#101010;
+.admin-note{
+  border:1px solid #2a2a2a;
+  background:#111;
   padding:22px;
-}
-
-.profile-avatar-row{
-  display:grid;
-  grid-template-columns:84px minmax(0,1fr);
-  gap:16px;
-  align-items:center;
-  margin-top:14px;
-}
-
-.avatar-preview{
-  width:84px;
-  height:84px;
-  border:1px solid #333;
-  border-radius:50%;
-  background:#151515;
-  object-fit:cover;
-}
-
-.login{
-  max-width:560px;
-  margin-top:32px;
-}
-
-label{
-  display:block;
+  margin-top:56px;
   color:#aaa;
-  margin:16px 0 8px;
-}
-
-input,
-textarea,
-select{
-  width:100%;
-  border:1px solid #303030;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-}
-
-textarea{
-  min-height:150px;
   line-height:1.8;
-  resize:vertical;
-}
-
-.dashboard{
-  display:grid;
-  grid-template-columns:minmax(300px,0.8fr) minmax(0,1fr);
-  gap:18px;
-  margin-top:32px;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:16px;
-}
-
-button,
-.button{
-  border:1px solid #303030;
-  background:#151515;
-  color:#f2f2f2;
-  padding:10px 14px;
-  cursor:pointer;
-  text-decoration:none;
-}
-
-button.primary{
-  background:#f2f2f2;
-  color:#0b0b0b;
-  font-weight:700;
-}
-
-button.danger{
-  color:#ff9a9a;
-  border-color:#4a2525;
-}
-
-.feed{
-  display:grid;
-  gap:14px;
-}
-
-.post-card{
-  position:relative;
-}
-
-.post-head{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  color:#777;
-  font-size:13px;
-  margin-bottom:14px;
-}
-
-.menu{
-  position:relative;
-}
-
-.menu-panel{
-  position:absolute;
-  right:0;
-  top:34px;
-  display:none;
-  min-width:150px;
-  border:1px solid #303030;
-  background:#0b0b0b;
-  z-index:3;
-}
-
-.menu.open .menu-panel{
-  display:grid;
-}
-
-.menu-panel button{
-  border:0;
-  border-bottom:1px solid #242424;
-  text-align:left;
-}
-
-.post-body{
-  white-space:pre-wrap;
-  line-height:1.8;
-  color:#e5e5e5;
-}
-
-.status{
-  color:#888;
-  margin-top:18px;
-  line-height:1.7;
-}
-
-.hidden{
-  display:none;
-}
-
-@media(max-width:860px){
-  .manage-shell{
-    padding:42px 18px 60px;
-  }
-
-  .dashboard{
-    grid-template-columns:1fr;
-  }
 }
 </style>
 </head>
+
 <body>
+
 <header class="topbar">
   <div class="logo">YUNHENODE CMS</div>
   <nav>
-    <a href="thought.html">公开随笔</a>
-    <a href="admin.html">后台</a>
     <a href="index.html">网站首页</a>
+    <a href="publish.html">新建内容</a>
+    <a href="thought-manage.html">随笔管理</a>
+    <a href="wechat-import.html">公众号导入</a>
+    <a href="article-manage.html">文章管理</a>
+    <a href="case-write.html">案例撰写</a>
+    <a href="media-manage.html">作品上传</a>
+    <a href="design-settings.html">设计设置</a>
+    <a href="diary.html">内部日记</a>
+    <a href="maintenance.html">维护</a>
   </nav>
 </header>
 
-<main class="manage-shell">
-  <p class="eyebrow">MICRO NOTES ADMIN</p>
-  <h1>随笔管理</h1>
-  <p class="intro">像微博一样发布短记录。你可以设为公开，也可以只保存在自己的账户管理里。</p>
+<main class="home">
+  <p class="eyebrow">ADMIN CENTER</p>
+  <h1>后台</h1>
+  <p class="intro">集中管理发布、文章、草稿与内部记录。</p>
 
-  <section id="login-panel" class="panel login">
-    <label for="admin-name">管理员名称</label>
-    <input id="admin-name" value="YUNHE" autocomplete="username">
+  <div class="grid admin-grid">
+    <a class="card" href="publish.html">
+      <span>01</span>
+      <h2>新建内容</h2>
+      <p>发布文章、视频、案例。</p>
+    </a>
 
-    <label for="admin-password">管理员密码</label>
-    <input id="admin-password" type="password" autocomplete="current-password">
+    <a class="card" href="article-manage.html">
+      <span>02</span>
+      <h2>文章管理</h2>
+      <p>搜索、编辑、删除文章。</p>
+    </a>
 
-    <div class="actions">
-      <button class="primary" type="button" onclick="login()">登录随笔系统</button>
-    </div>
-    <div id="login-status" class="status"></div>
-  </section>
+    <a class="card" href="thought-manage.html">
+      <span>03</span>
+      <h2>随笔管理</h2>
+      <p>发布短随笔，设置公开或仅自己可见。</p>
+    </a>
 
-  <section id="dashboard" class="dashboard hidden">
-    <div>
-      <section class="panel">
-        <h2>个人资料</h2>
-        <label for="profile-name">显示名称</label>
-        <input id="profile-name" value="云鹤系统">
+    <a class="card" href="wechat-import.html">
+      <span>04</span>
+      <h2>公众号导入</h2>
+      <p>粘贴公众号内容，自动匹配板块和主题并保存。</p>
+    </a>
 
-        <label for="profile-avatar-file">头像</label>
-        <div class="profile-avatar-row">
-          <img id="profile-avatar-preview" class="avatar-preview" src="app-icon.svg" alt="头像预览">
-          <div>
-            <input id="profile-avatar-file" type="file" accept="image/*">
-            <div class="actions">
-              <button type="button" onclick="uploadAvatar()">上传头像</button>
-            </div>
-          </div>
-        </div>
+    <a class="card" href="article-draft.html">
+      <span>05</span>
+      <h2>草稿箱</h2>
+      <p>检查未发布内容。</p>
+    </a>
 
-        <label for="profile-avatar">头像图片地址</label>
-        <input id="profile-avatar" placeholder="上传头像后会自动填写，也可以粘贴 https://..." oninput="updateAvatarPreview()">
+    <a class="card" href="diary.html">
+      <span>06</span>
+      <h2>内部日记</h2>
+      <p>进入私人记录和本机日记 App。</p>
+    </a>
 
-        <label for="profile-signature">签名</label>
-        <textarea id="profile-signature" placeholder="写一句显示在随笔页上方的话"></textarea>
+    <a class="card" href="media-manage.html">
+      <span>07</span>
+      <h2>作品上传</h2>
+      <p>上传摄影作品和影像作品。</p>
+    </a>
 
-        <div class="actions">
-          <button type="button" onclick="saveProfile()">保存资料</button>
-        </div>
-        <div id="profile-status" class="status"></div>
-      </section>
+    <a class="card" href="backup.html">
+      <span>08</span>
+      <h2>数据备份</h2>
+      <p>导出网站内容、日记和作品索引。</p>
+    </a>
 
-      <section class="panel" style="margin-top:18px;">
-        <h2 id="composer-title">写随笔</h2>
-        <label for="post-body">内容</label>
-        <textarea id="post-body" placeholder="写一条短记录。支持粘贴图片或视频链接，也支持 [图片:说明](https://...) 这种格式。"></textarea>
+    <a class="card" href="case-write.html">
+      <span>09</span>
+      <h2>案例撰写</h2>
+      <p>选择模板，生成极简案例文本并保存。</p>
+    </a>
 
-        <label for="post-visibility">发布模式</label>
-        <select id="post-visibility">
-          <option value="public">公开</option>
-          <option value="private">仅自己可见</option>
-        </select>
+    <a class="card" href="maintenance.html">
+      <span>10</span>
+      <h2>维护与防御</h2>
+      <p>检查权限、备份、安全头和部署限制。</p>
+    </a>
 
-        <div class="actions">
-          <button class="primary" type="button" onclick="savePost()">发布 / 保存</button>
-          <button type="button" onclick="clearComposer()">清空</button>
-        </div>
-        <div id="save-status" class="status"></div>
-      </section>
+    <a class="card" href="design-settings.html">
+      <span>11</span>
+      <h2>设计设置</h2>
+      <p>自定义阅读页主题、强调色和背景图。</p>
+    </a>
+  </div>
 
-      <section class="panel" style="margin-top:18px;">
-        <h2>访客评论账户</h2>
-        <p class="status">下一阶段开放邮箱申请。访客只能设置头像、名字、签名并评论，不能发布主站内容。</p>
-      </section>
-    </div>
-
-    <section>
-      <div id="list-status" class="status">正在读取随笔...</div>
-      <div id="feed" class="feed"></div>
-    </section>
-  </section>
+  <div class="admin-note">
+    管理后台使用 Vercel 环境变量进行验证。管理员名称填写环境变量名，例如 YUNHE；密码填写该环境变量对应的值。
+  </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-let ADMIN_NAME = "";
-let ADMIN_PASSWORD = "";
-let POSTS = [];
-let PROFILE = null;
-let EDITING_ID = "";
-
-function escapeHtml(value){
-  return String(value || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function formatDate(value){
-  const date = new Date(value);
-  if(Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString("zh-CN", {
-    year:"numeric",
-    month:"2-digit",
-    day:"2-digit",
-    hour:"2-digit",
-    minute:"2-digit"
-  });
-}
-
-function makeTitle(text){
-  const clean = String(text || "").replace(/\s+/g, " ").trim();
-  return clean.slice(0, 24) || "未命名随笔";
-}
-
-function profileBody(){
-  return JSON.stringify({
-    name:document.getElementById("profile-name").value.trim() || "云鹤系统",
-    avatar:document.getElementById("profile-avatar").value.trim(),
-    signature:document.getElementById("profile-signature").value.trim()
-  });
-}
-
-function parseProfile(row){
-  try{
-    return JSON.parse(row?.body || "{}");
-  }catch(e){
-    return {};
-  }
-}
-
-function updateAvatarPreview(){
-  const url = document.getElementById("profile-avatar").value.trim() || "app-icon.svg";
-  document.getElementById("profile-avatar-preview").src = url;
-}
-
-async function uploadAvatar(){
-  const status = document.getElementById("profile-status");
-  const file = document.getElementById("profile-avatar-file").files[0];
-
-  if(!ADMIN_NAME || !ADMIN_PASSWORD){
-    status.textContent = "请先登录随笔系统。";
-    return;
-  }
-
-  if(!file){
-    status.textContent = "请先选择头像图片。";
-    return;
-  }
-
-  if(!window.supabase){
-    status.textContent = "上传组件还没加载好，请刷新页面后再试。";
-    return;
-  }
-
-  status.textContent = "正在申请头像上传通道...";
-
-  const signRes = await fetch("./api/media-sign-upload", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD,
-      kind:"photo",
-      fileName:`avatar-${file.name}`,
-      contentType:file.type
-    })
-  });
-
-  const sign = await signRes.json().catch(() => ({}));
-
-  if(!signRes.ok){
-    status.textContent = sign.error || "申请上传通道失败。";
-    return;
-  }
-
-  status.textContent = "正在上传头像...";
-
-  const client = window.supabase.createClient("https://ndraugyrdnecqqcyfzjt.supabase.co", "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM");
-  const uploadResult = await client.storage
-    .from(sign.bucket)
-    .uploadToSignedUrl(sign.path, sign.token, file);
-
-  if(uploadResult.error){
-    status.textContent = uploadResult.error.message || "头像上传失败。";
-    return;
-  }
-
-  await fetch("./api/media-record", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD,
-      kind:"photo",
-      title:"随笔头像",
-      description:"从随笔管理页上传的头像",
-      fileName:file.name,
-      path:sign.path,
-      url:sign.publicUrl
-    })
-  }).catch(() => null);
-
-  document.getElementById("profile-avatar").value = sign.publicUrl;
-  updateAvatarPreview();
-  status.textContent = "头像已上传。记得点击“保存资料”。";
-}
-
-async function adminList(type){
-  const res = await fetch("/api/admin-list", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD,
-      type
-    })
-  });
-  const result = await res.json().catch(() => ({}));
-  if(!res.ok) throw new Error(result.error || "读取失败");
-  return Array.isArray(result.data) ? result.data : [];
-}
-
-async function login(){
-  ADMIN_NAME = document.getElementById("admin-name").value.trim();
-  ADMIN_PASSWORD = document.getElementById("admin-password").value.trim();
-
-  if(!ADMIN_NAME || !ADMIN_PASSWORD){
-    document.getElementById("login-status").textContent = "请填写管理员名称和密码。";
-    return;
-  }
-
-  document.getElementById("login-status").textContent = "正在登录...";
-
-  try{
-    await reloadAll();
-    document.getElementById("login-panel").classList.add("hidden");
-    document.getElementById("dashboard").classList.remove("hidden");
-    document.getElementById("login-status").textContent = "";
-  }catch(e){
-    document.getElementById("login-status").textContent = e.message || "登录失败。";
-  }
-}
-
-async function reloadAll(){
-  const [posts, profiles] = await Promise.all([
-    adminList("thought"),
-    adminList("thought_profile")
-  ]);
-
-  POSTS = posts;
-  PROFILE = profiles[0] || null;
-
-  const profile = parseProfile(PROFILE);
-  document.getElementById("profile-name").value = profile.name || "云鹤系统";
-  document.getElementById("profile-avatar").value = profile.avatar || "";
-  document.getElementById("profile-signature").value = profile.signature || "";
-  document.getElementById("profile-status").textContent = "";
-  updateAvatarPreview();
-  renderPosts();
-}
-
-function renderPosts(){
-  const feed = document.getElementById("feed");
-  const status = document.getElementById("list-status");
-
-  if(!POSTS.length){
-    status.textContent = "还没有随笔。";
-    feed.innerHTML = "";
-    return;
-  }
-
-  status.textContent = "";
-  feed.innerHTML = POSTS.map(item => `
-    <article class="post-card">
-      <div class="post-head">
-        <span>${item.topic === "private" ? "仅自己可见" : "公开"} / ${formatDate(item.created_at)}</span>
-        <div class="menu">
-          <button type="button" onclick="toggleMenu(this)">⌄</button>
-          <div class="menu-panel">
-            <button type="button" onclick="editPost('${item.id}')">编辑</button>
-            <button type="button" onclick="toggleVisibility('${item.id}')">${item.topic === "private" ? "设为公开" : "设为仅自己可见"}</button>
-            <button type="button" onclick="deletePost('${item.id}')">删除</button>
-          </div>
-        </div>
-      </div>
-      <div class="post-body">${escapeHtml(item.body || "")}</div>
-    </article>
-  `).join("");
-}
-
-function toggleMenu(button){
-  document.querySelectorAll(".menu.open").forEach(menu => {
-    if(menu !== button.parentElement) menu.classList.remove("open");
-  });
-  button.parentElement.classList.toggle("open");
-}
-
-function clearComposer(){
-  EDITING_ID = "";
-  document.getElementById("composer-title").textContent = "写随笔";
-  document.getElementById("post-body").value = "";
-  document.getElementById("post-visibility").value = "public";
-  document.getElementById("save-status").textContent = "";
-}
-
-function editPost(id){
-  const item = POSTS.find(post => String(post.id) === String(id));
-  if(!item) return;
-  EDITING_ID = String(item.id);
-  document.getElementById("composer-title").textContent = "编辑随笔";
-  document.getElementById("post-body").value = item.body || "";
-  document.getElementById("post-visibility").value = item.topic === "private" ? "private" : "public";
-  document.getElementById("post-body").focus();
-  window.scrollTo({ top:0, behavior:"smooth" });
-}
-
-async function saveProfile(){
-  const body = profileBody();
-  const payload = {
-    adminName:ADMIN_NAME,
-    password:ADMIN_PASSWORD,
-    title:"随笔个人资料",
-    intro:document.getElementById("profile-signature").value.trim(),
-    body,
-    topic:"public"
-  };
-
-  const url = PROFILE?.id ? "/api/update" : "/api/publish";
-  const requestBody = PROFILE?.id ? { ...payload, id:PROFILE.id } : { ...payload, type:"thought_profile" };
-
-  const res = await fetch(url, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(requestBody)
-  });
-  const result = await res.json().catch(() => ({}));
-  if(!res.ok){
-    alert(result.error || "资料保存失败。");
-    return;
-  }
-  await reloadAll();
-  alert("资料已保存。");
-}
-
-async function savePost(){
-  const body = document.getElementById("post-body").value.trim();
-  const visibility = document.getElementById("post-visibility").value;
-
-  if(!body){
-    document.getElementById("save-status").textContent = "内容不能为空。";
-    return;
-  }
-
-  const payload = {
-    adminName:ADMIN_NAME,
-    password:ADMIN_PASSWORD,
-    title:makeTitle(body),
-    intro:body.slice(0, 100),
-    body,
-    topic:visibility
-  };
-
-  const url = EDITING_ID ? "/api/update" : "/api/publish";
-  const requestBody = EDITING_ID ? { ...payload, id:EDITING_ID } : { ...payload, type:"thought" };
-
-  document.getElementById("save-status").textContent = "正在保存...";
-  const res = await fetch(url, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(requestBody)
-  });
-  const result = await res.json().catch(() => ({}));
-  if(!res.ok){
-    document.getElementById("save-status").textContent = result.error || "保存失败。";
-    return;
-  }
-  clearComposer();
-  await reloadAll();
-  document.getElementById("save-status").textContent = "已保存。";
-}
-
-async function toggleVisibility(id){
-  const item = POSTS.find(post => String(post.id) === String(id));
-  if(!item) return;
-  const next = item.topic === "private" ? "public" : "private";
-
-  const res = await fetch("/api/update", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      id:item.id,
-      title:item.title || makeTitle(item.body),
-      intro:item.intro || "",
-      body:item.body || "",
-      topic:next,
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD
-    })
-  });
-  const result = await res.json().catch(() => ({}));
-  if(!res.ok){
-    alert(result.error || "修改可见性失败。");
-    return;
-  }
-  await reloadAll();
-}
-
-async function deletePost(id){
-  const item = POSTS.find(post => String(post.id) === String(id));
-  if(!item) return;
-  if(!confirm("确定删除这条随笔吗？")) return;
-
-  const res = await fetch("/api/delete", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      id:item.id,
-      slug:item.slug || "",
-      title:item.title || "",
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD
-    })
-  });
-  const result = await res.json().catch(() => ({}));
-  if(!res.ok){
-    alert(result.error || "删除失败。");
-    return;
-  }
-  POSTS = POSTS.filter(post => String(post.id) !== String(id));
-  renderPosts();
-}
-</script>
 </body>
 </html>
