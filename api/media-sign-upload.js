@@ -1,7 +1,18 @@
-const { createClient } = require("@supabase/supabase-js");
-const { checkAdmin, requireSupabaseEnv } = require("./_auth");
+const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
 
 const BUCKET = "media";
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/heic",
+  "image/heif",
+  "application/octet-stream",
+  "video/mp4",
+  "video/quicktime",
+  "video/webm"
+];
 
 function safeFileName(name) {
   return String(name || "upload.bin")
@@ -10,10 +21,85 @@ function safeFileName(name) {
     .slice(0, 120);
 }
 
-async function ensureBucket(supabase) {
-  const { data } = await supabase.storage.getBucket(BUCKET);
-  if (data) return;
-  await supabase.storage.createBucket(BUCKET, { public: true, fileSizeLimit: 5368709120 });
+function getSupabaseEnv() {
+  return {
+    url: String(process.env.SUPABASE_URL || "").replace(/\/$/, ""),
+    key: process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+  };
+}
+
+function isJwtKey(key) {
+  return String(key || "").split(".").length === 3;
+}
+
+async function storageRequest(path, options = {}) {
+  const env = getSupabaseEnv();
+  const headers = {
+    apikey: env.key,
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+
+  if (isJwtKey(env.key)) {
+    headers.Authorization = `Bearer ${env.key}`;
+  }
+
+  const response = await fetch(`${env.url}/storage/v1${path}`, {
+    ...options,
+    headers
+  });
+
+  const text = await response.text();
+  let data = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (e) {
+    data = text;
+  }
+
+  if (!response.ok) {
+    const message = data?.message || data?.error || text || `Supabase Storage HTTP ${response.status}`;
+    const error = new Error(message);
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+
+  return data;
+}
+
+async function ensureBucket() {
+  try {
+    await storageRequest(`/bucket/${encodeURIComponent(BUCKET)}`);
+  } catch (e) {
+    if (e.status !== 404) throw e;
+    await storageRequest("/bucket", {
+      method: "POST",
+      body: JSON.stringify({
+        id: BUCKET,
+        name: BUCKET,
+        public: true,
+        file_size_limit: 5368709120,
+        allowed_mime_types: ALLOWED_MIME_TYPES
+      })
+    });
+    return;
+  }
+
+  await storageRequest(`/bucket/${encodeURIComponent(BUCKET)}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      public: true,
+      file_size_limit: 5368709120,
+      allowed_mime_types: ALLOWED_MIME_TYPES
+    })
+  });
+}
+
+function publicUrl(path) {
+  const env = getSupabaseEnv();
+  return `${env.url}/storage/v1/object/public/${BUCKET}/${path.split("/").map(encodeURIComponent).join("/")}`;
 }
 
 module.exports = async function handler(req, res) {
@@ -34,27 +120,26 @@ module.exports = async function handler(req, res) {
     const kind = body?.kind === "video" ? "video" : "photo";
     const safeName = safeFileName(body?.fileName);
     const path = `${kind}/${Date.now()}-${safeName}`;
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-    await ensureBucket(supabase);
+    await ensureBucket();
 
-    const { data, error } = await supabase.storage
-      .from(BUCKET)
-      .createSignedUploadUrl(path);
-
-    if (error) return res.status(500).json({ success: false, error: error.message || error });
-
-    const { data: publicData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+    const signed = await storageRequest(`/object/upload/sign/${BUCKET}/${path}`, {
+      method: "POST"
+    });
 
     return res.status(200).json({
       success: true,
       bucket: BUCKET,
       path,
-      token: data.token,
-      signedUrl: data.signedUrl,
-      publicUrl: publicData.publicUrl
+      token: signed.token,
+      signedUrl: signed.url || signed.signedURL || signed.signedUrl || null,
+      publicUrl: publicUrl(path)
     });
   } catch (e) {
-    return res.status(500).json({ success: false, error: e.message });
+    return res.status(500).json({
+      success: false,
+      error: e.message || "申请上传通道失败",
+      detail: e.data || null
+    });
   }
 };
