@@ -14,11 +14,19 @@ function cleanBody(body) {
   return String(body || "").replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "").trim();
 }
 
+function inferSource(body, source) {
+  const text = cleanBody(body);
+  if (/原文链接[：:]\s*https?:\/\/mp\.weixin\.qq\.com\//.test(text)) {
+    return "云鹤系统公众号转载";
+  }
+  return String(source || "").trim() || "本站撰写";
+}
+
 function withMeta(body, data) {
   const meta = {
     subtitle: String(data?.subtitle || "").trim(),
     originalDate: String(data?.originalDate || "").trim(),
-    source: String(data?.source || "").trim() || "本站撰写"
+    source: inferSource(body, data?.source)
   };
   return `${cleanBody(body)}\n\n<!--yunhe-meta:${JSON.stringify(meta)}-->`;
 }
