@@ -15,11 +15,26 @@ module.exports = async function handler(req, res) {
   }
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-  const { data, error } = await supabase
+  let query = supabase
     .from("media_items")
     .select("id,title,description,kind,url,path,status,created_at")
-    .eq("status", "published")
     .order("created_at", { ascending: false });
+
+  let { data, error } = await query.eq("status", "published");
+
+  if (error) {
+    const message = `${error.message || ""} ${error.details || ""}`;
+    const isColumnMismatch = /column|schema cache|status|path/i.test(message);
+    if (!isColumnMismatch) return res.status(500).json({ success: false, error: error.message || error });
+
+    const fallback = await supabase
+      .from("media_items")
+      .select("id,title,description,kind,url,created_at")
+      .order("created_at", { ascending: false });
+
+    data = fallback.data;
+    error = fallback.error;
+  }
 
   if (error) return res.status(500).json({ success: false, error: error.message || error });
 
