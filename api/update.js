@@ -1,6 +1,30 @@
 const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
 const { supabaseRequest } = require("../lib/_supabase-rest");
 
+function cleanBody(body) {
+  return String(body || "").replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "").trim();
+}
+
+function readMeta(body) {
+  const match = String(body || "").match(/<!--yunhe-meta:([\s\S]*?)-->\s*$/m);
+  if (!match) return {};
+  try {
+    return JSON.parse(match[1]);
+  } catch (e) {
+    return {};
+  }
+}
+
+function withMeta(body, data, currentBody) {
+  const previous = readMeta(currentBody || body);
+  const meta = {
+    subtitle: String(data?.subtitle || previous.subtitle || "").trim(),
+    originalDate: String(data?.originalDate || previous.originalDate || "").trim(),
+    source: String(data?.source || previous.source || "本站撰写").trim()
+  };
+  return `${cleanBody(body)}\n\n<!--yunhe-meta:${JSON.stringify(meta)}-->`;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -21,14 +45,20 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: "缺少文章 ID、标题或正文" });
     }
 
+    const currentRows = await supabaseRequest(`/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=body`, {
+      method: "GET"
+    }).catch(() => []);
+    const bodyWithMeta = withMeta(body, data, currentRows?.[0]?.body || "");
+    const nextIntro = String(intro || data?.subtitle || "").trim();
+
     const updatedRows = await supabaseRequest(`/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=id,title,slug,intro,body,type,topic,created_at`, {
       method: "PATCH",
       headers: { Prefer: "return=representation" },
       body: JSON.stringify({
         title,
-        intro: intro || "",
+        intro: nextIntro,
         topic: topic || "未分类",
-        body
+        body: bodyWithMeta
       })
     });
 
