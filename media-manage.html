@@ -182,6 +182,15 @@ async function compressImageForUpload(file, targetBytes){
   };
 }
 
+function fileToDataUrl(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("图片兜底保存失败。"));
+    reader.readAsDataURL(file);
+  });
+}
+
 async function uploadMedia(){
   const selectedFile = document.getElementById("file").files[0];
   const status = document.getElementById("status");
@@ -291,8 +300,20 @@ async function uploadMedia(){
         status.textContent = `保底版本：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在最后尝试上传...`;
         sign = await uploadWithSign(file);
       }catch(finalError){
-        status.textContent = `${finalError.message || "上传失败。"}。如果保底小图也失败，说明 Supabase 的 media 存储桶尺寸限制没有被后台更新，需要在 Supabase Storage 里把 media bucket 的 File size limit 调大。`;
-        return;
+        try{
+          status.textContent = "Supabase Storage 仍然拒绝图片，正在改用数据库兜底保存...";
+          compressed = await compressImageForUpload(selectedFile, 38 * 1024);
+          file = compressed.file;
+          const inlineUrl = await fileToDataUrl(file);
+          sign = {
+            path:`inline/photo-${Date.now()}.jpg`,
+            publicUrl:inlineUrl
+          };
+          status.textContent = `已改用兜底图片：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在写入作品库...`;
+        }catch(inlineError){
+          status.textContent = `${finalError.message || "上传失败。"}。兜底保存也失败：${inlineError.message || "图片处理失败"}。`;
+          return;
+        }
       }
     }
   }
