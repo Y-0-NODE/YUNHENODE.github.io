@@ -1,5 +1,5 @@
-const { createClient } = require("@supabase/supabase-js");
-const { checkAdmin, requireSupabaseEnv } = require("./_auth");
+const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
+const { supabaseRequest } = require("../lib/_supabase-rest");
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -7,7 +7,7 @@ module.exports = async function handler(req, res) {
   if (req.method === "GET") {
     return res.status(200).json({
       success: true,
-      version: "diary-list-api-2026-07-04-v1",
+      version: "diary-list-api-2026-07-10-rest-v2",
       present: {
         SUPABASE_URL: Boolean(process.env.SUPABASE_URL),
         SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
@@ -30,16 +30,14 @@ module.exports = async function handler(req, res) {
     const env = requireSupabaseEnv();
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-    const { data, error } = await supabase
-      .from("diary_entries")
-      .select("id,title,entry_date,mood,tags,body,created_at,updated_at")
-      .order("updated_at", { ascending: false });
-
-    if (error) return res.status(500).json({ success: false, error: error.message || error });
+    const data = await supabaseRequest("/rest/v1/diary_entries?select=id,title,entry_date,mood,tags,body,created_at,updated_at&order=updated_at.desc");
 
     return res.status(200).json({ success: true, data: data || [] });
   } catch (e) {
-    return res.status(500).json({ success: false, error: e.message });
+    return res.status(500).json({
+      success: false,
+      error: e.message,
+      detail: e.data || null
+    });
   }
 };
