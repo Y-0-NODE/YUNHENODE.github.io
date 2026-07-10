@@ -30,6 +30,58 @@
   margin-top:36px;
   line-height:1.7;
 }
+
+.article-list{
+  display:grid;
+  gap:14px;
+  margin-top:54px;
+}
+
+.article-row{
+  display:grid;
+  grid-template-columns:160px minmax(0,1fr);
+  gap:28px;
+  border-top:1px solid #2a2a2a;
+  padding:24px 0;
+}
+
+.article-row:hover h2{
+  color:#fff;
+}
+
+.article-row .topic{
+  color:#8a8a8a;
+  font-size:14px;
+  line-height:1.8;
+}
+
+.article-row h2{
+  font-size:clamp(28px,4vw,54px);
+  line-height:1.08;
+  margin:0;
+}
+
+.article-row .subtitle{
+  color:#cfcfcf;
+  font-size:20px;
+  line-height:1.55;
+  margin:16px 0 0;
+}
+
+.article-row .excerpt{
+  color:#888;
+  font-size:15px;
+  line-height:1.8;
+  margin:18px 0 0;
+  max-width:860px;
+}
+
+@media(max-width:760px){
+  .article-row{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+}
 </style>
 </head>
 
@@ -64,7 +116,7 @@
   </div>
 
   <div id="status" class="status">正在加载文章...</div>
-  <div id="list" class="grid"></div>
+  <div id="list" class="article-list"></div>
 </main>
 
 <script>
@@ -77,6 +129,16 @@ let DATA = [];
 function articleUrl(item){
   if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
   return `content.html?id=${encodeURIComponent(item.id)}`;
+}
+
+function splitTitle(title){
+  const text = String(title || "").trim();
+  const match = text.match(/^(.*?)\s*(——|—|-)\s*(.+)$/);
+  if(!match) return { title:text, subtitle:"" };
+  return {
+    title:match[1].trim() || text,
+    subtitle:match[3].trim()
+  };
 }
 
 function render(list){
@@ -93,13 +155,17 @@ function render(list){
 
   list.forEach(item => {
     const a = document.createElement("a");
-    a.className = "card";
+    const titleParts = splitTitle(item.title);
+    a.className = "article-row";
     a.href = articleUrl(item);
 
     a.innerHTML = `
-      <span>${item.topic || "ARTICLE"}</span>
-      <h2>${item.title || "未命名文章"}</h2>
-      <p>${item.intro || ""}</p>
+      <div class="topic">${item.topic || "ARTICLE"}<br>${String(item.created_at || "").slice(0,10)}</div>
+      <div>
+        <h2>${titleParts.title || "未命名文章"}</h2>
+        <p class="subtitle">${titleParts.subtitle || item.intro || ""}</p>
+        ${titleParts.subtitle && item.intro ? `<p class="excerpt">${item.intro}</p>` : ""}
+      </div>
     `;
 
     el.appendChild(a);
