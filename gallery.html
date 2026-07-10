@@ -87,10 +87,26 @@ function escapeHtml(value){
     .replaceAll("'", "&#039;");
 }
 
-fetch("./api/media-list")
-  .then(res => res.json())
-  .then(result => {
-    const list = Array.isArray(result.data) ? result.data : [];
+async function loadJson(url, fallback){
+  try{
+    const res = await fetch(url, { cache:"no-store" });
+    if(!res.ok) return fallback;
+    return await res.json();
+  }catch(e){
+    return fallback;
+  }
+}
+
+Promise.all([
+  loadJson("./api/media-list", { data:[] }),
+  loadJson("./data/local-gallery.json", [])
+])
+  .then(([remoteResult, localResult]) => {
+    const remoteList = Array.isArray(remoteResult.data) ? remoteResult.data : [];
+    const localList = Array.isArray(localResult) ? localResult : [];
+    const list = [...remoteList, ...localList].sort((a, b) =>
+      String(b.created_at || "").localeCompare(String(a.created_at || ""))
+    );
     const status = document.getElementById("status");
     const gallery = document.getElementById("gallery");
 
