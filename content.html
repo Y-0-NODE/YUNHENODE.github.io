@@ -196,6 +196,25 @@ h1{
   max-width:1180px;
 }
 
+.source-link{
+  color:#a8a8a8;
+  font-size:14px;
+  line-height:1.8;
+  margin:22px 0;
+  max-width:1180px;
+}
+
+.source-link a{
+  color:#bdbdbd;
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:4px;
+}
+
+.source-link a:hover{
+  color:#ffffff;
+}
+
 .empty{
   color:var(--muted);
 }
@@ -341,18 +360,34 @@ function formatDate(value){
   if(!value) return "";
   const date = new Date(value);
   if(Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("zh-CN", {
+  return date.toLocaleString("zh-CN", {
     year:"numeric",
     month:"2-digit",
-    day:"2-digit"
+    day:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit",
+    hour12:false
   });
 }
 
-function renderMeta(meta, createdAt){
+function findOriginalLink(raw){
+  const match = String(raw || "").match(/原文链接[：:]\s*(https?:\/\/\S+)/);
+  return match ? match[1].trim() : "";
+}
+
+function sourceLabel(meta, raw){
+  const link = findOriginalLink(raw);
+  const source = String(meta.source || "").trim();
+  if(/mp\.weixin\.qq\.com/.test(link)) return "云鹤系统公众号转载";
+  return source || "本站撰写";
+}
+
+function renderMeta(meta, createdAt, raw){
   const items = [];
   if(meta.originalDate) items.push(`原始撰写时间：${formatDate(meta.originalDate)}`);
   if(createdAt) items.push(`入库时间：${formatDate(createdAt)}`);
-  if(meta.source) items.push(`来源：${meta.source}`);
+  items.push(`来源：${sourceLabel(meta, raw)}`);
   const text = items.join("　/　");
   document.getElementById("meta-top").textContent = text;
   document.getElementById("meta-footer").textContent = text ? `记录信息：${text}` : "";
@@ -401,6 +436,10 @@ function parseMediaLine(line){
   return null;
 }
 
+function parseSourceLink(line){
+  return String(line || "").match(/^原文链接[：:]\s*(https?:\/\/\S+)$/);
+}
+
 function renderMedia(line){
   const media = parseMediaLine(line);
   if(!media) return "";
@@ -430,6 +469,12 @@ function renderBody(raw){
 
   document.getElementById("body").innerHTML = lines.map((line, index) => {
     const type = lineType(line, index);
+    const sourceMatch = parseSourceLink(line);
+    if(sourceMatch){
+      const url = escapeHtml(sourceMatch[1]);
+      return `<p class="source-link">原文链接：<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a></p>`;
+    }
+
     const safe = escapeHtml(line);
 
     if(type === "media") return renderMedia(line);
@@ -488,8 +533,9 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic,creat
   document.getElementById("title").innerText = parts.title || "无标题";
   document.getElementById("subtitle").innerText = subtitle;
   document.getElementById("intro").innerText = post.intro && post.intro !== subtitle ? post.intro : "";
-  renderMeta(meta, post.created_at);
-  renderBody(cleanBody(post.body || ""));
+  const body = cleanBody(post.body || "");
+  renderMeta(meta, post.created_at, body);
+  renderBody(body);
   renderArticleTools(post);
 })
 .catch(err => {
