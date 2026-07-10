@@ -36,13 +36,10 @@ async function storageRequest(path, options = {}) {
   const env = getSupabaseEnv();
   const headers = {
     apikey: env.key,
+    Authorization: `Bearer ${env.key}`,
     "Content-Type": "application/json",
     ...(options.headers || {})
   };
-
-  if (isJwtKey(env.key)) {
-    headers.Authorization = `Bearer ${env.key}`;
-  }
 
   const response = await fetch(`${env.url}/storage/v1${path}`, {
     ...options,
@@ -143,4 +140,3 @@ module.exports = async function handler(req, res) {
     });
   }
 };
-
