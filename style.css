@@ -143,7 +143,7 @@ h1 {
     position: sticky;
     height: auto;
     min-height: 64px;
-    padding: 14px 18px;
+    padding: 12px 14px;
     align-items: flex-start;
     gap: 12px;
     flex-direction: column;
@@ -151,13 +151,14 @@ h1 {
 
   .logo {
     font-size: 15px;
+    line-height: 1.35;
   }
 
   nav {
     display: flex;
     width: 100%;
     overflow-x: auto;
-    gap: 12px;
+    gap: 8px;
     padding-bottom: 4px;
   }
 
@@ -165,6 +166,14 @@ h1 {
     margin-left: 0;
     font-size: 13px;
     white-space: nowrap;
+    padding: 7px 10px;
+    border: 1px solid #222;
+    background: #101010;
+  }
+
+  .cms-topbar nav a {
+    font-size: 12px;
+    padding: 6px 9px;
   }
 
   .home {
