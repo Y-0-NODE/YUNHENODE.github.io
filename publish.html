@@ -2,8 +2,64 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>内容发布后台｜云鹤系统</title>
 <link rel="stylesheet" href="style.css">
+<style>
+.publish-panel{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:24px;
+  margin-top:34px;
+}
+
+.publish-panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.publish-panel input,
+.publish-panel select,
+.publish-panel textarea{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.publish-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.publish-panel textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+#body{
+  min-height:260px;
+}
+
+.publish-panel button{
+  margin-top:20px;
+  border:1px solid #2a2a2a;
+  background:#f2f2f2;
+  color:#0b0b0b;
+  padding:12px 16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+@media(max-width:760px){
+  .publish-row{
+    grid-template-columns:1fr;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -26,48 +82,76 @@
 <h1>新建内容</h1>
 <p class="intro">选择内容类型与研究主题，发布后自动进入对应目录。</p>
 
-<hr>
+<section class="publish-panel">
+  <div class="publish-row">
+    <div>
+      <label for="admin-name">管理员名称</label>
+      <input id="admin-name" value="YUNHE" autocomplete="username">
+    </div>
+    <div>
+      <label for="password">管理员密码</label>
+      <input id="password" type="password" autocomplete="current-password">
+    </div>
+  </div>
 
-<p>管理员名称：</p>
-<input id="admin-name" value="YUNHE" style="width:100%;height:44px;">
+  <div class="publish-row">
+    <div>
+      <label for="type">内容类型</label>
+      <select id="type">
+        <option value="article">文章</option>
+        <option value="video">视频</option>
+        <option value="case">案例</option>
+      </select>
+    </div>
+    <div>
+      <label for="topic">研究主题</label>
+      <select id="topic">
+        <option value="平台">平台</option>
+        <option value="品牌">品牌</option>
+        <option value="城市">城市</option>
+        <option value="组织">组织</option>
+        <option value="消费">消费</option>
+        <option value="艺术">艺术</option>
+        <option value="空间">空间</option>
+        <option value="技术">技术</option>
+        <option value="梦境">梦境</option>
+      </select>
+    </div>
+  </div>
 
-<p>管理员密码：</p>
-<input id="password" type="password" style="width:100%;height:44px;">
+  <label for="title">主标题</label>
+  <input id="title" placeholder="例如：为什么成熟系统也会突然失效？">
 
-<p>内容类型：</p>
-<select id="type" style="width:100%;height:44px;">
-  <option value="video">视频</option>
-  <option value="article">文章</option>
-  <option value="case">案例</option>
-</select>
+  <label for="subtitle">副标题</label>
+  <input id="subtitle" placeholder="例如：我在亚朵连续几天观察到的运营细节">
 
-<p>研究主题：</p>
-<select id="topic" style="width:100%;height:44px;">
-  <option value="平台">平台</option>
-  <option value="品牌">品牌</option>
-  <option value="城市">城市</option>
-  <option value="组织">组织</option>
-  <option value="消费">消费</option>
-  <option value="艺术">艺术</option>
-  <option value="空间">空间</option>
-  <option value="梦境">梦境</option>
-</select>
+  <label for="intro">摘要 / 卡片说明</label>
+  <textarea id="intro" placeholder="如果不填，列表会优先使用副标题。"></textarea>
 
-<p>标题：</p>
-<textarea id="title" style="width:100%;height:40px;"></textarea>
+  <div class="publish-row">
+    <div>
+      <label for="original-date">原始撰写时间</label>
+      <input id="original-date" type="date">
+    </div>
+    <div>
+      <label for="source">内容来源</label>
+      <select id="source">
+        <option value="本站撰写">本站撰写</option>
+        <option value="公众号导入">公众号导入</option>
+        <option value="内部日记整理">内部日记整理</option>
+        <option value="外部链接摘录">外部链接摘录</option>
+      </select>
+    </div>
+  </div>
 
-<p>一句简介：</p>
-<textarea id="intro" style="width:100%;height:60px;"></textarea>
+  <label for="video">视频链接 / 原始链接</label>
+  <textarea id="video"></textarea>
 
-<p>视频链接 / 原始链接：</p>
-<textarea id="video" style="width:100%;height:60px;"></textarea>
+  <label for="body">正文</label>
+  <textarea id="body"></textarea>
 
-<p>正文：</p>
-<textarea id="body" style="width:100%;height:220px;"></textarea>
-
-<hr>
-
-<button onclick="publishToSite()">发布到网站</button>
+  <button onclick="publishToSite()">发布到网站</button>
+</section>
 
 <pre id="output" style="white-space:pre-wrap;background:#111;padding:20px;margin-top:30px;"></pre>
 
@@ -82,7 +166,10 @@ async function publishToSite() {
   const type = document.getElementById("type").value;
   const topic = document.getElementById("topic").value;
   const title = document.getElementById("title").value.trim();
+  const subtitle = document.getElementById("subtitle").value.trim();
   const intro = document.getElementById("intro").value.trim();
+  const originalDate = document.getElementById("original-date").value;
+  const source = document.getElementById("source").value;
   const video = document.getElementById("video").value.trim();
   const body = document.getElementById("body").value.trim();
   const output = document.getElementById("output");
@@ -104,7 +191,10 @@ async function publishToSite() {
         adminName,
         password,
         title,
+        subtitle,
         intro,
+        originalDate,
+        source,
         body,
         type,
         topic,
