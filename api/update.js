@@ -15,12 +15,20 @@ function readMeta(body) {
   }
 }
 
+function inferSource(body, source) {
+  const text = cleanBody(body);
+  if (/原文链接[：:]\s*https?:\/\/mp\.weixin\.qq\.com\//.test(text)) {
+    return "云鹤系统公众号转载";
+  }
+  return String(source || "").trim();
+}
+
 function withMeta(body, data, currentBody) {
   const previous = readMeta(currentBody || body);
   const meta = {
     subtitle: String(data?.subtitle || previous.subtitle || "").trim(),
     originalDate: String(data?.originalDate || previous.originalDate || "").trim(),
-    source: String(data?.source || previous.source || "本站撰写").trim()
+    source: inferSource(body, data?.source || previous.source) || "本站撰写"
   };
   return `${cleanBody(body)}\n\n<!--yunhe-meta:${JSON.stringify(meta)}-->`;
 }
