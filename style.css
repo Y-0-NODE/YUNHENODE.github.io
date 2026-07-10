@@ -9,6 +9,14 @@ body {
   font-family: "Microsoft YaHei", Arial, sans-serif;
 }
 
+button,
+input,
+textarea,
+select {
+  max-width: 100%;
+  font: inherit;
+}
+
 .topbar {
   position: fixed;
   top: 0;
@@ -21,6 +29,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 10;
 }
 
 .logo {
@@ -103,21 +112,93 @@ h1 {
   line-height: 1.7;
 }
 
+.article-card h2 {
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.12;
+  letter-spacing: 0;
+  margin-bottom: 14px;
+  overflow-wrap: anywhere;
+}
+
+.article-card .subtitle {
+  color: #d8d8d8;
+  font-size: 17px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.article-card .excerpt {
+  color: #888;
+  font-size: 14px;
+  line-height: 1.75;
+  margin-top: 18px;
+}
+
+.latest-article-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
 @media (max-width: 800px) {
   .topbar {
-    padding: 0 24px;
+    position: sticky;
+    height: auto;
+    min-height: 64px;
+    padding: 14px 18px;
+    align-items: flex-start;
+    gap: 12px;
+    flex-direction: column;
+  }
+
+  .logo {
+    font-size: 15px;
+  }
+
+  nav {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 4px;
   }
 
   nav a {
-    margin-left: 14px;
+    margin-left: 0;
     font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .home {
+    padding: 40px 18px 56px;
   }
 
   h1 {
-    font-size: 48px;
+    font-size: 42px;
+    letter-spacing: 1px;
+    overflow-wrap: anywhere;
+  }
+
+  .intro {
+    font-size: 17px;
+  }
+
+  .card {
+    min-height: 150px;
+    padding: 20px;
+  }
+
+  .card h2 {
+    font-size: 22px;
+    margin: 24px 0 10px;
   }
 
   .grid {
+    margin-top: 40px;
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 801px) and (max-width: 1120px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
