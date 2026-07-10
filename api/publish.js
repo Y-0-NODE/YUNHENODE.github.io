@@ -10,6 +10,19 @@ function makeSlug(title) {
     .slice(0, 80) + "-" + Date.now();
 }
 
+function cleanBody(body) {
+  return String(body || "").replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "").trim();
+}
+
+function withMeta(body, data) {
+  const meta = {
+    subtitle: String(data?.subtitle || "").trim(),
+    originalDate: String(data?.originalDate || "").trim(),
+    source: String(data?.source || "").trim() || "本站撰写"
+  };
+  return `${cleanBody(body)}\n\n<!--yunhe-meta:${JSON.stringify(meta)}-->`;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -26,7 +39,8 @@ module.exports = async function handler(req, res) {
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
     const title = String(data?.title || "").trim();
-    const body = String(data?.body || "").trim();
+    const body = withMeta(data?.body, data);
+    const intro = String(data?.intro || data?.subtitle || "").trim();
 
     if (!title || !body) {
       return res.status(400).json({ success: false, error: "标题和正文不能为空" });
@@ -38,7 +52,7 @@ module.exports = async function handler(req, res) {
       headers: { Prefer: "return=representation" },
       body: JSON.stringify({
         title,
-        intro: data?.intro || "",
+        intro,
         body,
         video: data?.video || "",
         type: data?.type || "article",
