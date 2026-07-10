@@ -138,16 +138,19 @@ function canvasToBlob(canvas, type, quality){
   });
 }
 
-async function compressImageForUpload(file){
+async function compressImageForUpload(file, targetBytes){
   if(!file.type.startsWith("image/")) return { file, changed:false };
 
   const image = await imageFromFile(file);
   const steps = [
     { maxSize:2200, quality:0.86 },
-    { maxSize:1800, quality:0.82 },
-    { maxSize:1400, quality:0.78 },
-    { maxSize:1100, quality:0.72 },
-    { maxSize:900, quality:0.68 }
+    { maxSize:1800, quality:0.8 },
+    { maxSize:1400, quality:0.72 },
+    { maxSize:1100, quality:0.64 },
+    { maxSize:900, quality:0.56 },
+    { maxSize:720, quality:0.5 },
+    { maxSize:560, quality:0.46 },
+    { maxSize:420, quality:0.42 }
   ];
   let blob = null;
 
@@ -163,7 +166,7 @@ async function compressImageForUpload(file){
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(image, 0, 0, width, height);
     blob = await canvasToBlob(canvas, "image/jpeg", step.quality);
-    if(blob.size <= 900 * 1024) break;
+    if(blob.size <= targetBytes) break;
   }
 
   const name = `${file.name.replace(/\.[^.]+$/, "") || "image"}-compressed.jpg`;
@@ -204,11 +207,12 @@ async function uploadMedia(){
   }
 
   let file = selectedFile;
+  let compressed = null;
 
   try{
     if(kind === "photo" && selectedFile.type.startsWith("image/")){
       status.textContent = "正在压缩图片...";
-      const compressed = await compressImageForUpload(selectedFile);
+      compressed = await compressImageForUpload(selectedFile, 450 * 1024);
       file = compressed.file;
       if(compressed.changed){
         status.textContent = `图片已压缩：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在申请上传通道...`;
@@ -221,6 +225,79 @@ async function uploadMedia(){
     return;
   }
 
+  async function requestSign(uploadFile){
+    const signRes = await fetch("./api/media-sign-upload", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        adminName,
+        password,
+        kind,
+        fileName:uploadFile.name,
+        contentType:uploadFile.type || "application/octet-stream"
+      })
+    });
+
+    const sign = await signRes.json().catch(() => ({}));
+    if(!signRes.ok) throw new Error(sign.error || "申请上传通道失败。");
+    return sign;
+  }
+
+  async function uploadWithSign(uploadFile){
+    const sign = await requestSign(uploadFile);
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const uploadResult = await client.storage
+      .from(sign.bucket)
+      .uploadToSignedUrl(sign.path, sign.token, uploadFile);
+
+    if(uploadResult.error){
+      const message = uploadResult.error.message || "上传到 Supabase 失败。";
+      const error = new Error(message);
+      error.sign = sign;
+      throw error;
+    }
+
+    return sign;
+  }
+
+  let sign = null;
+  try{
+    status.textContent = "正在直传到 Supabase，请不要关闭页面...";
+    sign = await uploadWithSign(file);
+  }catch(e){
+    const isSizeError = /maximum allowed size|exceeded/i.test(e.message || "");
+    if(kind !== "photo" || !selectedFile.type.startsWith("image/") || !isSizeError){
+      status.textContent = e.message || "上传到 Supabase 失败。";
+      return;
+    }
+
+    try{
+      status.textContent = "Supabase 仍然认为图片过大，正在生成更小版本...";
+      compressed = await compressImageForUpload(selectedFile, 180 * 1024);
+      file = compressed.file;
+      status.textContent = `已生成小图版本：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在重新上传...`;
+      sign = await uploadWithSign(file);
+    }catch(secondError){
+      const tooLarge = /maximum allowed size|exceeded/i.test(secondError.message || "");
+      if(!tooLarge){
+        status.textContent = secondError.message || "上传到 Supabase 失败。";
+        return;
+      }
+
+      try{
+        status.textContent = "存储桶限制仍然很低，正在生成保底缩略图版本...";
+        compressed = await compressImageForUpload(selectedFile, 70 * 1024);
+        file = compressed.file;
+        status.textContent = `保底版本：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在最后尝试上传...`;
+        sign = await uploadWithSign(file);
+      }catch(finalError){
+        status.textContent = `${finalError.message || "上传失败。"}。如果保底小图也失败，说明 Supabase 的 media 存储桶尺寸限制没有被后台更新，需要在 Supabase Storage 里把 media bucket 的 File size limit 调大。`;
+        return;
+      }
+    }
+  }
+
+  /*
   const signRes = await fetch("./api/media-sign-upload", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
@@ -250,6 +327,7 @@ async function uploadMedia(){
     status.textContent = uploadResult.error.message || "上传到 Supabase 失败。";
     return;
   }
+  */
 
   status.textContent = "文件已上传，正在写入作品库...";
   const recordRes = await fetch("./api/media-record", {
