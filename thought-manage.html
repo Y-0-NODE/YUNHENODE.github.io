@@ -36,44 +36,41 @@
   line-height:1.75;
 }
 
-.account-strip,
 .panel,
 .post-card{
   border:1px solid #292929;
   background:#101010;
 }
 
-.account-strip{
+.profile-chip{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  padding:16px 18px;
-  margin-bottom:18px;
+  gap:12px;
+  min-width:240px;
+  max-width:360px;
+  padding:12px;
+  border:1px solid #292929;
+  background:#101010;
+  color:#f2f2f2;
+  text-decoration:none;
 }
 
-.account-mini{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  min-width:0;
-}
-
-.account-mini img{
-  width:46px;
-  height:46px;
+.profile-chip img{
+  width:42px;
+  height:42px;
+  flex:0 0 auto;
   border-radius:50%;
   border:1px solid #333;
   object-fit:cover;
   background:#151515;
 }
 
-.account-mini b{
+.profile-chip b{
   display:block;
   font-size:16px;
 }
 
-.account-mini span{
+.profile-chip span{
   display:block;
   color:#888;
   font-size:13px;
@@ -257,9 +254,10 @@ button.danger{
     font-size:16px;
   }
 
-  .account-strip{
-    align-items:flex-start;
-    flex-direction:column;
+  .profile-chip{
+    width:100%;
+    max-width:none;
+    min-width:0;
   }
 
   .dashboard{
@@ -294,7 +292,13 @@ button.danger{
       <h1>写随笔</h1>
       <p>像微博一样发布短记录。这里专门写内容和管理已发布随笔，头像、签名放在独立账户页。</p>
     </div>
-    <a class="button" href="thought-profile.html">账户设置</a>
+    <a id="profile-chip" class="profile-chip hidden" href="thought-profile.html" aria-label="进入随笔账户设置">
+      <img id="profile-avatar-preview" src="app-icon.svg" alt="头像">
+      <span>
+        <b id="profile-name-view">云鹤系统</b>
+        <span id="profile-signature-view">短记录、即时观察与公开片段。</span>
+      </span>
+    </a>
   </section>
 
   <section id="login-panel" class="panel login">
@@ -311,17 +315,6 @@ button.danger{
   </section>
 
   <section id="dashboard" class="hidden">
-    <div class="account-strip">
-      <div class="account-mini">
-        <img id="profile-avatar-preview" src="app-icon.svg" alt="头像">
-        <div>
-          <b id="profile-name-view">云鹤系统</b>
-          <span id="profile-signature-view">短记录、即时观察与公开片段。</span>
-        </div>
-      </div>
-      <a class="button" href="thought-profile.html">修改头像和签名</a>
-    </div>
-
     <div class="dashboard">
       <section class="panel">
         <h2 id="composer-title">写随笔</h2>
@@ -626,6 +619,7 @@ async function login(){
     await reloadAll();
     document.getElementById("login-panel").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("profile-chip").classList.remove("hidden");
     document.getElementById("login-status").textContent = "";
   }catch(e){
     document.getElementById("login-status").textContent = e.message || "登录失败。";
