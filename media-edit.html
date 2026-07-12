@@ -46,6 +46,11 @@
   cursor:pointer;
 }
 
+.panel button.danger{
+  color:#ffb0a8;
+  border-color:#5a2a26;
+}
+
 .preview{
   max-width:420px;
   margin-top:18px;
@@ -110,6 +115,7 @@
     <div id="created-at" class="readonly">未标注</div>
 
     <button type="button" onclick="saveWork()">保存修改</button>
+    <button class="danger" type="button" onclick="deleteWork()">删除作品</button>
     <a href="gallery.html">返回作品页</a>
     <div id="status" class="status">正在读取作品...</div>
   </section>
@@ -211,6 +217,49 @@ async function saveWork(){
     return;
   }
   status.textContent = "已保存。回到艺术摄影页面刷新后可以看到新信息。";
+}
+
+async function deleteWork(){
+  const status = document.getElementById("status");
+  if(!CURRENT){
+    status.textContent = "没有正在编辑的作品。";
+    return;
+  }
+
+  const adminName = document.getElementById("admin-name").value.trim();
+  const password = document.getElementById("admin-password").value.trim();
+  if(!adminName || !password){
+    status.textContent = "请先填写账户名称和密码。";
+    return;
+  }
+
+  const ok = confirm("确定删除这个作品吗？删除后作品页不会再显示。");
+  if(!ok) return;
+
+  status.textContent = "正在删除...";
+  const res = await fetch("./api/media-update", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      id:CURRENT.id,
+      adminName,
+      password,
+      action:"delete"
+    })
+  });
+  const result = await res.json().catch(() => ({}));
+  if(!res.ok){
+    const detail = result.detail ? `｜${result.detail}` : "";
+    status.textContent = `${result.error || "删除失败。"}${detail}`;
+    return;
+  }
+
+  status.textContent = result.storageWarning
+    ? `作品记录已删除。提醒：${result.storageWarning}`
+    : "作品已删除，正在返回作品页。";
+  setTimeout(() => {
+    location.href = `gallery.html?v=${Date.now()}`;
+  }, 600);
 }
 
 loadWork();
