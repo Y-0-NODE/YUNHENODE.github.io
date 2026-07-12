@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编辑本地作品｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.panel{
+  border:1px solid #2a2a2a;
+  background:#111;
+  padding:22px;
+  margin-top:36px;
+}
+
+.panel label{
+  display:block;
+  color:#aaa;
+  margin:16px 0 8px;
+}
+
+.panel input,
+.panel textarea{
+  width:100%;
+  border:1px solid #2a2a2a;
+  background:#0b0b0b;
+  color:#f2f2f2;
+  padding:12px;
+}
+
+.panel textarea{
+  min-height:140px;
+}
+
+.panel button,
+.panel a{
+  display:inline-block;
+  margin-top:18px;
+  margin-right:10px;
+  border:1px solid #2a2a2a;
+  background:#111;
+  color:#f2f2f2;
+  padding:12px 14px;
+  text-decoration:none;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.preview{
+  max-width:420px;
+  margin-top:18px;
+  border:1px solid #2a2a2a;
+  background:#050505;
+}
+
+.preview img,
+.preview video{
+  width:100%;
+  display:block;
+}
+
+.readonly,
+.status,
+.steps{
+  color:#aaa;
+  line-height:1.8;
+}
+
+.steps{
+  border-top:1px solid #2a2a2a;
+  margin-top:24px;
+  padding-top:18px;
+}
+
+.code{
+  background:#050505;
+  border:1px solid #2a2a2a;
+  padding:12px;
+  overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">YUNHENODE CMS</div>
+  <nav>
+    <a href="gallery.html">艺术摄影</a>
+    <a href="admin.html">后台首页</a>
+  </nav>
+</header>
+
+<main class="home">
+  <p class="eyebrow">LOCAL MEDIA EDIT</p>
+  <h1>编辑本地作品</h1>
+  <p class="intro">本地文件夹作品不在数据库里。这里会生成一个说明文件，用它改作品名称、介绍和拍摄日期。</p>
+
+  <section class="panel">
+    <div id="preview" class="preview"></div>
+
+    <label for="title">作品名称</label>
+    <input id="title" type="text">
+
+    <label for="description">作品介绍</label>
+    <textarea id="description"></textarea>
+
+    <label for="shot-at">拍摄日期</label>
+    <input id="shot-at" type="date">
+
+    <label>上传日期</label>
+    <div id="created-at" class="readonly">未标注</div>
+
+    <button type="button" onclick="downloadSidecar()">下载说明文件</button>
+    <a href="gallery.html">返回作品页</a>
+    <div id="status" class="status">正在读取作品...</div>
+
+    <div class="steps">
+      <strong>你下载后这样做：</strong><br>
+      1. 把下载的说明文件放进本地 <code>local-media-source</code> 文件夹。<br>
+      2. 说明文件要和原照片放在同一个文件夹里。<br>
+      3. 重新运行同步命令。<br>
+      4. 把新的 <code>data/local-gallery.json</code> 上传到 GitHub。<br>
+      <div class="code">cd /Users/sunnian/Documents/Codex/2026-07-03/jin/work/YUNHENODE.github.io<br>node scripts/sync-local-gallery.js local-media-source</div>
+    </div>
+  </section>
+</main>
+
+<script>
+let CURRENT = null;
+
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatDateTime(value){
+  if(!value) return "未标注";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return String(value);
+  const pad = n => String(n).padStart(2, "0");
+  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function toDateInput(value){
+  if(!value) return "";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return String(value).slice(0, 10);
+  const pad = n => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+async function loadWork(){
+  const url = new URLSearchParams(location.search).get("url");
+  const status = document.getElementById("status");
+  const list = await fetch("./data/local-gallery.json", { cache:"no-store" })
+    .then(res => res.ok ? res.json() : [])
+    .catch(() => []);
+  CURRENT = Array.isArray(list) ? list.find(item => item.url === url || item.large_url === url) : null;
+
+  if(!CURRENT){
+    status.textContent = "没有找到这个本地作品。";
+    return;
+  }
+
+  document.getElementById("preview").innerHTML = CURRENT.kind === "video"
+    ? `<video src="${escapeHtml(CURRENT.url)}" controls playsinline></video>`
+    : `<img src="${escapeHtml(CURRENT.url)}" alt="${escapeHtml(CURRENT.title || "作品")}">`;
+  document.getElementById("title").value = CURRENT.title || "";
+  document.getElementById("description").value = CURRENT.description || "";
+  document.getElementById("shot-at").value = toDateInput(CURRENT.shot_at);
+  document.getElementById("created-at").textContent = formatDateTime(CURRENT.created_at);
+  status.textContent = "修改后点击“下载说明文件”。";
+}
+
+function downloadSidecar(){
+  const status = document.getElementById("status");
+  if(!CURRENT){
+    status.textContent = "没有正在编辑的作品。";
+    return;
+  }
+
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const shotAt = document.getElementById("shot-at").value;
+  const content = [
+    `标题: ${title || CURRENT.title || "未命名作品"}`,
+    `说明: ${description}`,
+    `拍摄日期: ${shotAt || ""}`,
+    `类型: ${CURRENT.kind === "video" ? "video" : "photo"}`
+  ].join("\n");
+  const blob = new Blob([content], { type:"text/plain;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = CURRENT.sidecar_name || `${title || CURRENT.title || "作品"}.txt`;
+  document.body.appendChild(link);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  link.remove();
+  status.textContent = `已下载 ${link.download}。把它放回 local-media-source，再重新同步。`;
+}
+
+loadWork();
+</script>
+</body>
+</html>
