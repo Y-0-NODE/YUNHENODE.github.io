@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
   let query = supabase
     .from("media_items")
-    .select("id,title,description,kind,url,path,status,created_at")
+    .select("id,title,description,kind,url,path,status,created_at,shot_at")
     .order("created_at", { ascending: false });
 
   let { data, error } = await query.eq("status", "published");
