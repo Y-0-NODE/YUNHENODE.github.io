@@ -15,7 +15,7 @@ async function insertMediaRecord(supabase, payload) {
     {
       title: payload.title,
       description: payload.description,
-      kind: payload.kind, 
+      kind: payload.kind,
       url: payload.url,
       path: payload.path
     },
