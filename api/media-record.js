@@ -9,12 +9,13 @@ async function insertMediaRecord(supabase, payload) {
       kind: payload.kind,
       url: payload.url,
       path: payload.path,
+      shot_at: payload.shot_at || null,
       status: "published"
     },
     {
       title: payload.title,
       description: payload.description,
-      kind: payload.kind,
+      kind: payload.kind, 
       url: payload.url,
       path: payload.path
     },
@@ -39,7 +40,7 @@ async function insertMediaRecord(supabase, payload) {
     lastError = error;
 
     const message = `${error.message || ""} ${error.details || ""}`;
-    const isColumnMismatch = /column|schema cache|status|path/i.test(message);
+    const isColumnMismatch = /column|schema cache|status|path|shot_at/i.test(message);
     if (!isColumnMismatch) break;
   }
 
@@ -71,7 +72,8 @@ module.exports = async function handler(req, res) {
       description: body?.description || "",
       kind: body?.kind === "video" ? "video" : "photo",
       url: body.url,
-      path: body.path
+      path: body.path,
+      shot_at: body?.shot_at || null
     };
     const { data, error } = await insertMediaRecord(supabase, payload);
 
