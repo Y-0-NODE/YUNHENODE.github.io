@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
@@ -19,10 +20,18 @@ function ensureDir(dir) {
 function slugify(value) {
   return String(value || "work")
     .normalize("NFKD")
-    .replace(/[^\w\u4e00-\u9fa5-]+/g, "-")
+    .replace(/[^\w-]+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 80) || "work";
+}
+
+function fileHash(file) {
+  return crypto
+    .createHash("sha1")
+    .update(fs.readFileSync(file))
+    .digest("hex")
+    .slice(0, 12);
 }
 
 function walk(dir) {
@@ -35,14 +44,9 @@ function walk(dir) {
   });
 }
 
-function uniqueOutputName(base, ext) {
-  let name = `${base}${ext}`;
-  let i = 2;
-  while (fs.existsSync(path.join(outputDir, name))) {
-    name = `${base}-${i}${ext}`;
-    i += 1;
-  }
-  return name;
+function outputName(file, titleBase, suffix, ext) {
+  const base = slugify(titleBase);
+  return `${base}-${fileHash(file)}${suffix}${ext}`;
 }
 
 function readSidecar(file) {
@@ -60,29 +64,44 @@ function readSidecar(file) {
     if (key === "title" || key === "标题") meta.title = value;
     if (key === "description" || key === "说明") meta.description = value;
     if (key === "type" || key === "类型") meta.type = value;
+    if (key === "shot_at" || key === "shooting_date" || key === "拍摄日期") meta.shot_at = value;
   }
   return meta;
 }
 
 function convertImage(file, titleBase) {
-  const name = uniqueOutputName(slugify(titleBase), ".jpg");
-  const dest = path.join(outputDir, name);
+  const thumbName = outputName(file, titleBase, "-thumb", ".jpg");
+  const largeName = outputName(file, titleBase, "-large", ".jpg");
+  const thumbDest = path.join(outputDir, thumbName);
+  const largeDest = path.join(outputDir, largeName);
 
   execFileSync("sips", [
     "-s", "format", "jpeg",
-    "-s", "formatOptions", "82",
-    "--resampleHeightWidthMax", "1800",
+    "-s", "formatOptions", "78",
+    "--resampleHeightWidthMax", "1200",
     file,
     "--out",
-    dest
+    thumbDest
   ], { stdio: "ignore" });
 
-  return `assets/local-gallery/${name}`;
+  execFileSync("sips", [
+    "-s", "format", "jpeg",
+    "-s", "formatOptions", "88",
+    "--resampleHeightWidthMax", "4096",
+    file,
+    "--out",
+    largeDest
+  ], { stdio: "ignore" });
+
+  return {
+    url: `assets/local-gallery/${thumbName}`,
+    large_url: `assets/local-gallery/${largeName}`
+  };
 }
 
 function copyVideo(file, titleBase) {
   const ext = path.extname(file).toLowerCase();
-  const name = uniqueOutputName(slugify(titleBase), ext);
+  const name = outputName(file, titleBase, "", ext);
   const dest = path.join(outputDir, name);
   fs.copyFileSync(file, dest);
   return `assets/local-gallery/${name}`;
@@ -114,16 +133,20 @@ function main() {
     const title = meta.title || parsed.name;
     const description = meta.description || "";
     const createdAt = stat.birthtime || stat.mtime;
+    const shotAt = meta.shot_at || "";
 
     if (imageExts.has(ext)) {
-      const url = convertImage(file, title);
+      const image = convertImage(file, title);
       items.push({
         title,
         description,
         kind: "photo",
-        url,
+        url: image.url,
+        large_url: image.large_url,
+        sidecar_name: `${parsed.name}.txt`,
         source: "local-folder",
-        created_at: createdAt.toISOString()
+        created_at: createdAt.toISOString(),
+        shot_at: shotAt
       });
       continue;
     }
@@ -140,8 +163,10 @@ function main() {
         description,
         kind: "video",
         url,
+        sidecar_name: `${parsed.name}.txt`,
         source: "local-folder",
-        created_at: createdAt.toISOString()
+        created_at: createdAt.toISOString(),
+        shot_at: shotAt
       });
     }
   }
