@@ -65,6 +65,12 @@ function readSidecar(file) {
     if (key === "description" || key === "说明") meta.description = value;
     if (key === "type" || key === "类型") meta.type = value;
     if (key === "shot_at" || key === "shooting_date" || key === "拍摄日期") meta.shot_at = value;
+    if (key === "hidden" || key === "hide" || key === "隐藏") {
+      meta.hidden = /^(true|yes|1|是|隐藏)$/i.test(value);
+    }
+    if (key === "delete" || key === "deleted" || key === "删除") {
+      meta.hidden = /^(true|yes|1|是|删除|隐藏)$/i.test(value);
+    }
   }
   return meta;
 }
@@ -130,6 +136,10 @@ function main() {
     const stat = fs.statSync(file);
     const parsed = path.parse(file);
     const meta = readSidecar(file);
+    if (meta.hidden) {
+      console.log(`跳过隐藏作品：${file}`);
+      continue;
+    }
     const title = meta.title || parsed.name;
     const description = meta.description || "";
     const createdAt = stat.birthtime || stat.mtime;
