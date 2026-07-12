@@ -194,8 +194,11 @@
         <p id="detail-description"></p>
       </div>
       <div class="detail-side">
-        <strong>时间</strong>
+        <strong>上传日期</strong>
         <div id="detail-time">未标注</div>
+        <br>
+        <strong>拍摄日期</strong>
+        <div id="detail-shot-time">未标注</div>
         <br>
         <strong>来源</strong>
         <div id="detail-source">作品库</div>
@@ -246,11 +249,15 @@ function openDetail(index){
   document.getElementById("detail-title").textContent = item.title || "未命名作品";
   document.getElementById("detail-description").textContent = item.description || "暂无说明。";
   document.getElementById("detail-time").textContent = formatDateTime(item.created_at);
+  document.getElementById("detail-shot-time").textContent = item.shot_at || "未标注";
   document.getElementById("detail-source").textContent = item.source === "local-folder" ? "本地摄影文件夹" : "作品库";
 
   const manage = document.getElementById("detail-manage");
   if(item.id && item.source !== "local-folder"){
-    manage.href = `media-manage.html?id=${encodeURIComponent(item.id)}`;
+    manage.href = `media-edit.html?id=${encodeURIComponent(item.id)}`;
+    manage.style.display = "";
+  }else if(item.source === "local-folder"){
+    manage.href = `local-gallery-edit.html?url=${encodeURIComponent(item.url || "")}`;
     manage.style.display = "";
   }else{
     manage.style.display = "none";
