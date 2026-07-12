@@ -16,6 +16,19 @@
 .work{
   border:1px solid #2a2a2a;
   background:#111;
+  color:#f2f2f2;
+  cursor:pointer;
+  text-align:left;
+  padding:0;
+  font:inherit;
+  transition:border-color .2s ease, transform .2s ease;
+}
+
+.work:hover,
+.work:focus-visible{
+  border-color:#777;
+  transform:translateY(-2px);
+  outline:none;
 }
 
 .work img,
@@ -47,8 +60,99 @@
   margin-top:32px;
 }
 
+.detail{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:none;
+  background:rgba(0,0,0,.86);
+  overflow:auto;
+  padding:36px;
+}
+
+.detail.is-open{
+  display:block;
+}
+
+.detail-inner{
+  width:min(1500px, 100%);
+  margin:0 auto;
+}
+
+.detail-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  border-bottom:1px solid #333;
+  padding-bottom:18px;
+  margin-bottom:22px;
+}
+
+.detail-bar a,
+.detail-bar button{
+  border:1px solid #333;
+  background:#111;
+  color:#ddd;
+  padding:10px 14px;
+  text-decoration:none;
+  cursor:pointer;
+  font:inherit;
+}
+
+.detail-media img,
+.detail-media video{
+  width:100%;
+  max-height:78vh;
+  object-fit:contain;
+  display:block;
+  background:#050505;
+}
+
+.detail-meta{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 280px;
+  gap:28px;
+  border-top:1px solid #333;
+  padding-top:22px;
+  margin-top:22px;
+}
+
+.detail-meta h2{
+  font-size:clamp(30px, 5vw, 72px);
+  line-height:1.05;
+  margin:0 0 18px;
+}
+
+.detail-meta p{
+  color:#c8c8c8;
+  line-height:1.9;
+  white-space:pre-wrap;
+  margin:0;
+}
+
+.detail-side{
+  color:#888;
+  line-height:1.8;
+  font-size:14px;
+}
+
+.detail-side strong{
+  display:block;
+  color:#ddd;
+  margin-bottom:4px;
+}
+
 @media(max-width:900px){
   .gallery-grid{
+    grid-template-columns:1fr;
+  }
+
+  .detail{
+    padding:18px;
+  }
+
+  .detail-meta{
     grid-template-columns:1fr;
   }
 }
@@ -77,7 +181,32 @@
   <section id="gallery" class="gallery-grid"></section>
 </main>
 
+<div id="detail" class="detail" aria-hidden="true">
+  <div class="detail-inner">
+    <div class="detail-bar">
+      <button type="button" onclick="closeDetail()">关闭</button>
+      <a id="detail-manage" href="media-manage.html" style="display:none;">管理作品</a>
+    </div>
+    <div id="detail-media" class="detail-media"></div>
+    <div class="detail-meta">
+      <div>
+        <h2 id="detail-title"></h2>
+        <p id="detail-description"></p>
+      </div>
+      <div class="detail-side">
+        <strong>时间</strong>
+        <div id="detail-time">未标注</div>
+        <br>
+        <strong>来源</strong>
+        <div id="detail-source">作品库</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+let WORKS = [];
+
 function escapeHtml(value){
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -97,6 +226,57 @@ async function loadJson(url, fallback){
   }
 }
 
+function formatDateTime(value){
+  if(!value) return "未标注";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return String(value);
+  const pad = n => String(n).padStart(2, "0");
+  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function openDetail(index){
+  const item = WORKS[index];
+  if(!item) return;
+  const detail = document.getElementById("detail");
+  const media = document.getElementById("detail-media");
+  const url = item.large_url || item.url || "";
+  media.innerHTML = item.kind === "video"
+    ? `<video src="${escapeHtml(url)}" controls playsinline></video>`
+    : `<img src="${escapeHtml(url)}" alt="${escapeHtml(item.title || "作品")}">`;
+  document.getElementById("detail-title").textContent = item.title || "未命名作品";
+  document.getElementById("detail-description").textContent = item.description || "暂无说明。";
+  document.getElementById("detail-time").textContent = formatDateTime(item.created_at);
+  document.getElementById("detail-source").textContent = item.source === "local-folder" ? "本地摄影文件夹" : "作品库";
+
+  const manage = document.getElementById("detail-manage");
+  if(item.id && item.source !== "local-folder"){
+    manage.href = `media-manage.html?id=${encodeURIComponent(item.id)}`;
+    manage.style.display = "";
+  }else{
+    manage.style.display = "none";
+  }
+
+  detail.classList.add("is-open");
+  detail.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeDetail(){
+  const detail = document.getElementById("detail");
+  detail.classList.remove("is-open");
+  detail.setAttribute("aria-hidden", "true");
+  document.getElementById("detail-media").innerHTML = "";
+  document.body.style.overflow = "";
+}
+
+document.getElementById("detail").addEventListener("click", event => {
+  if(event.target.id === "detail") closeDetail();
+});
+
+document.addEventListener("keydown", event => {
+  if(event.key === "Escape") closeDetail();
+});
+
 Promise.all([
   loadJson("./api/media-list", { data:[] }),
   loadJson("./data/local-gallery.json", [])
@@ -115,9 +295,10 @@ Promise.all([
       return;
     }
 
+    WORKS = list;
     status.textContent = "";
-    gallery.innerHTML = list.map(item => `
-      <article class="work">
+    gallery.innerHTML = list.map((item, index) => `
+      <button class="work" type="button" onclick="openDetail(${index})">
         ${item.kind === "video"
           ? `<video src="${escapeHtml(item.url)}" controls playsinline></video>`
           : `<img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.title || "作品")}">`}
@@ -125,7 +306,7 @@ Promise.all([
           <h2>${escapeHtml(item.title || "未命名作品")}</h2>
           <p>${escapeHtml(item.description || "")}</p>
         </div>
-      </article>
+      </button>
     `).join("");
   })
   .catch(() => {
