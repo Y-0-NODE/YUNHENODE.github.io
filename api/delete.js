@@ -1,20 +1,24 @@
 const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
 const { supabaseRequest } = require("../lib/_supabase-rest");
 
-const DELETE_API_VERSION = "delete-api-rest-2026-07-04-v1";
+const DELETE_API_VERSION = "delete-api-rest-2026-07-10-key-diagnosis-v2";
 
-function getSupabaseKeyRole() {
+function getSupabaseKeyInfo() {
+  const key = String(process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
+
+  if (!key) return { role: "missing", kind: "missing" };
+  if (key.startsWith("sb_secret_")) return { role: "secret-key", kind: "supabase-secret-key" };
+  if (key.startsWith("sb_publishable_")) return { role: "wrong-publishable-key", kind: "publishable-key" };
+
   try {
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-    if (key.startsWith("sb_secret_")) return "secret-key";
     const payload = key.split(".")[1];
-    if (!payload) return "missing-or-not-jwt";
+    if (!payload) return { role: "missing-or-not-jwt", kind: "unknown-format" };
 
     const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
     const decoded = JSON.parse(Buffer.from(normalized, "base64").toString("utf8"));
-    return decoded.role || "unknown";
+    return { role: decoded.role || "unknown", kind: "jwt" };
   } catch (e) {
-    return "unreadable";
+    return { role: "unreadable", kind: "unreadable" };
   }
 }
 
@@ -47,7 +51,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       success: true,
       version: DELETE_API_VERSION,
-      message: "这是删除接口版本检查。看到 rest-2026-07-04-v1 才说明 GitHub/Vercel 已经更新到新版。"
+      message: "这是删除接口版本检查。看到 key-diagnosis-v2 才说明 GitHub/Vercel 已经更新到新版。"
     });
   }
 
@@ -97,11 +101,12 @@ module.exports = async function handler(req, res) {
 
     const remainingRows = await supabaseRequest(`/rest/v1/contents?select=id&id=eq.${encodeURIComponent(found.article.id)}&limit=1`);
     if (remainingRows && remainingRows.length > 0) {
-      const role = getSupabaseKeyRole();
+      const keyInfo = getSupabaseKeyInfo();
       return res.status(500).json({
         success: false,
-        supabaseKeyRole: role,
-        error: `已经找到文章「${found.article.title}」，但删除后它仍然存在。当前 SUPABASE_SERVICE_ROLE_KEY 角色是「${role}」。它必须拥有删除 contents 的权限。`
+        supabaseKeyRole: keyInfo.role,
+        supabaseKeyKind: keyInfo.kind,
+        error: `已经找到文章「${found.article.title}」，但删除后它仍然存在。当前 SUPABASE_SERVICE_ROLE_KEY 类型是「${keyInfo.kind}」，角色是「${keyInfo.role}」。它必须是 Supabase 后端密钥：Legacy service_role JWT 或 Secret key。`
       });
     }
 
