@@ -1,5 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
-const { checkAdmin, requireSupabaseEnv } = require("./_auth");
+const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
 
 const TABLES = ["contents", "diary_entries", "media_items", "content_backups"];
 
