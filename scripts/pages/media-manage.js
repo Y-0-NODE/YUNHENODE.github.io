@@ -42,14 +42,14 @@ async function compressImageForUpload(file, targetBytes) {
 
   const image = await imageFromFile(file);
   const steps = [
-    { maxSize: 2200, quality: 0.86 },
-    { maxSize: 1800, quality: 0.8 },
-    { maxSize: 1400, quality: 0.72 },
-    { maxSize: 1100, quality: 0.64 },
-    { maxSize: 900, quality: 0.56 },
-    { maxSize: 720, quality: 0.5 },
-    { maxSize: 560, quality: 0.46 },
-    { maxSize: 420, quality: 0.42 }
+    { maxSize: 3200, quality: 0.9 },
+    { maxSize: 2800, quality: 0.86 },
+    { maxSize: 2400, quality: 0.82 },
+    { maxSize: 2000, quality: 0.78 },
+    { maxSize: 1600, quality: 0.72 },
+    { maxSize: 1200, quality: 0.66 },
+    { maxSize: 900, quality: 0.58 },
+    { maxSize: 700, quality: 0.5 }
   ];
   let blob = null;
 
@@ -100,6 +100,7 @@ async function uploadMedia() {
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
   const shotAt = document.getElementById("shot-at").value;
+  const photoQuality = document.getElementById("photo-quality").value;
   const externalUrl = document.getElementById("external-url").value.trim();
 
   if (!selectedFile && !externalUrl) {
@@ -150,7 +151,8 @@ async function uploadMedia() {
   try {
     if (kind === "photo" && selectedFile.type.startsWith("image/")) {
       status.textContent = "正在压缩图片...";
-      compressed = await compressImageForUpload(selectedFile, 450 * 1024);
+      const targetBytes = photoQuality === "web-standard" ? 700 * 1024 : 2 * 1024 * 1024;
+      compressed = await compressImageForUpload(selectedFile, targetBytes);
       file = compressed.file;
       if (compressed.changed) {
         status.textContent = `图片已压缩：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在申请上传通道...`;
@@ -246,38 +248,6 @@ async function uploadMedia() {
       }
     }
   }
-
-  /*
-  const signRes = await fetch("./api/media-sign-upload", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName,
-      password,
-      kind,
-      fileName:file.name,
-      contentType:file.type || "application/octet-stream"
-    })
-  });
-
-  const sign = await signRes.json().catch(() => ({}));
-
-  if(!signRes.ok){
-    status.textContent = sign.error || "申请上传通道失败。";
-    return;
-  }
-
-  status.textContent = "正在直传到 Supabase，请不要关闭页面...";
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  const uploadResult = await client.storage
-    .from(sign.bucket)
-    .uploadToSignedUrl(sign.path, sign.token, file);
-
-  if(uploadResult.error){
-    status.textContent = uploadResult.error.message || "上传到 Supabase 失败。";
-    return;
-  }
-  */
 
   status.textContent = "文件已上传，正在写入作品库...";
   const recordRes = await fetch("./api/media-record", {
