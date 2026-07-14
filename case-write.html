@@ -165,12 +165,19 @@
 
       <label for="template">Template（模板）</label>
       <select id="template" onchange="applyTemplate()">
-        <option value="A">A｜Case Archive（案例库）</option>
-        <option value="B">B｜Method Archive（方法库）</option>
-        <option value="C">C｜Research Notes（研究记录）</option>
-        <option value="D">D｜Project Archive（项目档案）</option>
-        <option value="E">E｜Media Archive（媒体库）</option>
-        <option value="X">X｜X Archive（未分类档案）</option>
+        <optgroup label="系统档案模板">
+          <option value="A">A｜Case Archive（案例库）</option>
+          <option value="B">B｜Method Archive（方法库）</option>
+          <option value="C">C｜Research Notes（研究记录）</option>
+          <option value="D">D｜Project Archive（项目档案）</option>
+          <option value="E">E｜Media Archive（媒体库）</option>
+          <option value="X">X｜X Archive（未分类档案）</option>
+        </optgroup>
+        <optgroup label="保留的原案例模板">
+          <option value="bo">Case 001｜BO H5 Modular Upgrade</option>
+          <option value="apple">Case 002｜Apple 幽灵账号问题</option>
+          <option value="architecture">Case 003｜网站架构</option>
+        </optgroup>
       </select>
 
       <label for="knowledge-level">Knowledge Level（知识层级）</label>
@@ -264,6 +271,7 @@ const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
 
 const TEMPLATES = {
   A:{
+    protocolTemplate:"A",
     title:"",
     intro:"用于现实案例、平台案例、品牌案例、组织案例、消费者案例与政府案例。",
     topic:"未分类",
@@ -271,6 +279,7 @@ const TEMPLATES = {
     sections:["Case Number（案例编号）","Problem（问题）","Observation（观察）","Analysis（分析）","Decision（判断）","Validation（验证）","Reference（参考资料）","Related Documents（相关文章）"]
   },
   B:{
+    protocolTemplate:"B",
     title:"",
     intro:"用于原创概念、原创理论、系统框架与判断模型。",
     topic:"未分类",
@@ -278,6 +287,7 @@ const TEMPLATES = {
     sections:["Concept（概念）","Definition（定义）","Background（提出背景）","Mechanism（运行机制）","Application（适用范围）","Boundary（边界）","Common Misunderstandings（常见误区）","Related Cases（相关案例）","Conclusion（结论）"]
   },
   C:{
+    protocolTemplate:"C",
     title:"",
     intro:"用于每日研究、阶段记录、观察日志与思考过程。",
     topic:"未分类",
@@ -285,6 +295,7 @@ const TEMPLATES = {
     sections:["Date（日期）","Observation（观察）","Discovery（发现）","Current Thinking（当前思考）","Questions（问题）","Need Verification（待验证）","Future Direction（未来方向）","Update History（更新记录）"]
   },
   D:{
+    protocolTemplate:"D",
     title:"",
     intro:"用于网站开发、产品开发、维权记录与长期项目。",
     topic:"未分类",
@@ -292,6 +303,7 @@ const TEMPLATES = {
     sections:["Project Name（项目名称）","Background（背景）","Goal（目标）","Problem（问题）","Process（过程）","Solution（方案）","Result（结果）","Iteration（迭代）","Current Status（当前状态）","Future Plan（未来计划）"]
   },
   E:{
+    protocolTemplate:"E",
     title:"",
     intro:"用于视频、摄影、图片、采访、演讲与录音档案。",
     topic:"艺术",
@@ -299,11 +311,36 @@ const TEMPLATES = {
     sections:["Media Type（媒体类型）","Introduction（简介）","Related Topics（相关主题）","Related Articles（相关文章）","Media Information（媒体信息）","Additional Notes（补充说明）"]
   },
   X:{
+    protocolTemplate:"X",
     title:"",
     intro:"用于暂时无法分类、以后需要重新整理的材料。",
     topic:"未分类",
     knowledgeLevel:"Observation",
     sections:["Summary（摘要）","Current Observation（当前观察）","Current Thinking（当前思考）","Possible Categories（可能分类）","Need Future Classification（是否以后分类）","Next Step（下一步）","Related Materials（相关资料）","Current Status（当前状态）"]
+  },
+  bo:{
+    protocolTemplate:"A",
+    title:"Case 001 / BO H5 Modular Upgrade",
+    intro:"围绕 H5 模块升级的结构化判断与验证记录。",
+    topic:"技术",
+    knowledgeLevel:"Validation",
+    sections:["Problem（问题）","Analysis（分析）","Decision（决策）","Validation（验证）"]
+  },
+  apple:{
+    protocolTemplate:"A",
+    title:"Case 002 / Apple 幽灵账号问题",
+    intro:"围绕异常账号、系统排查和沟通处理的案例记录。",
+    topic:"平台",
+    knowledgeLevel:"Validation",
+    sections:["系统分析","排查流程","沟通策略"]
+  },
+  architecture:{
+    protocolTemplate:"D",
+    title:"Case 003 / 网站架构",
+    intro:"记录网站从代码、数据、部署到协作工具的基础架构。",
+    topic:"技术",
+    knowledgeLevel:"Analysis",
+    sections:["GitHub","Supabase","Vercel","Codex"]
   }
 };
 
@@ -496,7 +533,8 @@ async function saveCase(){
   const title = document.getElementById("title").value.trim();
   const intro = document.getElementById("intro").value.trim();
   const body = buildCaseText();
-  const template = document.getElementById("template").value;
+  const presetKey = document.getElementById("template").value;
+  const template = TEMPLATES[presetKey]?.protocolTemplate || presetKey;
   const knowledgeLevel = document.getElementById("knowledge-level").value;
 
   if(!title || !body || !template || !knowledgeLevel){
