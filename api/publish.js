@@ -1,6 +1,9 @@
 const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
 const { supabaseRequest } = require("../lib/_supabase-rest");
 
+const ALLOWED_TEMPLATES = new Set(["A", "B", "C", "D", "E", "X"]);
+const ALLOWED_LEVELS = new Set(["Observation", "Analysis", "Decision", "Validation", "Method"]);
+
 function makeSlug(title) {
   return String(title || "content")
     .toLowerCase()
@@ -22,13 +25,74 @@ function inferSource(body, source) {
   return String(source || "").trim() || "本站撰写";
 }
 
-function withMeta(body, data) {
-  const meta = {
+function defaultTemplate(type) {
+  if (type === "case") return "A";
+  if (type === "video" || type === "image") return "E";
+  if (type === "thought") return "C";
+  return "X";
+}
+
+function normalizeKeywords(value, title, topic, type, template) {
+  const supplied = Array.isArray(value)
+    ? value
+    : String(value || "").split(/[，,]/);
+  return [...new Set([
+    ...supplied,
+    topic,
+    type,
+    `Template ${template}`,
+    title
+  ].map(item => String(item || "").trim()).filter(Boolean))].slice(0, 12);
+}
+
+function inferCoverImage(body) {
+  const text = cleanBody(body);
+  const yunheMedia = text.match(/\[图片(?::\s*[^\]]+)?\]\((https?:\/\/[^)]+)\)/);
+  if (yunheMedia) return yunheMedia[1];
+  const markdownImage = text.match(/!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
+  return markdownImage ? markdownImage[1] : "";
+}
+
+function buildMeta(body, data, system) {
+  const templateValue = String(data?.template || "").toUpperCase();
+  const levelValue = String(data?.knowledgeLevel || data?.knowledge_level || "");
+  const template = ALLOWED_TEMPLATES.has(templateValue) ? templateValue : defaultTemplate(system.type);
+  const knowledgeLevel = ALLOWED_LEVELS.has(levelValue) ? levelValue : "Observation";
+  const summary = String(data?.intro || data?.subtitle || cleanBody(body).slice(0, 160)).trim();
+
+  return {
+    id: `YH-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    template,
+    title: system.title,
+    slug: system.slug,
+    summary,
+    topic: system.topic,
+    type: system.type,
+    knowledge_level: knowledgeLevel,
+    status: String(data?.status || "Published"),
+    visibility: String(data?.visibility || "Public"),
+    keywords: normalizeKeywords(data?.keywords, system.title, system.topic, system.type, template),
+    author: String(data?.author || "Yunhe"),
+    language: String(data?.language || "zh-CN"),
+    created_at: system.createdAt,
+    updated_at: system.createdAt,
+    version: String(data?.version || "v1.0"),
+    related_documents: Array.isArray(data?.relatedDocuments) ? data.relatedDocuments : [],
+    cover_image: String(data?.coverImage || inferCoverImage(body)),
+    seo_title: String(data?.seoTitle || system.title),
+    seo_description: String(data?.seoDescription || summary).slice(0, 200),
     subtitle: String(data?.subtitle || "").trim(),
     originalDate: String(data?.originalDate || "").trim(),
     source: inferSource(body, data?.source)
   };
+}
+
+function withMeta(body, meta) {
   return `${cleanBody(body)}\n\n<!--yunhe-meta:${JSON.stringify(meta)}-->`;
+}
+
+function shouldEmbedMeta(type) {
+  return type !== "thought" && type !== "thought_profile";
 }
 
 module.exports = async function handler(req, res) {
@@ -46,21 +110,27 @@ module.exports = async function handler(req, res) {
     const env = requireSupabaseEnv();
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
- const title = String(data?.title || "").trim();
-const contentType = String(data?.type || "article");
-const plainBody = cleanBody(data?.body);
+    const title = String(data?.title || "").trim();
+    const plainBody = cleanBody(data?.body);
+    const contentType = String(data?.type || "article").trim();
+    const topic = String(data?.topic || "未分类").trim();
+    const intro = String(data?.intro || data?.subtitle || "").trim();
 
-const body = ["article", "case"].includes(contentType)
-  ? withMeta(plainBody, data)
-  : plainBody;
-
-const intro = String(data?.intro || data?.subtitle || "").trim();
-
-    if (!title || !body) {
+    if (!title || !plainBody) {
       return res.status(400).json({ success: false, error: "标题和正文不能为空" });
     }
 
     const slug = makeSlug(title);
+    const createdAt = new Date().toISOString();
+    const meta = buildMeta(plainBody, data, {
+      title,
+      slug,
+      topic,
+      type: contentType,
+      createdAt
+    });
+    const body = shouldEmbedMeta(contentType) ? withMeta(plainBody, meta) : plainBody;
+
     const inserted = await supabaseRequest("/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at", {
       method: "POST",
       headers: { Prefer: "return=representation" },
@@ -70,9 +140,9 @@ const intro = String(data?.intro || data?.subtitle || "").trim();
         body,
         video: data?.video || "",
         type: contentType,
-        topic: data?.topic || "未分类",
+        topic,
         slug,
-        created_at: new Date().toISOString()
+        created_at: createdAt
       })
     });
 
