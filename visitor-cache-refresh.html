@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="云鹤系统公开访客入口：文章、案例、影像、摄影作品与关于云鹤系统。"
+    />
+    <title>访客入口｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260715-2" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="index.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE</a
+      >
+      <nav>
+        <a href="visitor.html">访客入口</a>
+        <a href="article-list.html">文章</a>
+        <a href="case-list.html">案例</a>
+        <a href="gallery.html">作品</a>
+        <a href="about.html">关于</a>
+      </nav>
+    </header>
+
+    <main class="visitor-shell">
+      <section class="visitor-hero">
+        <p class="eyebrow">PUBLIC VISITOR ENTRY</p>
+        <h1>云鹤系统</h1>
+        <p>
+          这里是给外部访客阅读的公开页面，只展示文章、案例、作品与系统说明。内部日记不开放，随笔进入邮箱账户机制后再开放给注册访客。
+        </p>
+      </section>
+
+      <section class="visitor-grid" aria-label="公开内容入口">
+        <a class="visitor-card" href="article-list.html?visitor=1">
+          <span>01 / PUBLIC ARTICLES</span>
+          <h2>文章</h2>
+          <p>结构分析、现实观察、长期研究与方法记录。</p>
+        </a>
+
+        <a class="visitor-card" href="case-list.html?visitor=1">
+          <span>02 / CASE ARCHIVE</span>
+          <h2>案例</h2>
+          <p>问题、分析、决策、验证，以及现实事件整理。</p>
+        </a>
+
+        <a class="visitor-card" href="gallery.html?visitor=1">
+          <span>03 / VISUAL WORKS</span>
+          <h2>作品</h2>
+          <p>摄影作品、影像作品与视觉记录。</p>
+        </a>
+
+        <a class="visitor-card" href="about.html?visitor=1">
+          <span>04 / ABOUT SYSTEM</span>
+          <h2>关于</h2>
+          <p>云鹤系统的身份、方法、内容边界与联系方式。</p>
+        </a>
+      </section>
+
+      <p class="visitor-note">访客入口仅供浏览。</p>
+    </main>
+    <script src="scripts/pages/visitor.js?v=20260715-2"></script>
+  </body>
+</html>
