@@ -280,7 +280,8 @@ Promise.all([
 ])
   .then(([remoteResult, localResult]) => {
     const remoteList = Array.isArray(remoteResult.data) ? remoteResult.data.filter(item => ["photo", "video"].includes(item.kind)) : [];
-    const localList = Array.isArray(localResult) ? localResult : [];
+    const remoteUrls = new Set(remoteList.map(item => item.url));
+    const localList = Array.isArray(localResult) ? localResult.filter(item => !remoteUrls.has(item.url)) : [];
     const list = [...remoteList, ...localList].sort((a, b) =>
       String(b.created_at || "").localeCompare(String(a.created_at || ""))
     );
