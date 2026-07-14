@@ -19,6 +19,7 @@ npm run sync:gallery
 ## 目录
 
 - `api/`：12 个稳定的 Vercel Serverless 入口。
+- `admin/`：后台运行入口清单与维护边界。
 - `assets/styles/`：公共样式与页面样式。
 - `scripts/core/`：浏览器公共配置、工具和 API 客户端。
 - `scripts/pages/`：页面控制器。
@@ -26,6 +27,7 @@ npm run sync:gallery
 - `lib/`：服务端仓库、服务和请求辅助代码。
 - `database/migrations/`：Supabase 数据迁移。
 - `legacy/`：不再运行但保留备查的旧代码。
+- `pages/`：公开页面入口清单；根目录文件用于网址兼容。
 - `docs/`：架构与迁移说明。
 
 详细说明见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)。
