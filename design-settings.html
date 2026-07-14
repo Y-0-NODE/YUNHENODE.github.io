@@ -32,7 +32,7 @@
       <p class="eyebrow">DESIGN SETTINGS</p>
       <h1>设计设置</h1>
       <p class="intro">
-        保存你的阅读页主题、强调色和背景图。背景图可以先在“作品上传”里上传，再把图片地址贴进来。
+        管理阅读页主题，并直接上传和调整访客入口背景。访客背景会保存到 Supabase，所有访客都能看到。
       </p>
 
       <section class="settings">
@@ -81,8 +81,73 @@
           <p>这里展示一级、二级、正文之间的视觉差异。</p>
         </article>
       </section>
+
+      <section class="settings visitor-background-settings">
+        <div class="panel">
+          <p class="eyebrow">VISITOR BACKGROUND</p>
+          <h2>访客入口背景</h2>
+
+          <label for="visitor-admin-name">管理员名称</label>
+          <input id="visitor-admin-name" value="YUNHE" />
+
+          <label for="visitor-admin-password">管理员密码</label>
+          <input id="visitor-admin-password" type="password" />
+
+          <label for="visitor-background-file">选择背景图片</label>
+          <input id="visitor-background-file" type="file" accept="image/*" />
+
+          <label for="visitor-position-x">左右位置</label>
+          <input id="visitor-position-x" type="range" min="0" max="100" value="0" />
+
+          <label for="visitor-position-y">上下位置</label>
+          <input id="visitor-position-y" type="range" min="0" max="100" value="50" />
+
+          <label for="visitor-scale">图片缩放</label>
+          <input id="visitor-scale" type="range" min="40" max="200" value="90" />
+
+          <label for="visitor-image-opacity">图片透明度</label>
+          <input id="visitor-image-opacity" type="range" min="0.1" max="1" step="0.05" value="1" />
+
+          <label for="visitor-veil">文字保护留白</label>
+          <input id="visitor-veil" type="range" min="0" max="0.9" step="0.05" value="0.08" />
+
+          <label for="visitor-content-side">文字区域</label>
+          <select id="visitor-content-side">
+            <option value="right">右侧</option>
+            <option value="left">左侧</option>
+            <option value="center">居中</option>
+          </select>
+
+          <label for="visitor-theme">页面文字主题</label>
+          <select id="visitor-theme">
+            <option value="light">浅色纸面</option>
+            <option value="dark">深色页面</option>
+          </select>
+
+          <div class="actions">
+            <button class="primary" type="button" onclick="saveVisitorBackground()">
+              上传并保存
+            </button>
+            <button type="button" onclick="removeVisitorBackground()">清除背景</button>
+            <a href="visitor.html" target="_blank" rel="noopener">打开访客页面</a>
+          </div>
+          <div id="visitor-bg-status" class="status">正在读取当前访客背景…</div>
+        </div>
+
+        <article id="visitor-preview" class="visitor-preview">
+          <div id="visitor-preview-background" class="visitor-preview-background"></div>
+          <div id="visitor-preview-veil" class="visitor-preview-veil"></div>
+          <div id="visitor-preview-content" class="visitor-preview-content">
+            <p>PUBLIC VISITOR ENTRY</p>
+            <h2>云鹤系统公开入口</h2>
+            <span>在这里检查墨迹与文字是否重叠。</span>
+          </div>
+        </article>
+      </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/core/config.js"></script>
     <script src="scripts/pages/design-settings.js"></script>
   </body>
 </html>
