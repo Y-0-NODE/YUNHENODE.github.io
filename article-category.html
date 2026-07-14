@@ -3,65 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="按主题浏览云鹤系统公开文章。">
+<meta name="description" content="按人与关系、组织与系统、社会与现实、创作与内在浏览云鹤系统文章。">
 <title>文章分类｜云鹤系统</title>
 <link rel="stylesheet" href="style.css">
 <style>
+.category-section{margin-top:58px;}
+.category-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:20px;
+  border-bottom:1px solid #2a2a2a;
+  padding-bottom:14px;
+}
+.category-head h2{font-size:clamp(28px,4vw,48px);margin:0;}
+.category-head p{color:#777;margin:0;line-height:1.7;}
 .category-grid{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:14px;
-  margin-top:46px;
+  margin-top:16px;
 }
-
 .category-card{
   display:flex;
-  min-height:190px;
+  min-height:180px;
   flex-direction:column;
   justify-content:space-between;
   border:1px solid #2a2a2a;
   background:#101010;
   color:#f2f2f2;
-  padding:22px;
+  padding:20px;
   text-decoration:none;
   transition:border-color .2s ease,transform .2s ease;
 }
-
-.category-card:hover,
-.category-card:focus-visible{
+.category-card:hover,.category-card:focus-visible{
   border-color:#777;
   transform:translateY(-2px);
   outline:none;
 }
-
-.category-card span{
-  color:#777;
-  font-size:13px;
-}
-
-.category-card h2{
-  margin:42px 0 8px;
-  font-size:clamp(25px,3vw,40px);
-}
-
-.category-card p{
-  color:#999;
-  line-height:1.7;
-  margin:0;
-}
-
-.status{
-  color:#888;
-  margin-top:30px;
-  line-height:1.8;
-}
-
-@media(max-width:960px){
-  .category-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
-}
-
-@media(max-width:620px){
+.category-card span{color:#777;font-size:13px;}
+.category-card h3{margin:38px 0 8px;font-size:clamp(22px,2.6vw,32px);}
+.category-card p{color:#999;line-height:1.7;margin:0;font-size:14px;}
+.status{color:#888;margin-top:30px;line-height:1.8;}
+@media(max-width:1000px){.category-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:650px){
   .category-grid{grid-template-columns:1fr;}
+  .category-head{display:block;}
+  .category-head p{margin-top:8px;}
+  .category-card{min-height:150px;}
 }
 </style>
 </head>
@@ -81,15 +70,57 @@
 <main class="home">
   <p class="eyebrow">ARTICLE / CATEGORY</p>
   <h1>文章分类</h1>
-  <p class="intro">按研究主题浏览公开文章。</p>
+  <p class="intro">先按写作维度划分，再进入更具体的主题。</p>
   <div id="status" class="status">正在读取文章分类...</div>
-  <section id="category-list" class="category-grid" aria-label="文章分类"></section>
+  <div id="category-list"></div>
 </main>
 
 <script>
 const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
-const DEFAULT_TOPICS = ["品牌","平台","城市","组织","消费","艺术","空间","梦境"];
+
+const CATEGORY_GROUPS = [
+  {
+    name:"人与关系",
+    description:"情绪、亲密关系、家庭互动、沟通和个人变化。",
+    items:[
+      { name:"情感与关系", aliases:["情感与关系","情感","关系"], description:"情绪经验、关系判断与相处方式。" },
+      { name:"亲密关系与家庭", aliases:["亲密关系与家庭","亲密关系","家庭"], description:"伴侣、家庭边界与长期关系。" },
+      { name:"沟通与冲突", aliases:["沟通与冲突"], description:"表达、误解、协商与冲突处理。" },
+      { name:"个体成长", aliases:["个体成长"], description:"自我认识、选择、边界与改变。" }
+    ]
+  },
+  {
+    name:"组织与系统",
+    description:"组织结构、系统运行、管理协作、平台与技术。",
+    items:[
+      { name:"组织结构", aliases:["组织结构","组织"], description:"角色、权责、流程与组织关系。" },
+      { name:"系统机制", aliases:["系统机制"], description:"系统如何形成、运行、失效与修复。" },
+      { name:"管理与协作", aliases:["管理与协作"], description:"决策、执行、团队协同与管理实践。" },
+      { name:"平台与技术", aliases:["平台与技术","平台","技术"], description:"平台机制、数字工具与技术变化。" }
+    ]
+  },
+  {
+    name:"社会与现实",
+    description:"社会现象、城市空间、消费生活与商业品牌。",
+    items:[
+      { name:"社会观察", aliases:["社会观察"], description:"现实事件、群体行为与社会变化。" },
+      { name:"城市与空间", aliases:["城市与空间","城市","空间"], description:"城市经验、公共空间与地方关系。" },
+      { name:"消费与生活", aliases:["消费与生活","消费"], description:"消费选择、日常生活与体验判断。" },
+      { name:"商业与品牌", aliases:["商业与品牌","品牌"], description:"品牌表达、商业模式与市场关系。" }
+    ]
+  },
+  {
+    name:"创作与内在",
+    description:"艺术创作、思考方法、梦境与内在经验。",
+    items:[
+      { name:"艺术与创作", aliases:["艺术与创作","艺术"], description:"视觉、影像、表达与创作过程。" },
+      { name:"方法与思考", aliases:["方法与思考"], description:"分析框架、研究方法与认知整理。" },
+      { name:"梦境与潜意识", aliases:["梦境与潜意识","梦境"], description:"梦境记录、象征与潜意识体验。" },
+      { name:"未分类", aliases:["未分类",""] , description:"暂时还未确定主题的文章。" }
+    ]
+  }
+];
 
 function escapeHtml(value){
   return String(value || "")
@@ -103,41 +134,39 @@ function escapeHtml(value){
 async function loadCategories(){
   const status = document.getElementById("status");
   const box = document.getElementById("category-list");
-
   try{
     const query = "select=topic&type=eq.article&order=created_at.desc";
     const res = await fetch(`${SUPABASE_URL}/rest/v1/contents?${query}`, {
-      headers:{
-        apikey:SUPABASE_KEY,
-        Authorization:`Bearer ${SUPABASE_KEY}`
-      }
+      headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}
     });
     if(!res.ok) throw new Error("load failed");
-
     const articles = await res.json();
-    const counts = new Map();
-    (Array.isArray(articles) ? articles : []).forEach(item => {
-      const topic = String(item.topic || "未分类").trim() || "未分类";
-      counts.set(topic, (counts.get(topic) || 0) + 1);
-    });
+    const list = Array.isArray(articles) ? articles : [];
 
-    const discovered = [...counts.keys()].filter(topic => !DEFAULT_TOPICS.includes(topic));
-    const topics = [...DEFAULT_TOPICS, ...discovered];
+    box.innerHTML = CATEGORY_GROUPS.map(group => `
+      <section class="category-section">
+        <div class="category-head">
+          <h2>${escapeHtml(group.name)}</h2>
+          <p>${escapeHtml(group.description)}</p>
+        </div>
+        <div class="category-grid">
+          ${group.items.map(item => {
+            const count = list.filter(article => item.aliases.includes(String(article.topic || "未分类"))).length;
+            return `
+              <a class="category-card" href="article-topic.html?topic=${encodeURIComponent(item.name)}">
+                <span>${count} 篇文章</span>
+                <div>
+                  <h3>${escapeHtml(item.name)}</h3>
+                  <p>${escapeHtml(item.description)}</p>
+                </div>
+              </a>
+            `;
+          }).join("")}
+        </div>
+      </section>
+    `).join("");
 
-    box.innerHTML = topics.map(topic => {
-      const count = counts.get(topic) || 0;
-      return `
-        <a class="category-card" href="article-topic.html?topic=${encodeURIComponent(topic)}">
-          <span>${count} 篇文章</span>
-          <div>
-            <h2>${escapeHtml(topic)}</h2>
-            <p>查看“${escapeHtml(topic)}”主题文章</p>
-          </div>
-        </a>
-      `;
-    }).join("");
-
-    status.textContent = articles.length ? `共读取 ${articles.length} 篇公开文章。` : "目前还没有公开文章，可以先浏览分类结构。";
+    status.textContent = list.length ? `共读取 ${list.length} 篇公开文章。旧分类已自动归入新的主题。` : "目前还没有公开文章，可以先浏览分类结构。";
   }catch(e){
     status.textContent = "文章分类加载失败，请检查 Supabase 配置。";
   }
