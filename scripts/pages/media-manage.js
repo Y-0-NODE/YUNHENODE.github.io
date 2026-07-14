@@ -100,7 +100,7 @@ async function uploadMedia() {
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
   const shotAt = document.getElementById("shot-at").value;
-  const photoQuality = document.getElementById("photo-quality").value;
+  const photoQuality = document.getElementById("photo-quality")?.value || "web-hd";
   const externalUrl = document.getElementById("external-url").value.trim();
 
   if (!selectedFile && !externalUrl) {
@@ -200,52 +200,45 @@ async function uploadMedia() {
     return sign;
   }
 
+  async function uploadThroughCompatibleChannel(uploadFile) {
+    const dataUrl = await fileToDataUrl(uploadFile);
+    const response = await fetch("./api/media-sign-upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        adminName,
+        password,
+        kind,
+        mode: "inline",
+        fileName: uploadFile.name,
+        contentType: uploadFile.type || "image/jpeg",
+        dataUrl
+      })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "兼容上传通道失败。");
+    return result;
+  }
+
   let sign = null;
   try {
     status.textContent = "正在直传到 Supabase，请不要关闭页面...";
     sign = await uploadWithSign(file);
   } catch (e) {
-    const isSizeError = /maximum allowed size|exceeded/i.test(e.message || "");
-    if (kind !== "photo" || !selectedFile.type.startsWith("image/") || !isSizeError) {
+    if (kind !== "photo" || !selectedFile.type.startsWith("image/")) {
       status.textContent = e.message || "上传到 Supabase 失败。";
       return;
     }
 
     try {
-      status.textContent = "Supabase 仍然认为图片过大，正在生成更小版本...";
-      compressed = await compressImageForUpload(selectedFile, 180 * 1024);
+      status.textContent = "直传没有完成，正在改用手机兼容上传通道...";
+      compressed = await compressImageForUpload(selectedFile, 1500 * 1024);
       file = compressed.file;
-      status.textContent = `已生成小图版本：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在重新上传...`;
-      sign = await uploadWithSign(file);
-    } catch (secondError) {
-      const tooLarge = /maximum allowed size|exceeded/i.test(secondError.message || "");
-      if (!tooLarge) {
-        status.textContent = secondError.message || "上传到 Supabase 失败。";
-        return;
-      }
-
-      try {
-        status.textContent = "存储桶限制仍然很低，正在生成保底缩略图版本...";
-        compressed = await compressImageForUpload(selectedFile, 70 * 1024);
-        file = compressed.file;
-        status.textContent = `保底版本：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在最后尝试上传...`;
-        sign = await uploadWithSign(file);
-      } catch (finalError) {
-        try {
-          status.textContent = "Supabase Storage 仍然拒绝图片，正在改用数据库兜底保存...";
-          compressed = await compressImageForUpload(selectedFile, 38 * 1024);
-          file = compressed.file;
-          const inlineUrl = await fileToDataUrl(file);
-          sign = {
-            path: `inline/photo-${Date.now()}.jpg`,
-            publicUrl: inlineUrl
-          };
-          status.textContent = `已改用兜底图片：${formatBytes(compressed.originalSize)} → ${formatBytes(compressed.newSize)}，正在写入作品库...`;
-        } catch (inlineError) {
-          status.textContent = `${finalError.message || "上传失败。"}。兜底保存也失败：${inlineError.message || "图片处理失败"}。`;
-          return;
-        }
-      }
+      status.textContent = `兼容上传版本：${formatBytes(compressed.newSize)}，正在上传到 Supabase Storage...`;
+      sign = await uploadThroughCompatibleChannel(file);
+    } catch (compatibleError) {
+      status.textContent = `${compatibleError.message || e.message || "上传失败。"} 没有保存低清替代图，请稍后重试。`;
+      return;
     }
   }
 
