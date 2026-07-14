@@ -475,12 +475,13 @@ function fileToDataUrl(file){
 
 async function uploadThroughServer(file, options){
   const dataUrl = await fileToDataUrl(file);
-  const uploadRes = await fetch("./api/media-inline-upload", {
+  const uploadRes = await fetch("./api/media-sign-upload", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({
       adminName:ADMIN_NAME,
       password:ADMIN_PASSWORD,
+      mode:"inline",
       kind:options.kind || "photo",
       fileName:file.name,
       contentType:file.type || "image/jpeg",
