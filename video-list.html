@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>视频列表｜云鹤系统</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -9,8 +10,13 @@
 <header class="topbar">
   <a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a>
   <nav>
-    <a href="video.html">返回视频</a>
-    <a href="admin.html">后台</a>
+    <a href="index.html">首页</a>
+    <a href="article.html">文章</a>
+    <a href="case.html">案例</a>
+    <a href="video.html">视频</a>
+    <a href="thought.html">随笔</a>
+    <a href="gallery.html">摄影</a>
+    <a href="about.html">关于</a>
   </nav>
 </header>
 
@@ -23,10 +29,22 @@
 </main>
 
 <script>
+const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
+
+function videoUrl(item){
+  if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
+  return `content.html?id=${encodeURIComponent(item.id)}`;
+}
+
 async function loadVideos() {
-  const res = await fetch("content-list.json");
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/contents?select=id,title,slug,intro,topic,type,created_at&type=eq.video&order=created_at.desc`, {
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` }
+  });
+  if(!res.ok) throw new Error("视频读取失败");
   const data = await res.json();
-  const videos = data.filter(item => item.type === "video");
+  const selectedTopic = new URLSearchParams(location.search).get("topic");
+  const videos = (Array.isArray(data) ? data : []).filter(item => !selectedTopic || (item.topic || "未分类") === selectedTopic);
   const box = document.getElementById("list");
 
   if (!videos.length) {
@@ -35,14 +53,16 @@ async function loadVideos() {
   }
 
   box.innerHTML = videos.map(item => `
-    <a class="card" href="${item.url}">
+    <a class="card" href="${videoUrl(item)}">
       <span>${item.topic || item.tag || "VIDEO"}</span>
       <h2>${item.title}</h2>
       <p>${item.intro}</p>
     </a>
   `).join("");
 }
-loadVideos();
+loadVideos().catch(() => {
+  document.getElementById("list").innerHTML = "<p>视频读取失败，请稍后重试。</p>";
+});
 </script>
 </body>
 </html>

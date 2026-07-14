@@ -545,8 +545,7 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic,creat
 
 function renderArticleTools(post){
   const tools = document.getElementById("manage-tools");
-  const contentType = post.type === "case" ? "case" : "article";
-  const listUrl = contentType === "case" ? "case-list.html" : "article-list.html";
+  const listUrl = post.type === "case" ? "case-list.html" : (post.type === "video" ? "video-list.html" : "article-list.html");
   document.getElementById("back-link").href = listUrl;
   tools.hidden = true;
   tools.innerHTML = "";
