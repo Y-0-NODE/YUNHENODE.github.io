@@ -1,707 +1,222 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文章管理｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.login-panel,
-.manage-item,
-.editor-panel,
-.tool-panel{
-  border:1px solid #2a2a2a;
-  background:#111;
-  padding:22px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文章管理｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/article-manage.css" />
+  </head>
 
-.login-panel{
-  margin-top:36px;
-  max-width:520px;
-}
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="index.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE</a
+      >
+      <nav>
+        <a href="index.html">首页</a>
+        <a href="article.html">文章</a>
+        <a href="article-list.html">文章列表</a>
+        <a href="case-list.html">案例列表</a>
+        <a href="article-manage.html?type=case">案例管理</a>
+        <a href="admin.html">后台首页</a>
+        <a href="publish.html">新建内容</a>
+      </nav>
+    </header>
 
-.login-panel label{
-  display:block;
-  color:#aaa;
-  margin:16px 0 10px;
-}
+    <main class="home">
+      <p id="page-eyebrow" class="eyebrow">ARTICLE MANAGEMENT</p>
+      <h1 id="page-title">文章管理</h1>
+      <p id="page-intro" class="intro">先登录数据管理员账户，再管理和删除文章。</p>
 
-.login-panel input{
-  width:100%;
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-}
+      <section id="login-panel" class="login-panel">
+        <label for="admin-name">数据管理员名称</label>
+        <input
+          id="admin-name"
+          type="text"
+          autocomplete="username"
+          placeholder="填写你的环境变量名称，例如 YUNHE"
+        />
 
-.tool-panel{
-  margin-top:28px;
-}
+        <label for="admin-password">数据管理员密码</label>
+        <input
+          id="admin-password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="填写这个环境变量对应的密码"
+        />
 
-.tool-panel input{
-  width:100%;
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-}
+        <button type="button" onclick="login()">登录管理后台</button>
+        <div id="login-status" class="status"></div>
+      </section>
 
-.login-panel button,
-.actions a,
-.actions button,
-.media-actions button,
-.editor-actions button{
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#ddd;
-  padding:10px 14px;
-  text-decoration:none;
-  cursor:pointer;
-  font-size:14px;
-}
-
-.login-panel button{
-  margin-top:18px;
-  width:100%;
-  max-width:420px;
-  background:#f2f2f2;
-  color:#0b0b0b;
-  font-weight:700;
-}
-
-.login-panel button:hover,
-.actions a:hover,
-.actions button:hover,
-.media-actions button:hover,
-.editor-actions button:hover{
-  background:#dcdcdc;
-}
-
-.manage-list{
-  display:grid;
-  gap:14px;
-  margin-top:40px;
-}
-
-.manage-item h2{
-  font-size:24px;
-  margin:10px 0 12px;
-}
-
-.meta{
-  color:#777;
-  font-size:14px;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
-
-.actions .danger{
-  color:#ff9a9a;
-  border-color:#4a2525;
-}
-
-.status{
-  color:#888;
-  margin-top:28px;
-  line-height:1.7;
-}
-
-.editor-panel{
-  margin-top:32px;
-}
-
-.editor-panel label{
-  display:block;
-  color:#aaa;
-  margin:16px 0 8px;
-}
-
-.editor-panel input,
-.editor-panel select,
-.editor-panel textarea{
-  width:100%;
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-}
-
-.editor-panel textarea{
-  min-height:160px;
-  resize:vertical;
-}
-
-.media-insert{
-  margin-top:22px;
-  padding-top:18px;
-  border-top:1px solid #2a2a2a;
-}
-
-.media-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.media-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.editor-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
-
-.hidden{
-  display:none;
-}
-
-@media(max-width:760px){
-  .media-row{
-    grid-template-columns:1fr;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<header class="topbar">
-  <a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a>
-  <nav>
-    <a href="index.html">首页</a>
-    <a href="article.html">文章</a>
-    <a href="article-list.html">文章列表</a>
-    <a href="case-list.html">案例列表</a>
-    <a href="article-manage.html?type=case">案例管理</a>
-    <a href="admin.html">后台首页</a>
-    <a href="publish.html">新建内容</a>
-  </nav>
-</header>
-
-<main class="home">
-  <p id="page-eyebrow" class="eyebrow">ARTICLE MANAGEMENT</p>
-  <h1 id="page-title">文章管理</h1>
-  <p id="page-intro" class="intro">先登录数据管理员账户，再管理和删除文章。</p>
-
-  <section id="login-panel" class="login-panel">
-    <label for="admin-name">数据管理员名称</label>
-    <input id="admin-name" type="text" autocomplete="username" placeholder="填写你的环境变量名称，例如 YUNHE">
-
-    <label for="admin-password">数据管理员密码</label>
-    <input id="admin-password" type="password" autocomplete="current-password" placeholder="填写这个环境变量对应的密码">
-
-    <button type="button" onclick="login()">登录管理后台</button>
-    <div id="login-status" class="status"></div>
-  </section>
-
-  <section id="manager-panel" class="hidden">
-    <div class="tool-panel">
-      <input id="search" type="search" placeholder="搜索标题、简介、主题" oninput="applySearch()">
-    </div>
-
-    <section id="editor-panel" class="editor-panel hidden">
-      <p id="editor-eyebrow" class="eyebrow">EDIT ARTICLE</p>
-      <h2 id="editor-heading">编辑文章</h2>
-
-      <label for="edit-title">标题</label>
-      <input id="edit-title" type="text">
-
-      <label for="edit-subtitle">副标题</label>
-      <input id="edit-subtitle" type="text" placeholder="大标题下面的说明文字">
-
-      <label for="edit-intro">摘要 / 卡片说明</label>
-      <textarea id="edit-intro"></textarea>
-
-      <div class="media-row">
-        <div>
-          <label for="edit-original-date">原始撰写时间</label>
-          <input id="edit-original-date" type="date">
+      <section id="manager-panel" class="hidden">
+        <div class="tool-panel">
+          <input
+            id="search"
+            type="search"
+            placeholder="搜索标题、简介、主题"
+            oninput="applySearch()"
+          />
         </div>
-        <div>
-          <label for="edit-source">内容来源</label>
-          <select id="edit-source">
-            <option value="本站撰写">本站撰写</option>
-            <option value="云鹤系统公众号转载">云鹤系统公众号转载</option>
-            <option value="公众号导入">公众号导入</option>
-            <option value="内部日记整理">内部日记整理</option>
-            <option value="外部链接摘录">外部链接摘录</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="media-row">
-        <div>
-          <label for="edit-template">Template（模板）</label>
-          <select id="edit-template">
-            <option value="A">A｜Case Archive（案例库）</option>
-            <option value="B">B｜Method Archive（方法库）</option>
-            <option value="C">C｜Research Notes（研究记录）</option>
-            <option value="D">D｜Project Archive（项目档案）</option>
-            <option value="E">E｜Media Archive（媒体库）</option>
-            <option value="X">X｜X Archive（未分类档案）</option>
-          </select>
-        </div>
-        <div>
-          <label for="edit-knowledge-level">Knowledge Level（知识层级）</label>
-          <select id="edit-knowledge-level">
-            <option value="Observation">Observation（观察）</option>
-            <option value="Analysis">Analysis（分析）</option>
-            <option value="Decision">Decision（判断）</option>
-            <option value="Validation">Validation（验证）</option>
-            <option value="Method">Method（方法）</option>
-          </select>
-        </div>
-      </div>
+        <section id="editor-panel" class="editor-panel hidden">
+          <p id="editor-eyebrow" class="eyebrow">EDIT ARTICLE</p>
+          <h2 id="editor-heading">编辑文章</h2>
 
-      <label for="edit-topic">主题</label>
-      <select id="edit-topic">
-        <optgroup label="人与关系">
-          <option value="情感与关系">情感与关系</option>
-          <option value="亲密关系与家庭">亲密关系与家庭</option>
-          <option value="沟通与冲突">沟通与冲突</option>
-          <option value="个体成长">个体成长</option>
-        </optgroup>
-        <optgroup label="组织与系统">
-          <option value="组织结构">组织结构</option>
-          <option value="系统机制">系统机制</option>
-          <option value="管理与协作">管理与协作</option>
-          <option value="平台与技术">平台与技术</option>
-        </optgroup>
-        <optgroup label="社会与现实">
-          <option value="社会观察">社会观察</option>
-          <option value="城市与空间">城市与空间</option>
-          <option value="消费与生活">消费与生活</option>
-          <option value="商业与品牌">商业与品牌</option>
-        </optgroup>
-        <optgroup label="创作与内在">
-          <option value="艺术与创作">艺术与创作</option>
-          <option value="方法与思考">方法与思考</option>
-          <option value="梦境与潜意识">梦境与潜意识</option>
-          <option value="未分类">未分类</option>
-        </optgroup>
-        <optgroup label="旧分类（重新编辑时可调整）">
-          <option value="平台">平台</option>
-          <option value="品牌">品牌</option>
-          <option value="城市">城市</option>
-          <option value="组织">组织</option>
-          <option value="消费">消费</option>
-          <option value="艺术">艺术</option>
-          <option value="空间">空间</option>
-          <option value="技术">技术</option>
-          <option value="梦境">梦境</option>
-          <option value="文化">文化</option>
-          <option value="社会">社会</option>
-        </optgroup>
-      </select>
+          <label for="edit-title">标题</label>
+          <input id="edit-title" type="text" />
 
-      <label for="edit-body">正文</label>
-      <textarea id="edit-body"></textarea>
+          <label for="edit-subtitle">副标题</label>
+          <input id="edit-subtitle" type="text" placeholder="大标题下面的说明文字" />
 
-      <div id="media-insert" class="media-insert">
-        <h2>插入图片 / 视频</h2>
-        <p class="status">可以上传电脑里的图片或视频，也可以粘贴已有链接。插入后会进入正文，详情页会自动显示成图片或播放器。</p>
+          <label for="edit-intro">摘要 / 卡片说明</label>
+          <textarea id="edit-intro"></textarea>
 
-        <div class="media-row">
-          <div>
-            <label for="media-kind">媒体类型</label>
-            <select id="media-kind">
-              <option value="image">图片</option>
-              <option value="video">视频</option>
-            </select>
+          <div class="media-row">
+            <div>
+              <label for="edit-original-date">原始撰写时间</label>
+              <input id="edit-original-date" type="date" />
+            </div>
+            <div>
+              <label for="edit-source">内容来源</label>
+              <select id="edit-source">
+                <option value="本站撰写">本站撰写</option>
+                <option value="云鹤系统公众号转载">云鹤系统公众号转载</option>
+                <option value="公众号导入">公众号导入</option>
+                <option value="内部日记整理">内部日记整理</option>
+                <option value="外部链接摘录">外部链接摘录</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label for="media-position">插入位置</label>
-            <select id="media-position">
-              <option value="end">插入到正文末尾</option>
-              <option value="cursor">插入到光标位置</option>
-            </select>
+
+          <div class="media-row">
+            <div>
+              <label for="edit-template">Template（模板）</label>
+              <select id="edit-template">
+                <option value="A">A｜Case Archive（案例库）</option>
+                <option value="B">B｜Method Archive（方法库）</option>
+                <option value="C">C｜Research Notes（研究记录）</option>
+                <option value="D">D｜Project Archive（项目档案）</option>
+                <option value="E">E｜Media Archive（媒体库）</option>
+                <option value="X">X｜X Archive（未分类档案）</option>
+              </select>
+            </div>
+            <div>
+              <label for="edit-knowledge-level">Knowledge Level（知识层级）</label>
+              <select id="edit-knowledge-level">
+                <option value="Observation">Observation（观察）</option>
+                <option value="Analysis">Analysis（分析）</option>
+                <option value="Decision">Decision（判断）</option>
+                <option value="Validation">Validation（验证）</option>
+                <option value="Method">Method（方法）</option>
+              </select>
+            </div>
           </div>
-        </div>
 
-        <label for="media-caption">说明文字</label>
-        <input id="media-caption" placeholder="例如：现场界面、验证截图、演示视频">
+          <label for="edit-topic">主题</label>
+          <select id="edit-topic">
+            <optgroup label="人与关系">
+              <option value="情感与关系">情感与关系</option>
+              <option value="亲密关系与家庭">亲密关系与家庭</option>
+              <option value="沟通与冲突">沟通与冲突</option>
+              <option value="个体成长">个体成长</option>
+            </optgroup>
+            <optgroup label="组织与系统">
+              <option value="组织结构">组织结构</option>
+              <option value="系统机制">系统机制</option>
+              <option value="管理与协作">管理与协作</option>
+              <option value="平台与技术">平台与技术</option>
+            </optgroup>
+            <optgroup label="社会与现实">
+              <option value="社会观察">社会观察</option>
+              <option value="城市与空间">城市与空间</option>
+              <option value="消费与生活">消费与生活</option>
+              <option value="商业与品牌">商业与品牌</option>
+            </optgroup>
+            <optgroup label="创作与内在">
+              <option value="艺术与创作">艺术与创作</option>
+              <option value="方法与思考">方法与思考</option>
+              <option value="梦境与潜意识">梦境与潜意识</option>
+              <option value="未分类">未分类</option>
+            </optgroup>
+            <optgroup label="旧分类（重新编辑时可调整）">
+              <option value="平台">平台</option>
+              <option value="品牌">品牌</option>
+              <option value="城市">城市</option>
+              <option value="组织">组织</option>
+              <option value="消费">消费</option>
+              <option value="艺术">艺术</option>
+              <option value="空间">空间</option>
+              <option value="技术">技术</option>
+              <option value="梦境">梦境</option>
+              <option value="文化">文化</option>
+              <option value="社会">社会</option>
+            </optgroup>
+          </select>
 
-        <label for="media-url">已有图片 / 视频地址</label>
-        <input id="media-url" placeholder="https://...">
+          <label for="edit-body">正文</label>
+          <textarea id="edit-body"></textarea>
 
-        <div class="media-actions">
-          <button type="button" onclick="insertMediaUrl()">插入已有地址</button>
-          <a class="button" href="media-center.html" target="_blank">打开 Media Center</a>
-        </div>
-        <div id="media-status" class="status"></div>
-      </div>
+          <div id="media-insert" class="media-insert">
+            <h2>插入图片 / 视频</h2>
+            <p class="status">
+              可以上传电脑里的图片或视频，也可以粘贴已有链接。插入后会进入正文，详情页会自动显示成图片或播放器。
+            </p>
 
-      <div class="editor-actions">
-        <button type="button" onclick="saveEdit()">保存修改</button>
-        <button type="button" onclick="closeEditor()">取消</button>
-      </div>
-    </section>
+            <div class="media-row">
+              <div>
+                <label for="media-kind">媒体类型</label>
+                <select id="media-kind">
+                  <option value="image">图片</option>
+                  <option value="video">视频</option>
+                </select>
+              </div>
+              <div>
+                <label for="media-position">插入位置</label>
+                <select id="media-position">
+                  <option value="end">插入到正文末尾</option>
+                  <option value="cursor">插入到光标位置</option>
+                </select>
+              </div>
+            </div>
 
-    <div id="status" class="status">正在加载内容...</div>
-    <div id="list" class="manage-list"></div>
-  </section>
-</main>
+            <label for="media-caption">说明文字</label>
+            <input id="media-caption" placeholder="例如：现场界面、验证截图、演示视频" />
 
-<script>
-let DATA = [];
-let ADMIN_NAME = "";
-let ADMIN_PASSWORD = "";
-let EDITING_ID = "";
-const PAGE_PARAMS = new URLSearchParams(location.search);
-const REQUESTED_TYPE = PAGE_PARAMS.get("type");
-const CONTENT_TYPE = ["case", "video"].includes(REQUESTED_TYPE) ? REQUESTED_TYPE : "article";
-const TYPE_LABEL = CONTENT_TYPE === "case" ? "案例" : (CONTENT_TYPE === "video" ? "视频" : "文章");
-const TARGET_ID = PAGE_PARAMS.get("id") || "";
-const TARGET_SLUG = PAGE_PARAMS.get("slug") || "";
-const TARGET_TITLE = PAGE_PARAMS.get("title") || "";
+            <label for="media-url">已有图片 / 视频地址</label>
+            <input id="media-url" placeholder="https://..." />
 
-function applyPageMode(){
-  document.title = `${TYPE_LABEL}管理｜云鹤系统`;
-  document.getElementById("page-eyebrow").textContent = CONTENT_TYPE === "case" ? "CASE MANAGEMENT" : (CONTENT_TYPE === "video" ? "VIDEO MANAGEMENT" : "ARTICLE MANAGEMENT");
-  document.getElementById("page-title").textContent = `${TYPE_LABEL}管理`;
-  document.getElementById("page-intro").textContent = `先登录数据管理员账户，再管理和删除${TYPE_LABEL}。`;
-  document.getElementById("editor-eyebrow").textContent = CONTENT_TYPE === "case" ? "EDIT CASE" : (CONTENT_TYPE === "video" ? "EDIT VIDEO" : "EDIT ARTICLE");
-}
+            <div class="media-actions">
+              <button type="button" onclick="insertMediaUrl()">插入已有地址</button>
+              <a class="button" href="media-center.html" target="_blank">打开 Media Center</a>
+            </div>
+            <div id="media-status" class="status"></div>
+          </div>
 
-function articleUrl(item){
-  if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
-  return `content.html?id=${encodeURIComponent(item.id)}`;
-}
+          <div class="editor-actions">
+            <button type="button" onclick="saveEdit()">保存修改</button>
+            <button type="button" onclick="closeEditor()">取消</button>
+          </div>
+        </section>
 
-function splitTitle(title){
-  const text = String(title || "").trim();
-  const match = text.match(/^(.*?)\s*(——|—|-)\s*(.+)$/);
-  if(!match) return { title:text, subtitle:"" };
-  return {
-    title:match[1].trim() || text,
-    subtitle:match[3].trim()
-  };
-}
+        <div id="status" class="status">正在加载内容...</div>
+        <div id="list" class="manage-list"></div>
+      </section>
+    </main>
 
-function readMeta(body){
-  const match = String(body || "").match(/<!--yunhe-meta:([\s\S]*?)-->\s*$/m);
-  if(!match) return {};
-  try{
-    return JSON.parse(match[1]);
-  }catch(e){
-    return {};
-  }
-}
+    <script src="shared/metadata.js"></script>
+    <script src="scripts/pages/article-manage.js"></script>
 
-function cleanBody(body){
-  return String(body || "").replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "").trim();
-}
-
-function render(list){
-  const box = document.getElementById("list");
-  const status = document.getElementById("status");
-  box.innerHTML = "";
-
-  if(!list.length){
-    status.textContent = `暂时没有${TYPE_LABEL}。`;
-    return;
-  }
-
-  status.textContent = "";
-  box.innerHTML = list.map(item => {
-    const protocol = readMeta(item.body || "");
-    const template = protocol.template || (item.type === "case" ? "A" : "X");
-    const level = protocol.knowledge_level || "Observation";
-    return `
-      <div class="manage-item">
-        <div class="meta">${item.topic || "未分类"} / Template ${template} / ${level} / ID ${item.id}</div>
-        <h2>${splitTitle(item.title).title || `未命名${TYPE_LABEL}`}</h2>
-        <p>${splitTitle(item.title).subtitle || item.intro || ""}</p>
-        <div class="actions">
-          <a href="${articleUrl(item)}">打开${TYPE_LABEL}</a>
-          <button type="button" onclick="openEditor('${item.id}')">编辑${TYPE_LABEL}</button>
-          <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除${TYPE_LABEL}</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function applySearch(){
-  const q = document.getElementById("search").value.trim().toLowerCase();
-
-  if(!q){
-    render(DATA);
-    return;
-  }
-
-  render(DATA.filter(item => {
-    return [
-      item.title,
-      item.intro,
-      item.topic,
-      item.type,
-      item.slug
-    ].some(value => String(value || "").toLowerCase().includes(q));
-  }));
-}
-
-async function login(){
-  ADMIN_NAME = document.getElementById("admin-name").value.trim();
-  ADMIN_PASSWORD = document.getElementById("admin-password").value.trim();
-
-  if(!ADMIN_NAME){
-    alert("请填写数据管理员名称。例如：YUNHE");
-    document.getElementById("admin-name").focus();
-    return;
-  }
-
-  if(!ADMIN_PASSWORD){
-    alert("请填写数据管理员密码。");
-    document.getElementById("admin-password").focus();
-    return;
-  }
-
-  document.getElementById("status").textContent = "正在登录...";
-  document.getElementById("login-status").textContent = "正在登录...";
-  document.getElementById("manager-panel").classList.remove("hidden");
-
-  const res = await fetch("/api/admin-list", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      adminName: ADMIN_NAME,
-      password: ADMIN_PASSWORD,
-      type: CONTENT_TYPE
-    })
-  });
-
-  const result = await res.json().catch(() => ({}));
-
-  if(!res.ok){
-    document.getElementById("manager-panel").classList.add("hidden");
-    const message = result.error || "登录失败，请检查 Vercel 环境变量名称和密码。";
-    document.getElementById("login-status").textContent = message;
-    alert(message);
-    return;
-  }
-
-  document.getElementById("login-panel").classList.add("hidden");
-  document.getElementById("login-status").textContent = "";
-  DATA = Array.isArray(result.data) ? result.data : [];
-  render(DATA);
-  openTargetFromUrl();
-}
-
-async function reloadArticles(){
-  const res = await fetch("/api/admin-list", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      adminName: ADMIN_NAME,
-      password: ADMIN_PASSWORD,
-      type: CONTENT_TYPE
-    })
-  });
-
-  const result = await res.json().catch(() => ({}));
-
-  if(res.ok){
-    DATA = Array.isArray(result.data) ? result.data : [];
-    applySearch();
-  }
-}
-
-function openEditor(id){
-  const item = DATA.find(row => String(row.id) === String(id));
-
-  if(!item){
-    alert(`没有找到这篇${TYPE_LABEL}，请刷新管理页。`);
-    return;
-  }
-
-  EDITING_ID = String(item.id);
-  const titleParts = splitTitle(item.title);
-  const meta = readMeta(item.body);
-  document.getElementById("editor-heading").textContent = `编辑${TYPE_LABEL}：${titleParts.title || `未命名${TYPE_LABEL}`}`;
-  document.getElementById("edit-title").value = titleParts.title || "";
-  document.getElementById("edit-subtitle").value = meta.subtitle || titleParts.subtitle || "";
-  document.getElementById("edit-intro").value = item.intro || "";
-  document.getElementById("edit-original-date").value = meta.originalDate || "";
-  document.getElementById("edit-source").value = meta.source || "本站撰写";
-  document.getElementById("edit-template").value = meta.template || (CONTENT_TYPE === "case" ? "A" : "X");
-  document.getElementById("edit-knowledge-level").value = meta.knowledge_level || "Observation";
-  document.getElementById("edit-topic").value = item.topic || "未分类";
-  document.getElementById("edit-body").value = cleanBody(item.body || "");
-  document.getElementById("media-caption").value = "";
-  document.getElementById("media-url").value = "";
-  document.getElementById("media-status").textContent = "";
-  document.getElementById("editor-panel").classList.remove("hidden");
-  document.getElementById("editor-panel").scrollIntoView({ behavior:"smooth", block:"start" });
-}
-
-function openTargetFromUrl(){
-  if(!TARGET_ID && !TARGET_SLUG && !TARGET_TITLE) return;
-
-  const target = DATA.find(item => {
-    return String(item.id) === String(TARGET_ID)
-      || (TARGET_SLUG && String(item.slug || "") === String(TARGET_SLUG))
-      || (TARGET_TITLE && String(item.title || "") === String(TARGET_TITLE));
-  });
-
-  if(!target){
-    document.getElementById("status").textContent = `已登录，但没有在列表里找到从详情页带来的那篇${TYPE_LABEL}。`;
-    return;
-  }
-
-  openEditor(target.id);
-}
-
-function closeEditor(){
-  EDITING_ID = "";
-  document.getElementById("editor-panel").classList.add("hidden");
-}
-
-function getMediaLine(kind, caption, url){
-  const label = kind === "video" ? "视频" : "图片";
-  const text = caption ? `${label}: ${caption}` : label;
-  return `[${text}](${url})`;
-}
-
-function insertIntoEditBody(line){
-  const body = document.getElementById("edit-body");
-  const position = document.getElementById("media-position").value;
-
-  if(position === "cursor"){
-    const start = body.selectionStart || 0;
-    const end = body.selectionEnd || 0;
-    const before = body.value.slice(0, start).replace(/\s*$/, "");
-    const after = body.value.slice(end).replace(/^\s*/, "");
-    body.value = `${before}${before ? "\n\n" : ""}${line}${after ? "\n\n" + after : ""}`;
-    const cursor = (before ? before.length + 2 : 0) + line.length;
-    body.setSelectionRange(cursor, cursor);
-  }else{
-    const current = body.value.trim();
-    body.value = current ? `${current}\n\n${line}` : line;
-  }
-
-  body.focus();
-}
-
-function insertMediaUrl(){
-  const status = document.getElementById("media-status");
-  const url = document.getElementById("media-url").value.trim();
-  const kind = document.getElementById("media-kind").value;
-  const caption = document.getElementById("media-caption").value.trim();
-
-  if(!EDITING_ID){
-    status.textContent = `请先打开要编辑的${TYPE_LABEL}。`;
-    return;
-  }
-
-  if(!url){
-    status.textContent = "请先填写图片或视频地址。";
-    return;
-  }
-
-  insertIntoEditBody(getMediaLine(kind, caption, url));
-  status.textContent = "已经插入正文，记得点击“保存修改”。";
-}
-
-async function saveEdit(){
-  if(!EDITING_ID){
-    alert(`没有正在编辑的${TYPE_LABEL}。`);
-    return;
-  }
-
-  const payload = {
-    id: EDITING_ID,
-    title: document.getElementById("edit-title").value.trim(),
-    subtitle: document.getElementById("edit-subtitle").value.trim(),
-    intro: document.getElementById("edit-intro").value.trim(),
-    originalDate: document.getElementById("edit-original-date").value,
-    source: document.getElementById("edit-source").value,
-    template: document.getElementById("edit-template").value,
-    knowledgeLevel: document.getElementById("edit-knowledge-level").value,
-    topic: document.getElementById("edit-topic").value,
-    body: document.getElementById("edit-body").value.trim(),
-    adminName: ADMIN_NAME,
-    password: ADMIN_PASSWORD
-  };
-
-  if(!payload.title || !payload.body){
-    alert("标题和正文不能为空。");
-    return;
-  }
-
-  const res = await fetch("/api/update", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify(payload)
-  });
-
-  const result = await res.json().catch(() => ({}));
-
-  if(!res.ok){
-    alert(result.error || "保存失败，请检查接口或环境变量。");
-    return;
-  }
-
-  alert("已保存");
-  closeEditor();
-  await reloadArticles();
-}
-
-async function deleteArticle(id, encodedSlug, encodedTitle){
-  const slug = decodeURIComponent(encodedSlug || "");
-  const title = decodeURIComponent(encodedTitle || "");
-  const name = title || slug || `ID ${id}`;
-  const ok = confirm(`确定删除${TYPE_LABEL}「${name}」吗？删除后不能在网站里恢复。`);
-
-  if(!ok) return;
-
-  const res = await fetch("/api/delete", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      id,
-      slug,
-      title,
-      adminName: ADMIN_NAME,
-      password: ADMIN_PASSWORD
-    })
-  });
-
-  const result = await res.json().catch(() => ({}));
-
-  if(!res.ok){
-    alert(result.error || "删除失败，请检查 Vercel 环境变量和 Supabase 权限。");
-    return;
-  }
-
-  alert(`已删除：${result.deleted?.title || name}`);
-  DATA = DATA.filter(item => String(item.id) !== String(id));
-  render(DATA);
-  reloadArticles();
-}
-
-applyPageMode();
-</script>
-
-<script src="knowledge-client.js"></script>
-</body>
+    <script src="scripts/core/knowledge-client.js"></script>
+  </body>
 </html>

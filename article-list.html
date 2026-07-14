@@ -1,218 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文章列表｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.toolbar{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:32px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文章列表｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/article-list.css" />
+  </head>
 
-.toolbar button{
-  border:1px solid #2a2a2a;
-  background:#111;
-  color:#ddd;
-  padding:10px 14px;
-  cursor:pointer;
-}
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="index.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE</a
+      >
+      <nav>
+        <a href="index.html">首页</a><a href="article.html">文章</a><a href="case.html">案例</a
+        ><a href="video.html">视频</a><a href="thought.html">随笔</a><a href="gallery.html">摄影</a>
+        <a href="about.html">关于</a>
+      </nav>
+    </header>
 
-.toolbar button:hover{
-  background:#181818;
-}
+    <main class="home">
+      <p class="eyebrow">ARTICLE LIST</p>
+      <h1>文章列表</h1>
+      <p class="intro">从 Supabase 自动读取已发布文章。</p>
 
-.status{
-  color:#888;
-  margin-top:36px;
-  line-height:1.7;
-}
-
-.article-list{
-  display:grid;
-  gap:14px;
-  margin-top:54px;
-}
-
-.article-row{
-  display:grid;
-  grid-template-columns:160px minmax(0,1fr);
-  gap:28px;
-  border-top:1px solid #2a2a2a;
-  padding:24px 0;
-  color:#f2f2f2;
-  text-decoration:none;
-}
-
-.article-row:hover h2{
-  color:#fff;
-}
-
-.article-row:visited,
-.article-row:active{
-  color:#f2f2f2;
-}
-
-.article-row .topic{
-  color:#8a8a8a;
-  font-size:14px;
-  line-height:1.8;
-}
-
-.article-row h2{
-  font-size:clamp(28px,4vw,54px);
-  line-height:1.08;
-  margin:0;
-  color:#f2f2f2;
-  text-decoration:none;
-}
-
-.article-row .subtitle{
-  color:#cfcfcf;
-  font-size:20px;
-  line-height:1.55;
-  margin:16px 0 0;
-}
-
-.article-row .excerpt{
-  color:#888;
-  font-size:15px;
-  line-height:1.8;
-  margin:18px 0 0;
-  max-width:860px;
-}
-
-@media(max-width:760px){
-  .article-row{
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<header class="topbar">
-  <a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a>
-  <nav>
-    <a href="index.html">首页</a><a href="article.html">文章</a><a href="case.html">案例</a><a href="video.html">视频</a><a href="thought.html">随笔</a><a href="gallery.html">摄影</a>
-    <a href="about.html">关于</a>
-  </nav>
-</header>
-
-<main class="home">
-  <p class="eyebrow">ARTICLE LIST</p>
-  <h1>文章列表</h1>
-  <p class="intro">从 Supabase 自动读取已发布文章。</p>
-
-  <div class="toolbar">
-    <button type="button" onclick="filterType('all')">全部</button>
-    <button type="button" onclick="filterDimension('人与关系')">人与关系</button>
-    <button type="button" onclick="filterDimension('组织与系统')">组织与系统</button>
-    <button type="button" onclick="filterDimension('社会与现实')">社会与现实</button>
-    <button type="button" onclick="filterDimension('创作与内在')">创作与内在</button>
-  </div>
-
-  <div id="status" class="status">正在加载文章...</div>
-  <div id="list" class="article-list"></div>
-</main>
-
-<script>
-const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
-const API = `${SUPABASE_URL}/rest/v1/contents?select=id,title,slug,intro,type,topic,created_at&type=eq.article&order=created_at.desc`;
-
-let DATA = [];
-
-const DIMENSIONS = {
-  "人与关系":["情感与关系","情感","关系","亲密关系与家庭","亲密关系","家庭","沟通与冲突","个体成长"],
-  "组织与系统":["组织结构","组织","系统机制","管理与协作","平台与技术","平台","技术"],
-  "社会与现实":["社会观察","城市与空间","城市","空间","消费与生活","消费","商业与品牌","品牌"],
-  "创作与内在":["艺术与创作","艺术","方法与思考","梦境与潜意识","梦境","未分类"]
-};
-
-function articleUrl(item){
-  if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
-  return `content.html?id=${encodeURIComponent(item.id)}`;
-}
-
-function splitTitle(title){
-  const text = String(title || "").trim();
-  const match = text.match(/^(.*?)\s*(——|—|-)\s*(.+)$/);
-  if(!match) return { title:text, subtitle:"" };
-  return {
-    title:match[1].trim() || text,
-    subtitle:match[3].trim()
-  };
-}
-
-function render(list){
-  const el = document.getElementById("list");
-  const status = document.getElementById("status");
-  el.innerHTML = "";
-
-  if(!list.length){
-    status.textContent = "暂时没有文章。";
-    return;
-  }
-
-  status.textContent = "";
-
-  list.forEach(item => {
-    const a = document.createElement("a");
-    const titleParts = splitTitle(item.title);
-    a.className = "article-row";
-    a.href = articleUrl(item);
-
-    a.innerHTML = `
-      <div class="topic">${item.topic || "ARTICLE"}<br>${String(item.created_at || "").slice(0,10)}</div>
-      <div>
-        <h2>${titleParts.title || "未命名文章"}</h2>
-        <p class="subtitle">${titleParts.subtitle || item.intro || ""}</p>
-        ${titleParts.subtitle && item.intro ? `<p class="excerpt">${item.intro}</p>` : ""}
+      <div class="toolbar">
+        <button type="button" onclick="filterType('all')">全部</button>
+        <button type="button" onclick="filterDimension('人与关系')">人与关系</button>
+        <button type="button" onclick="filterDimension('组织与系统')">组织与系统</button>
+        <button type="button" onclick="filterDimension('社会与现实')">社会与现实</button>
+        <button type="button" onclick="filterDimension('创作与内在')">创作与内在</button>
       </div>
-    `;
 
-    el.appendChild(a);
-  });
-}
+      <div id="status" class="status">正在加载文章...</div>
+      <div id="list" class="article-list"></div>
+    </main>
 
-function filterType(type){
-  if(type === "all") return render(DATA);
-  render(DATA.filter(i => i.type === type));
-}
-
-function filterTopic(topic){
-  render(DATA.filter(i => i.topic === topic));
-}
-
-function filterDimension(name){
-  const topics = DIMENSIONS[name] || [];
-  render(DATA.filter(item => topics.includes(String(item.topic || "未分类"))));
-}
-
-fetch(API, {
-  headers:{
-    apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${SUPABASE_KEY}`
-  }
-})
-  .then(r => {
-    if(!r.ok) throw new Error("load failed");
-    return r.json();
-  })
-  .then(data => {
-    DATA = Array.isArray(data) ? data : [];
-    render(DATA);
-  })
-  .catch(() => {
-    document.getElementById("status").textContent = "文章加载失败，请检查 Supabase 配置。";
-  });
-</script>
-
-</body>
+    <script src="scripts/core/config.js"></script>
+    <script src="scripts/pages/article-list.js"></script>
+  </body>
 </html>

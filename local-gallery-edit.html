@@ -1,249 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>编辑本地作品｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.panel{
-  border:1px solid #2a2a2a;
-  background:#111;
-  padding:22px;
-  margin-top:36px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>编辑本地作品｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/local-gallery-edit.css" />
+  </head>
 
-.panel label{
-  display:block;
-  color:#aaa;
-  margin:16px 0 8px;
-}
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav>
+        <a href="photography-manage.html">摄影作品管理</a>
+        <a href="admin.html">后台首页</a>
+      </nav>
+    </header>
 
-.panel input,
-.panel textarea{
-  width:100%;
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-}
+    <main class="home">
+      <p class="eyebrow">LOCAL MEDIA EDIT</p>
+      <h1>编辑本地作品</h1>
+      <p class="intro">
+        第一次保存会把这件本地作品登记到 Supabase，之后可以直接编辑，不需要下载说明文件。
+      </p>
 
-.panel textarea{
-  min-height:140px;
-}
+      <section class="panel">
+        <div id="preview" class="preview"></div>
 
-.panel button,
-.panel a{
-  display:inline-block;
-  margin-top:18px;
-  margin-right:10px;
-  border:1px solid #2a2a2a;
-  background:#111;
-  color:#f2f2f2;
-  padding:12px 14px;
-  text-decoration:none;
-  font-weight:700;
-  cursor:pointer;
-}
+        <label for="admin-name">管理员名称</label>
+        <input id="admin-name" value="YUNHE" />
 
-.panel button.danger{
-  color:#ffb0a8;
-  border-color:#5a2a26;
-}
+        <label for="admin-password">管理员密码</label>
+        <input id="admin-password" type="password" />
 
-.panel button.primary{
-  background:#f2f2f2;
-  border-color:#f2f2f2;
-  color:#0b0b0b;
-}
+        <label for="title">作品名称</label>
+        <input id="title" type="text" />
 
-.preview{
-  max-width:420px;
-  margin-top:18px;
-  border:1px solid #2a2a2a;
-  background:#050505;
-}
+        <label for="description">作品介绍</label>
+        <textarea id="description"></textarea>
 
-.preview img,
-.preview video{
-  width:100%;
-  display:block;
-}
+        <label for="shot-at">拍摄日期</label>
+        <input id="shot-at" type="date" />
 
-.readonly,
-.status,
-.steps{
-  color:#aaa;
-  line-height:1.8;
-}
+        <label>上传日期</label>
+        <div id="created-at" class="readonly">未标注</div>
 
-.steps{
-  border-top:1px solid #2a2a2a;
-  margin-top:24px;
-  padding-top:18px;
-}
+        <button class="primary" type="button" onclick="saveDirectly()">保存修改</button>
+        <a href="photography-manage.html">返回摄影作品管理</a>
+        <div id="status" class="status">正在读取作品...</div>
+      </section>
+    </main>
 
-.code{
-  background:#050505;
-  border:1px solid #2a2a2a;
-  padding:12px;
-  overflow:auto;
-}
-</style>
-</head>
-
-<body>
-
-<header class="topbar">
-  <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
-  <nav>
-    <a href="photography-manage.html">摄影作品管理</a>
-    <a href="admin.html">后台首页</a>
-  </nav>
-</header>
-
-<main class="home">
-  <p class="eyebrow">LOCAL MEDIA EDIT</p>
-  <h1>编辑本地作品</h1>
-  <p class="intro">第一次保存会把这件本地作品登记到 Supabase，之后可以直接编辑，不需要下载说明文件。</p>
-
-  <section class="panel">
-    <div id="preview" class="preview"></div>
-
-    <label for="admin-name">管理员名称</label>
-    <input id="admin-name" value="YUNHE">
-
-    <label for="admin-password">管理员密码</label>
-    <input id="admin-password" type="password">
-
-    <label for="title">作品名称</label>
-    <input id="title" type="text">
-
-    <label for="description">作品介绍</label>
-    <textarea id="description"></textarea>
-
-    <label for="shot-at">拍摄日期</label>
-    <input id="shot-at" type="date">
-
-    <label>上传日期</label>
-    <div id="created-at" class="readonly">未标注</div>
-
-    <button class="primary" type="button" onclick="saveDirectly()">保存修改</button>
-    <a href="photography-manage.html">返回摄影作品管理</a>
-    <div id="status" class="status">正在读取作品...</div>
-
-  </section>
-</main>
-
-<script>
-let CURRENT = null;
-
-function escapeHtml(value){
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function formatDateTime(value){
-  if(!value) return "未标注";
-  const date = new Date(value);
-  if(Number.isNaN(date.getTime())) return String(value);
-  const pad = n => String(n).padStart(2, "0");
-  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-}
-
-function toDateInput(value){
-  if(!value) return "";
-  const date = new Date(value);
-  if(Number.isNaN(date.getTime())) return String(value).slice(0, 10);
-  const pad = n => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-async function loadWork(){
-  const url = new URLSearchParams(location.search).get("url");
-  const status = document.getElementById("status");
-  const list = await fetch("./data/local-gallery.json", { cache:"no-store" })
-    .then(res => res.ok ? res.json() : [])
-    .catch(() => []);
-  CURRENT = Array.isArray(list) ? list.find(item => item.url === url || item.large_url === url) : null;
-
-  if(!CURRENT){
-    status.textContent = "没有找到这个本地作品。";
-    return;
-  }
-
-  document.getElementById("preview").innerHTML = CURRENT.kind === "video"
-    ? `<video src="${escapeHtml(CURRENT.url)}" controls playsinline></video>`
-    : `<img src="${escapeHtml(CURRENT.url)}" alt="${escapeHtml(CURRENT.title || "作品")}">`;
-  document.getElementById("title").value = CURRENT.title || "";
-  document.getElementById("description").value = CURRENT.description || "";
-  document.getElementById("shot-at").value = toDateInput(CURRENT.shot_at);
-  document.getElementById("created-at").textContent = formatDateTime(CURRENT.created_at);
-  status.textContent = "填写管理员密码后，可以直接保存。";
-}
-
-async function saveDirectly(){
-  const status = document.getElementById("status");
-  if(!CURRENT){
-    status.textContent = "没有正在编辑的作品。";
-    return;
-  }
-
-  const adminName = document.getElementById("admin-name").value.trim();
-  const password = document.getElementById("admin-password").value;
-  const title = document.getElementById("title").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const shotAt = document.getElementById("shot-at").value;
-  if(!adminName || !password){
-    status.textContent = "请填写管理员名称和密码。";
-    return;
-  }
-
-  status.textContent = "正在保存到摄影作品库…";
-  try{
-    const listResult = await fetch("./api/media-list", { cache:"no-store" })
-      .then(response => response.json())
-      .catch(() => ({ data:[] }));
-    const existing = (Array.isArray(listResult.data) ? listResult.data : [])
-      .find(item => item.url === CURRENT.url);
-    const endpoint = existing ? "./api/media-update" : "./api/media-record";
-    const payload = existing ? {
-      adminName,
-      password,
-      id:existing.id,
-      title:title || CURRENT.title || "未命名作品",
-      description,
-      shot_at:shotAt || null
-    } : {
-      adminName,
-      password,
-      title:title || CURRENT.title || "未命名作品",
-      description,
-      shot_at:shotAt || null,
-      kind:CURRENT.kind === "video" ? "video" : "photo",
-      url:CURRENT.url,
-      path:`external/local-gallery-${Date.now()}`,
-      fileName:CURRENT.sidecar_name || "local-work"
-    };
-    const response = await fetch(endpoint, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify(payload)
-    });
-    const result = await response.json().catch(() => ({}));
-    if(!response.ok || !result.success) throw new Error(result.error || "保存失败");
-    status.textContent = "保存成功。现在它已经进入 Supabase 摄影作品库。";
-    setTimeout(() => { location.href = "photography-manage.html"; }, 900);
-  }catch(error){
-    status.textContent = error.message || "保存失败。";
-  }
-}
-
-loadWork();
-</script>
-</body>
+    <script src="scripts/pages/local-gallery-edit.js"></script>
+  </body>
 </html>

@@ -2,9 +2,15 @@
   "name": "api",
   "version": "1.0.0",
   "scripts": {
+    "check": "node scripts/check-project.js",
+    "format": "npx prettier --write .",
+    "format:check": "npx prettier --check .",
     "sync:gallery": "node scripts/sync-local-gallery.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
   }
 }

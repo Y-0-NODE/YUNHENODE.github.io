@@ -1,15 +1,68 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>摄影作品管理｜YUNHENODE CMS</title><link rel="stylesheet" href="style.css"><style>
-.login,.workspace,.item{border:1px solid #2b2b2b;background:#101010;padding:18px}.login input,input,textarea,select{box-sizing:border-box;width:100%;background:#090909;color:#eee;border:1px solid #333;padding:11px;margin:7px 0 13px}.login button,button,.action{background:#151515;color:#eee;border:1px solid #3a3a3a;padding:10px 13px;cursor:pointer;text-decoration:none}.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;margin-top:22px}.items{display:grid;gap:9px}.item{display:grid;grid-template-columns:78px 1fr;gap:12px;text-align:left;color:#eee;cursor:pointer}.item img{width:78px;height:62px;object-fit:cover}.actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.wide{grid-column:1/-1}.muted{color:#999}.history article{border-top:1px solid #292929;padding:10px 0}@media(max-width:800px){.layout,.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
-</style></head><body><header class="topbar"><a class="logo" href="admin.html">YUNHENODE CMS</a><nav><a href="gallery.html">摄影展示</a><a href="media-manage.html">上传媒体</a><a href="admin.html">后台首页</a></nav></header><main class="home"><p class="eyebrow">PHOTOGRAPHY ARCHIVE</p><h1>摄影作品管理</h1><p class="intro">这里同时显示 Supabase 上传作品和本地文件夹同步作品。两种来源使用各自的保存方式，不会再遗漏旧摄影作品。</p><section class="login"><input id="admin" value="YUNHE" aria-label="管理员名称"><input id="password" type="password" placeholder="管理员密码"><button onclick="loadItems()">进入摄影管理</button> <span id="status" class="muted"></span></section><div class="layout"><aside class="items" id="items"><p class="muted">验证后读取摄影作品。</p></aside><section class="workspace"><h2 id="heading">请选择作品</h2><p id="source-note" class="muted"></p><div id="preview"></div><div class="actions"><a id="edit" class="action" href="#">Edit｜编辑</a><button onclick="removeItem()">Delete｜删除</button><button onclick="duplicateItem()">Duplicate｜复制</button><button onclick="lifecycle('archived')">Archive｜归档</button><button onclick="history()">Version History｜历史版本</button></div><div class="grid"><label>Publish Settings｜发布设置<select id="publish" onchange="lifecycle(this.value)"><option value="published">公开发布</option><option value="private">私人</option><option value="draft">草稿</option><option value="archived">归档</option></select></label><label>Metadata｜作品名称<input id="title"></label><label>拍摄日期<input id="shot" type="date"></label><label>作品说明<textarea id="description"></textarea></label><label class="wide">Collections｜作品集<textarea id="collections"></textarea></label><label class="wide">Related Content｜关联内容<textarea id="related"></textarea></label><label class="wide">Media Files｜媒体文件<textarea id="files"></textarea></label></div><div class="actions"><button onclick="save()">保存作品信息</button></div><div id="history" class="history"></div></section></div></main><script>
-let ITEMS=[],CURRENT=null;const v=id=>document.getElementById(id).value,auth=()=>({adminName:v('admin'),password:v('password')}),lines=id=>v(id).split(/[\n，,]/).map(x=>x.trim()).filter(Boolean),esc=s=>String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
-async function call(data){const r=await fetch('./api/media-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...auth(),...data})}),j=await r.json().catch(()=>({}));if(!r.ok||!j.success)throw Error(j.error||'操作失败');return j}
-async function loadItems(){try{const [j,local]=await Promise.all([call({action:'admin-list',kind:'photo'}),fetch('./data/local-gallery.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[])]);const remote=(j.data||[]).map(x=>({...x,_local:false})),remoteUrls=new Set(remote.map(x=>x.url)),localPhotos=(Array.isArray(local)?local:[]).filter(x=>x.kind==='photo'&&!remoteUrls.has(x.url)).map((x,i)=>({...x,id:`local-${i}`,_local:true,status:'本地同步'}));ITEMS=[...remote,...localPhotos].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));document.getElementById('status').textContent=`已读取 ${ITEMS.length} 件（Supabase ${remote.length} 件，本地同步 ${localPhotos.length} 件）`;document.getElementById('items').innerHTML=ITEMS.length?ITEMS.map((x,i)=>`<button class="item" onclick="selectItem(${i})"><img src="${esc(x.url)}" alt=""><span><b>${esc(x.title)}</b><br><small>${esc(x.status||'published')}</small></span></button>`).join(''):'<p>暂无摄影作品。</p>'}catch(e){document.getElementById('status').textContent=e.message}}
-function selectItem(index){CURRENT=ITEMS[index];if(!CURRENT)return;const m=CURRENT.metadata||{};document.getElementById('heading').textContent=CURRENT.title;document.getElementById('source-note').textContent=CURRENT._local?'来源：本地文件夹同步。编辑或删除会进入说明文件流程。':'来源：Supabase 媒体库。可直接保存全部管理信息。';document.getElementById('preview').innerHTML=`<img src="${esc(CURRENT.large_url||CURRENT.url)}" alt="" style="max-width:100%;max-height:360px">`;document.getElementById('edit').href=CURRENT._local?`local-gallery-edit.html?url=${encodeURIComponent(CURRENT.url)}`:`media-edit.html?id=${CURRENT.id}`;document.getElementById('title').value=CURRENT.title||'';document.getElementById('description').value=CURRENT.description||'';document.getElementById('shot').value=String(CURRENT.shot_at||'').slice(0,10);document.getElementById('publish').value=CURRENT._local?'published':(CURRENT.status||'published');document.getElementById('collections').value=(m.collections||[]).join('\n');document.getElementById('related').value=(m.related_content||[]).join('\n');document.getElementById('files').value=(m.media_files||[CURRENT.large_url||CURRENT.url]).join('\n')}
-function localNotice(action){alert(`这件作品来自本地文件夹，${action}需要通过说明文件完成。点击“Edit｜编辑”进入本地作品编辑页。`)}
-async function save(){if(!CURRENT)return;if(CURRENT._local)return localNotice('保存');try{await call({id:CURRENT.id,title:v('title'),description:v('description'),shot_at:v('shot'),status:v('publish'),collections:lines('collections'),relatedContent:lines('related'),mediaFiles:lines('files')});await loadItems();alert('已保存')}catch(e){alert(e.message)}}
-async function lifecycle(x){if(!CURRENT)return;if(CURRENT._local)return localNotice('修改发布状态');try{await call({action:'lifecycle',id:CURRENT.id,lifecycle:x});await loadItems()}catch(e){alert(e.message)}}
-async function duplicateItem(){if(!CURRENT)return;if(CURRENT._local)return localNotice('复制');try{await call({action:'duplicate',id:CURRENT.id});await loadItems();alert('已复制为草稿')}catch(e){alert(e.message)}}
-async function removeItem(){if(!CURRENT)return;if(CURRENT._local){location.href=`local-gallery-edit.html?url=${encodeURIComponent(CURRENT.url)}`;return}if(!confirm('确定删除摄影作品？'))return;try{await call({action:'delete',id:CURRENT.id});CURRENT=null;await loadItems()}catch(e){alert(e.message)}}
-async function history(){if(!CURRENT)return;if(CURRENT._local)return localNotice('查看历史版本');try{const j=await call({action:'history',id:CURRENT.id});window.H=j.data||[];document.getElementById('history').innerHTML=H.length?H.map((x,i)=>`<article>${esc(x.operation)} · ${new Date(x.created_at).toLocaleString()} <button onclick="restore(${i})">恢复</button></article>`).join(''):'没有历史版本'}catch(e){alert(e.message)}}
-async function restore(i){if(!confirm('恢复这个版本？'))return;try{await call({action:'restore',id:CURRENT.id,snapshot:H[i].snapshot});await loadItems()}catch(e){alert(e.message)}}
-</script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>摄影作品管理｜YUNHENODE CMS</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/photography-manage.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo" href="admin.html">YUNHENODE CMS</a>
+      <nav>
+        <a href="gallery.html">摄影展示</a><a href="media-manage.html">上传媒体</a
+        ><a href="admin.html">后台首页</a>
+      </nav>
+    </header>
+    <main class="home">
+      <p class="eyebrow">PHOTOGRAPHY ARCHIVE</p>
+      <h1>摄影作品管理</h1>
+      <p class="intro">
+        这里同时显示 Supabase
+        上传作品和本地文件夹同步作品。两种来源使用各自的保存方式，不会再遗漏旧摄影作品。
+      </p>
+      <section class="login">
+        <input id="admin" value="YUNHE" aria-label="管理员名称" /><input
+          id="password"
+          type="password"
+          placeholder="管理员密码"
+        /><button onclick="loadItems()">进入摄影管理</button>
+        <span id="status" class="muted"></span>
+      </section>
+      <div class="layout">
+        <aside class="items" id="items"><p class="muted">验证后读取摄影作品。</p></aside>
+        <section class="workspace">
+          <h2 id="heading">请选择作品</h2>
+          <p id="source-note" class="muted"></p>
+          <div id="preview"></div>
+          <div class="actions">
+            <a id="edit" class="action" href="#">Edit｜编辑</a
+            ><button onclick="removeItem()">Delete｜删除</button
+            ><button onclick="duplicateItem()">Duplicate｜复制</button
+            ><button onclick="lifecycle('archived')">Archive｜归档</button
+            ><button onclick="history()">Version History｜历史版本</button>
+          </div>
+          <div class="grid">
+            <label
+              >Publish Settings｜发布设置<select id="publish" onchange="lifecycle(this.value)">
+                <option value="published">公开发布</option>
+                <option value="private">私人</option>
+                <option value="draft">草稿</option>
+                <option value="archived">归档</option>
+              </select></label
+            ><label>Metadata｜作品名称<input id="title" /></label
+            ><label>拍摄日期<input id="shot" type="date" /></label
+            ><label>作品说明<textarea id="description"></textarea></label
+            ><label class="wide">Collections｜作品集<textarea id="collections"></textarea></label
+            ><label class="wide">Related Content｜关联内容<textarea id="related"></textarea></label
+            ><label class="wide">Media Files｜媒体文件<textarea id="files"></textarea></label>
+          </div>
+          <div class="actions"><button onclick="save()">保存作品信息</button></div>
+          <div id="history" class="history"></div>
+        </section>
+      </div>
+    </main>
+    <script src="scripts/pages/photography-manage.js"></script>
+  </body>
+</html>

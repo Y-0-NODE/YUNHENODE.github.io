@@ -1,297 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>随笔｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.thought-shell{
-  max-width:920px;
-  margin:0 auto;
-  padding:130px 24px 80px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>随笔｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/thought.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="index.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE</a
+      >
+      <nav>
+        <a href="index.html">首页</a>
+        <a href="article.html">文章</a>
+        <a href="case.html">案例</a>
+        <a href="video.html">视频</a>
+        <a href="thought.html">随笔</a>
+        <a href="gallery.html">摄影</a>
+        <a href="about.html">关于</a>
+      </nav>
+    </header>
 
-.profile{
-  display:grid;
-  grid-template-columns:84px minmax(0,1fr);
-  gap:22px;
-  align-items:center;
-  padding-bottom:34px;
-  border-bottom:1px solid #262626;
-}
+    <main class="thought-shell">
+      <section class="profile">
+        <img id="avatar" class="avatar" alt="头像" />
+        <div>
+          <p class="eyebrow">MICRO NOTES</p>
+          <h1 id="profile-name">云鹤系统</h1>
+          <p id="profile-signature">短记录、即时观察与公开片段。</p>
+        </div>
+      </section>
 
-.avatar{
-  width:84px;
-  height:84px;
-  border:1px solid #333;
-  border-radius:50%;
-  background:#151515;
-  object-fit:cover;
-}
+      <section id="feed" class="feed"></section>
+      <div id="status" class="status">正在读取随笔...</div>
 
-.profile h1{
-  font-size:clamp(40px,6vw,72px);
-  margin:0 0 10px;
-  letter-spacing:0;
-}
+      <section class="visitor-note">
+        访客评论账户将采用邮箱申请制。开放后，访客可以设置头像、名字和签名，并在公开随笔下评论；访客不能发布主站内容。
+      </section>
+    </main>
 
-.profile p{
-  color:#aaa;
-  font-size:17px;
-  line-height:1.8;
-  margin:0;
-}
-
-.feed{
-  display:grid;
-  gap:18px;
-  margin-top:34px;
-}
-
-.post{
-  position:relative;
-  border:1px solid #242424;
-  background:#101010;
-  padding:22px;
-}
-
-.post-meta{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  color:#777;
-  font-size:13px;
-  margin-bottom:14px;
-}
-
-.post-body{
-  white-space:pre-wrap;
-  color:#e6e6e6;
-  font-size:17px;
-  line-height:1.78;
-}
-
-.post img,
-.post video{
-  display:block;
-  width:100%;
-  max-height:70vh;
-  object-fit:contain;
-  margin-top:18px;
-  border:1px solid #252525;
-  background:#050505;
-}
-
-.visitor-note{
-  border-top:1px solid #242424;
-  margin-top:42px;
-  padding-top:22px;
-  color:#8d8d8d;
-  line-height:1.8;
-}
-
-.status{
-  color:#888;
-  margin-top:28px;
-}
-
-@media(max-width:760px){
-  .thought-shell{
-    padding:24px 12px 52px;
-  }
-
-  .profile{
-    grid-template-columns:54px minmax(0,1fr);
-    gap:14px;
-    padding-bottom:22px;
-  }
-
-  .avatar{
-    width:54px;
-    height:54px;
-  }
-
-  .profile h1{
-    font-size:28px;
-    margin-bottom:4px;
-  }
-
-  .profile p{
-    font-size:14px;
-    line-height:1.6;
-  }
-
-  .feed{
-    gap:12px;
-    margin-top:22px;
-  }
-
-  .post{
-    padding:16px;
-  }
-
-  .post-meta{
-    font-size:12px;
-    margin-bottom:10px;
-  }
-
-  .post-body{
-    font-size:15px;
-    line-height:1.75;
-  }
-
-  .visitor-note{
-    font-size:14px;
-    margin-top:28px;
-  }
-}
-</style>
-</head>
-<body>
-<header class="topbar">
-  <a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a>
-  <nav>
-    <a href="index.html">首页</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-    <a href="video.html">视频</a>
-    <a href="thought.html">随笔</a>
-    <a href="gallery.html">摄影</a>
-    <a href="about.html">关于</a>
-  </nav>
-</header>
-
-<main class="thought-shell">
-  <section class="profile">
-    <img id="avatar" class="avatar" alt="头像">
-    <div>
-      <p class="eyebrow">MICRO NOTES</p>
-      <h1 id="profile-name">云鹤系统</h1>
-      <p id="profile-signature">短记录、即时观察与公开片段。</p>
-    </div>
-  </section>
-
-  <section id="feed" class="feed"></section>
-  <div id="status" class="status">正在读取随笔...</div>
-
-  <section class="visitor-note">
-    访客评论账户将采用邮箱申请制。开放后，访客可以设置头像、名字和签名，并在公开随笔下评论；访客不能发布主站内容。
-  </section>
-</main>
-
-<script>
-const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
-
-function escapeHtml(value){
-  return String(value || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function formatDate(value){
-  if(!value) return "";
-  const date = new Date(value);
-  if(Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString("zh-CN", {
-    year:"numeric",
-    month:"2-digit",
-    day:"2-digit",
-    hour:"2-digit",
-    minute:"2-digit"
-  });
-}
-
-function localViews(id){
-  const key = `yunhe.thought.views.${id}`;
-  const current = Number(localStorage.getItem(key) || "0") + 1;
-  localStorage.setItem(key, String(current));
-  return current;
-}
-
-function parseProfile(row){
-  try{
-    return JSON.parse(row?.body || "{}");
-  }catch(e){
-    return {};
-  }
-}
-
-function renderMedia(text){
-  const media = [];
-  const body = String(text || "")
-  .replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "")
-  .replace(/\[(图片|视频)(?::\s*([^\]]+))?\]\((https?:\/\/[^)]+)\)/g, (_, kind, caption, url) => {
-    media.push({ kind, caption: caption || "", url });
-    return "";
-  }).trim();
-
-  const html = [`<div class="post-body">${escapeHtml(body)}</div>`];
-  media.forEach(item => {
-    if(item.kind === "视频"){
-      html.push(`<video controls src="${escapeHtml(item.url)}"></video>`);
-    }else{
-      html.push(`<img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.caption || "随笔图片")}">`);
-    }
-  });
-  return html.join("");
-}
-
-async function fetchContents(query){
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/contents?${query}`, {
-    headers:{
-      apikey:SUPABASE_KEY,
-      Authorization:`Bearer ${SUPABASE_KEY}`
-    }
-  });
-  if(!res.ok) throw new Error("读取失败");
-  return res.json();
-}
-
-async function loadProfile(){
-  const rows = await fetchContents("select=id,title,intro,body,type,topic,created_at&type=eq.thought_profile&order=created_at.desc&limit=1");
-  const profile = parseProfile(rows?.[0]);
-  document.getElementById("profile-name").textContent = profile.name || "云鹤系统";
-  document.getElementById("profile-signature").textContent = profile.signature || "短记录、即时观察与公开片段。";
-  document.getElementById("avatar").src = profile.avatar || "app-icon.svg";
-}
-
-async function loadThoughts(){
-  const status = document.getElementById("status");
-  const feed = document.getElementById("feed");
-  const rows = await fetchContents("select=id,title,slug,intro,body,type,topic,created_at&type=eq.thought&topic=eq.public&order=created_at.desc");
-
-  if(!rows.length){
-    status.textContent = "暂时没有公开随笔。";
-    return;
-  }
-
-  status.textContent = "";
-  feed.innerHTML = rows.map(item => `
-    <article class="post">
-      <div class="post-meta">
-        <span>${formatDate(item.created_at)}</span>
-        <span>浏览 ${localViews(item.id)}</span>
-      </div>
-      ${renderMedia(item.body || item.intro || item.title)}
-    </article>
-  `).join("");
-}
-
-async function boot(){
-  try{
-    await loadProfile();
-    await loadThoughts();
-  }catch(e){
-    document.getElementById("status").textContent = "随笔读取失败，请检查 Supabase 配置。";
-  }
-}
-
-boot();
-</script>
-</body>
+    <script src="scripts/core/config.js"></script>
+    <script src="shared/metadata.js"></script>
+    <script src="scripts/pages/thought.js"></script>
+  </body>
 </html>

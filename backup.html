@@ -1,7 +1,69 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>数据中心｜云鹤系统</title><link rel="stylesheet" href="style.css"><style>.panel{border:1px solid #292929;background:#101010;padding:22px;margin-top:24px;scroll-margin-top:100px}.panel label{display:block;color:#aaa;margin:14px 0 8px}.panel input{width:100%;border:1px solid #303030;background:#0b0b0b;color:#eee;padding:11px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}button{border:1px solid #333;background:#151515;color:#eee;padding:10px 14px;cursor:pointer}.primary{background:#eee;color:#111;font-weight:700}.status{color:#888;line-height:1.7;margin-top:14px}.history{display:grid;gap:10px;margin-top:15px}.version{border:1px solid #292929;padding:14px}.version b{display:block}.version small{color:#777}.warning{color:#d6b38b}.hidden{display:none}</style></head><body><header class="topbar cms-topbar"><a class="logo logo-back" href="admin.html" onclick="if(history.length>1){event.preventDefault();history.back()}" aria-label="返回上一页">YUNHENODE CMS</a><nav><a href="admin.html">后台</a><a href="system-center.html">系统中心</a></nav></header><main class="home"><p class="eyebrow">DATA CENTER / RECOVERY</p><h1>数据中心</h1><p class="intro">备份、导出、导入、版本历史和恢复共用同一套数据通道。</p>
-<section id="backup" class="panel"><h2>管理员验证</h2><label>账户名称</label><input id="name" value="YUNHE"><label>账户密码</label><input id="password" type="password"><div id="auth-status" class="status">备份、历史与恢复都需要管理员验证。</div></section>
-<section id="export" class="panel"><h2>Backup Center / Export｜备份与导出</h2><p>导出 contents、diary_entries、media_items 和 content_backups。</p><div class="actions"><button class="primary" onclick="downloadBackup()">导出整个网站 JSON</button></div><div id="export-status" class="status"></div></section>
-<section id="import" class="panel"><h2>Import｜导入</h2><p>选择从本站导出的 JSON 备份，先预览数量，不会立即写入。</p><input id="backup-file" type="file" accept="application/json"><div class="actions"><button onclick="previewImport()">预览导入文件</button></div><div id="import-status" class="status"></div></section>
-<section id="versions" class="panel"><h2>Version History｜版本历史</h2><div class="actions"><button onclick="loadHistory()">读取删除前快照</button></div><div id="history" class="history"></div></section>
-<section id="restore" class="panel"><h2>Restore｜恢复</h2><p class="warning">恢复会向 Supabase 写入数据。只有在已检查备份日期和数量后才应继续。</p><div class="actions"><button id="restore-all" class="hidden" onclick="restoreBackup()">恢复已预览的备份</button></div><div id="restore-status" class="status"></div></section></main>
-<script>let IMPORTED=null,HISTORY=[];const auth=()=>({adminName:document.getElementById("name").value.trim(),password:document.getElementById("password").value});async function call(data){const r=await fetch("./api/backup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...auth(),...data})}),o=await r.json().catch(()=>({}));if(!r.ok)throw new Error(o.error||"请求失败");return o}async function downloadBackup(){const s=document.getElementById("export-status");s.textContent="正在生成备份…";try{const o=await call({action:"export"}),blob=new Blob([JSON.stringify(o.backup,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`yunhe-full-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);s.textContent="全站备份已导出。"}catch(e){s.textContent=e.message}}async function previewImport(){const f=document.getElementById("backup-file").files[0],s=document.getElementById("import-status");if(!f){s.textContent="请先选择 JSON 备份。";return}try{IMPORTED=JSON.parse(await f.text());if(!IMPORTED.tables)throw new Error("备份缺少 tables 数据");const summary=Object.entries(IMPORTED.tables).map(([k,v])=>`${k}: ${Array.isArray(v.data)?v.data.length:0}`).join(" ｜ ");s.textContent=`备份时间：${IMPORTED.exportedAt||"未知"}。${summary}`;document.getElementById("restore-all").classList.remove("hidden")}catch(e){IMPORTED=null;s.textContent=e.message}}async function loadHistory(){const box=document.getElementById("history");box.innerHTML='<p class="status">正在读取…</p>';try{const o=await call({action:"history"});HISTORY=o.data||[];box.innerHTML=HISTORY.map((x,i)=>`<article class="version"><b>${x.snapshot?.title||x.operation||"内容快照"}</b><small>${x.created_at||""} · ID ${x.content_id||""}</small><div class="actions"><button onclick="restoreVersion(${i})">恢复这个版本</button></div></article>`).join("")||'<p class="status">暂无历史快照。</p>'}catch(e){box.innerHTML=`<p class="status">${e.message}</p>`}}async function restoreVersion(i){const x=HISTORY[i];if(!x?.snapshot||!confirm(`确定恢复「${x.snapshot.title||"这篇内容"}」？`))return;const s=document.getElementById("restore-status");s.textContent="正在恢复…";try{await call({action:"restore-version",snapshot:x.snapshot});s.textContent="该内容版本已恢复。"}catch(e){s.textContent=e.message}}async function restoreBackup(){if(!IMPORTED||!confirm("确定将这份备份写回 Supabase？同 ID 数据将被更新。"))return;const s=document.getElementById("restore-status");s.textContent="正在恢复全站数据…";try{const o=await call({action:"restore-backup",backup:IMPORTED});s.textContent=`恢复完成：${JSON.stringify(o.restored)}` }catch(e){s.textContent=e.message}}</script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>数据中心｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/backup.css" />
+  </head>
+  <body>
+    <header class="topbar cms-topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (history.length > 1) {
+            event.preventDefault();
+            history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav><a href="admin.html">后台</a><a href="system-center.html">系统中心</a></nav>
+    </header>
+    <main class="home">
+      <p class="eyebrow">DATA CENTER / RECOVERY</p>
+      <h1>数据中心</h1>
+      <p class="intro">备份、导出、导入、版本历史和恢复共用同一套数据通道。</p>
+      <section id="backup" class="panel">
+        <h2>管理员验证</h2>
+        <label>账户名称</label><input id="name" value="YUNHE" /><label>账户密码</label
+        ><input id="password" type="password" />
+        <div id="auth-status" class="status">备份、历史与恢复都需要管理员验证。</div>
+      </section>
+      <section id="export" class="panel">
+        <h2>Backup Center / Export｜备份与导出</h2>
+        <p>导出 contents、diary_entries、media_items 和 content_backups。</p>
+        <div class="actions">
+          <button class="primary" onclick="downloadBackup()">导出整个网站 JSON</button>
+        </div>
+        <div id="export-status" class="status"></div>
+      </section>
+      <section id="import" class="panel">
+        <h2>Import｜导入</h2>
+        <p>选择从本站导出的 JSON 备份，先预览数量，不会立即写入。</p>
+        <input id="backup-file" type="file" accept="application/json" />
+        <div class="actions"><button onclick="previewImport()">预览导入文件</button></div>
+        <div id="import-status" class="status"></div>
+      </section>
+      <section id="versions" class="panel">
+        <h2>Version History｜版本历史</h2>
+        <div class="actions"><button onclick="loadHistory()">读取删除前快照</button></div>
+        <div id="history" class="history"></div>
+      </section>
+      <section id="restore" class="panel">
+        <h2>Restore｜恢复</h2>
+        <p class="warning">恢复会向 Supabase 写入数据。只有在已检查备份日期和数量后才应继续。</p>
+        <div class="actions">
+          <button id="restore-all" class="hidden" onclick="restoreBackup()">
+            恢复已预览的备份
+          </button>
+        </div>
+        <div id="restore-status" class="status"></div>
+      </section>
+    </main>
+    <script src="scripts/pages/backup.js"></script>
+  </body>
+</html>

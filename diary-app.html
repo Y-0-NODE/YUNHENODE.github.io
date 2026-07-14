@@ -1,647 +1,104 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>内部日记 App｜云鹤系统</title>
-<meta name="theme-color" content="#0b0b0b">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="云鹤日记">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="app-icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="app-icon.svg">
-<style>
-*{
-  box-sizing:border-box;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>内部日记 App｜云鹤系统</title>
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="云鹤日记" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="app-icon.svg" />
+    <link rel="stylesheet" href="assets/styles/pages/diary-app.css" />
+  </head>
+  <body>
+    <section id="app" class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>内部日记</h1>
+          <div id="count" class="sync">0 篇</div>
+        </div>
+        <div id="sync-mode" class="sync">正在等待登录</div>
 
-body{
-  margin:0;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;
-}
+        <input
+          id="search"
+          class="search"
+          type="search"
+          placeholder="搜索日记"
+          oninput="renderList()"
+        />
 
-button,
-input,
-textarea,
-select{
-  font:inherit;
-}
+        <div class="toolbar">
+          <button class="btn primary" type="button" onclick="newEntry()">新建</button>
+          <button class="btn" type="button" onclick="exportData()">导出</button>
+          <button
+            class="btn"
+            type="button"
+            onclick="document.getElementById('import-file').click()"
+          >
+            导入
+          </button>
+          <button class="btn" type="button" onclick="lockApp()">锁定</button>
+        </div>
 
-.app{
-  min-height:100vh;
-  display:grid;
-  grid-template-columns:320px 1fr;
-}
+        <input
+          id="import-file"
+          class="file-input"
+          type="file"
+          accept="application/json"
+          onchange="importData(event)"
+        />
+        <div id="entry-list" class="entry-list"></div>
+      </aside>
 
-.sidebar{
-  border-right:1px solid #242424;
-  background:#101010;
-  padding:24px;
-  position:sticky;
-  top:0;
-  height:100vh;
-  overflow:auto;
-}
+      <main class="main">
+        <div class="topline">
+          <div class="date" id="current-date"></div>
+          <a class="btn" href="admin.html">后台首页</a>
+        </div>
 
-.brand{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:28px;
-}
+        <section id="empty" class="empty">选择一篇日记，或者新建一篇。</section>
 
-.brand h1{
-  font-size:18px;
-  margin:0;
-  letter-spacing:1px;
-}
+        <section id="editor" class="editor" hidden>
+          <input
+            id="title"
+            class="title-input"
+            type="text"
+            placeholder="标题"
+            oninput="markDirty()"
+          />
 
-.sync{
-  color:#8d8d8d;
-  font-size:12px;
-}
+          <div class="meta-row">
+            <input id="entry-date" type="date" onchange="markDirty()" />
+            <select id="mood" onchange="markDirty()">
+              <option value="平静">平静</option>
+              <option value="清醒">清醒</option>
+              <option value="疲惫">疲惫</option>
+              <option value="焦虑">焦虑</option>
+              <option value="开心">开心</option>
+              <option value="混乱">混乱</option>
+            </select>
+            <input id="tags" type="text" placeholder="标签，用逗号分隔" oninput="markDirty()" />
+          </div>
 
-.search{
-  width:100%;
-  border:1px solid #303030;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-  margin-bottom:14px;
-}
+          <textarea
+            id="body"
+            class="body-input"
+            placeholder="写点什么"
+            oninput="markDirty()"
+          ></textarea>
 
-.toolbar{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:20px;
-}
-
-.btn{
-  border:1px solid #303030;
-  background:#151515;
-  color:#e8e8e8;
-  padding:10px 12px;
-  cursor:pointer;
-}
-
-.btn:hover{
-  background:#1f1f1f;
-}
-
-.btn.primary{
-  background:#f2f2f2;
-  color:#0b0b0b;
-  font-weight:700;
-}
-
-.btn.danger{
-  color:#ff9b9b;
-  border-color:#4c2727;
-}
-
-.entry-list{
-  display:grid;
-  gap:10px;
-}
-
-.entry-item{
-  border:1px solid #252525;
-  background:#141414;
-  padding:14px;
-  cursor:pointer;
-}
-
-.entry-item.active{
-  border-color:#777;
-  background:#1a1a1a;
-}
-
-.entry-item h2{
-  font-size:15px;
-  margin:0 0 8px;
-  line-height:1.35;
-}
-
-.entry-item p{
-  color:#858585;
-  margin:0;
-  font-size:12px;
-  line-height:1.5;
-}
-
-.main{
-  padding:32px;
-  min-width:0;
-}
-
-.topline{
-  display:flex;
-  justify-content:space-between;
-  gap:16px;
-  align-items:center;
-  margin-bottom:22px;
-}
-
-.topline .date{
-  color:#8d8d8d;
-  font-size:13px;
-}
-
-.editor{
-  display:grid;
-  gap:14px;
-  max-width:980px;
-}
-
-.editor input,
-.editor textarea,
-.editor select{
-  width:100%;
-  border:1px solid #2d2d2d;
-  background:#101010;
-  color:#f2f2f2;
-  padding:13px;
-}
-
-.title-input{
-  font-size:28px;
-  font-weight:700;
-}
-
-.meta-row{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:12px;
-}
-
-.body-input{
-  min-height:420px;
-  line-height:1.8;
-  resize:vertical;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.empty{
-  border:1px solid #2a2a2a;
-  background:#111;
-  color:#aaa;
-  padding:28px;
-  max-width:680px;
-  line-height:1.8;
-}
-
-.file-input{
-  display:none;
-}
-
-@media(max-width:860px){
-  .app{
-    grid-template-columns:1fr;
-  }
-
-  .sidebar{
-    position:relative;
-    height:auto;
-  }
-
-  .meta-row{
-    grid-template-columns:1fr;
-  }
-}
-</style>
-</head>
-<body>
-
-<section id="app" class="app">
-  <aside class="sidebar">
-    <div class="brand">
-      <h1>内部日记</h1>
-      <div id="count" class="sync">0 篇</div>
-    </div>
-    <div id="sync-mode" class="sync">正在等待登录</div>
-
-    <input id="search" class="search" type="search" placeholder="搜索日记" oninput="renderList()">
-
-    <div class="toolbar">
-      <button class="btn primary" type="button" onclick="newEntry()">新建</button>
-      <button class="btn" type="button" onclick="exportData()">导出</button>
-      <button class="btn" type="button" onclick="document.getElementById('import-file').click()">导入</button>
-      <button class="btn" type="button" onclick="lockApp()">锁定</button>
-    </div>
-
-    <input id="import-file" class="file-input" type="file" accept="application/json" onchange="importData(event)">
-    <div id="entry-list" class="entry-list"></div>
-  </aside>
-
-  <main class="main">
-    <div class="topline">
-      <div class="date" id="current-date"></div>
-      <a class="btn" href="admin.html">后台首页</a>
-    </div>
-
-    <section id="empty" class="empty">
-      选择一篇日记，或者新建一篇。
+          <div class="actions">
+            <button class="btn primary" type="button" onclick="saveEntry()">保存</button>
+            <button class="btn" type="button" onclick="duplicateEntry()">复制</button>
+            <button class="btn danger" type="button" onclick="deleteEntry()">删除</button>
+          </div>
+        </section>
+      </main>
     </section>
 
-    <section id="editor" class="editor" hidden>
-      <input id="title" class="title-input" type="text" placeholder="标题" oninput="markDirty()">
-
-      <div class="meta-row">
-        <input id="entry-date" type="date" onchange="markDirty()">
-        <select id="mood" onchange="markDirty()">
-          <option value="平静">平静</option>
-          <option value="清醒">清醒</option>
-          <option value="疲惫">疲惫</option>
-          <option value="焦虑">焦虑</option>
-          <option value="开心">开心</option>
-          <option value="混乱">混乱</option>
-        </select>
-        <input id="tags" type="text" placeholder="标签，用逗号分隔" oninput="markDirty()">
-      </div>
-
-      <textarea id="body" class="body-input" placeholder="写点什么" oninput="markDirty()"></textarea>
-
-      <div class="actions">
-        <button class="btn primary" type="button" onclick="saveEntry()">保存</button>
-        <button class="btn" type="button" onclick="duplicateEntry()">复制</button>
-        <button class="btn danger" type="button" onclick="deleteEntry()">删除</button>
-      </div>
-    </section>
-  </main>
-</section>
-
-<script>
-const STORAGE_KEY = "yunhe.diary.entries.v1";
-const ACCOUNT_KEY = "yunhe.diary.account.v1";
-const SESSION_KEY = "yunhe.diary.session.v1";
-
-let entries = [];
-let activeId = "";
-let dirty = false;
-let accountName = "";
-let accountPassword = "";
-let cloudMode = false;
-let autoSaveTimer = null;
-
-function escapeHtml(value){
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function escapeJsString(value){
-  return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-}
-
-function today(){
-  return new Date().toISOString().slice(0, 10);
-}
-
-function uid(){
-  return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-}
-
-function loadEntries(){
-  entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-}
-
-function persist(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
-
-function setSyncMode(text){
-  document.getElementById("sync-mode").textContent = text;
-}
-
-function normalizeEntry(entry){
-  return {
-    id: entry.id || uid(),
-    title: entry.title || "未命名日记",
-    date: entry.date || entry.entry_date || today(),
-    mood: entry.mood || "平静",
-    tags: entry.tags || "",
-    body: entry.body || "",
-    createdAt: entry.createdAt || entry.created_at || new Date().toISOString(),
-    updatedAt: entry.updatedAt || entry.updated_at || new Date().toISOString()
-  };
-}
-
-async function loadFromCloud(){
-  setSyncMode("正在连接 Supabase...");
-  try{
-    const res = await fetch("./api/diary-list", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        adminName: accountName,
-        password: accountPassword
-      })
-    });
-
-    const result = await res.json().catch(() => ({}));
-
-    if(res.ok){
-      cloudMode = true;
-      const cloudEntries = (result.data || []).map(normalizeEntry);
-      const localEntries = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]").map(normalizeEntry);
-      const merged = new Map();
-
-      localEntries.forEach(entry => merged.set(entry.id, entry));
-      cloudEntries.forEach(entry => merged.set(entry.id, entry));
-
-      entries = Array.from(merged.values());
-      persist();
-      setSyncMode("云端模式：已连接 Supabase");
-    }else{
-      cloudMode = false;
-      loadEntries();
-      setSyncMode(result.error || "云端登录失败，已进入本机模式。");
-    }
-  }catch(err){
-    cloudMode = false;
-    loadEntries();
-    setSyncMode("没有连到云端接口，当前先使用本机草稿。");
-  }
-
-  renderList();
-  document.getElementById("current-date").textContent = today();
-}
-
-function lockApp(){
-  activeId = "";
-  sessionStorage.removeItem(SESSION_KEY);
-  window.location.href = "diary-login.html";
-}
-
-function renderList(){
-  const q = document.getElementById("search").value.trim().toLowerCase();
-  const list = document.getElementById("entry-list");
-  const filtered = entries
-    .filter(entry => {
-      const haystack = [
-        entry.title,
-        entry.body,
-        entry.mood,
-        entry.tags,
-        entry.date
-      ].join(" ").toLowerCase();
-      return haystack.includes(q);
-    })
-    .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-
-  document.getElementById("count").textContent = entries.length + " 篇";
-
-  list.innerHTML = filtered.map(entry => `
-    <article class="entry-item ${entry.id === activeId ? "active" : ""}" onclick="openEntry('${escapeJsString(entry.id)}')">
-      <h2>${escapeHtml(entry.title || "未命名日记")}</h2>
-      <p>${escapeHtml(entry.date || "")} / ${escapeHtml(entry.mood || "")}</p>
-    </article>
-  `).join("");
-}
-
-function newEntry(){
-  const entry = {
-    id: uid(),
-    title: "未命名日记",
-    date: today(),
-    mood: "平静",
-    tags: "",
-    body: "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  entries.unshift(entry);
-  activeId = entry.id;
-  persist();
-  renderList();
-  showEditor(entry);
-}
-
-function collectEditorEntry(existing){
-  return {
-    id: existing?.id || activeId || uid(),
-    title: document.getElementById("title").value.trim() || "未命名日记",
-    date: document.getElementById("entry-date").value || today(),
-    mood: document.getElementById("mood").value,
-    tags: document.getElementById("tags").value.trim(),
-    body: document.getElementById("body").value,
-    createdAt: existing?.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-}
-
-function openEntry(id){
-  if(dirty && !confirm("当前内容还没保存，继续切换吗？")) return;
-
-  const entry = entries.find(item => item.id === id);
-  if(!entry) return;
-
-  activeId = id;
-  dirty = false;
-  renderList();
-  showEditor(entry);
-}
-
-function showEditor(entry){
-  document.getElementById("empty").hidden = true;
-  document.getElementById("editor").hidden = false;
-  document.getElementById("title").value = entry.title || "";
-  document.getElementById("entry-date").value = entry.date || today();
-  document.getElementById("mood").value = entry.mood || "平静";
-  document.getElementById("tags").value = entry.tags || "";
-  document.getElementById("body").value = entry.body || "";
-}
-
-function markDirty(){
-  dirty = true;
-  const existing = entries.find(item => item.id === activeId);
-
-  if(existing){
-    Object.assign(existing, collectEditorEntry(existing));
-    persist();
-    renderList();
-  }
-
-  scheduleCloudSave();
-}
-
-function scheduleCloudSave(){
-  clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(() => {
-    if(activeId) saveEntry(true);
-  }, 1200);
-}
-
-async function saveEntry(silent = false){
-  const existing = entries.find(item => item.id === activeId);
-  const entry = collectEditorEntry(existing);
-
-  if(!entry.body.trim() && !entry.title.trim()){
-    alert("正文不能为空。");
-    return;
-  }
-
-  if(existing){
-    Object.assign(existing, entry);
-  }else{
-    entries.unshift(entry);
-    activeId = entry.id;
-  }
-
-  persist();
-  dirty = false;
-  renderList();
-
-  if(cloudMode){
-    setSyncMode("云端模式：正在保存...");
-    const res = await fetch("./api/diary-save", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        adminName: accountName,
-        password: accountPassword,
-        entry
-      })
-    });
-
-    if(!res.ok){
-      const result = await res.json().catch(() => ({}));
-      if(!silent) alert(result.error || "云端保存失败，已保存在本机。");
-      setSyncMode("本机已保存，云端保存失败");
-    }else{
-      setSyncMode("云端模式：已保存");
-    }
-  }else{
-    setSyncMode("本机模式：已保存到当前设备");
-  }
-}
-
-function duplicateEntry(){
-  const entry = entries.find(item => item.id === activeId);
-  if(!entry) return;
-
-  const copy = {
-    ...entry,
-    id: uid(),
-    title: entry.title + " 副本",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  entries.unshift(copy);
-  activeId = copy.id;
-  persist();
-  renderList();
-  showEditor(copy);
-}
-
-async function deleteEntry(){
-  const entry = entries.find(item => item.id === activeId);
-  if(!entry) return;
-  if(!confirm(`确定删除「${entry.title || "未命名日记"}」吗？`)) return;
-
-  entries = entries.filter(item => item.id !== activeId);
-  activeId = "";
-  persist();
-  dirty = false;
-  document.getElementById("editor").hidden = true;
-  document.getElementById("empty").hidden = false;
-  renderList();
-
-  if(cloudMode){
-    const res = await fetch("./api/diary-delete", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        adminName: accountName,
-        password: accountPassword,
-        id: entry.id
-      })
-    });
-
-    if(!res.ok){
-      const result = await res.json().catch(() => ({}));
-      alert(result.error || "云端删除失败，本机已删除。");
-    }
-  }
-}
-
-function exportData(){
-  const blob = new Blob([JSON.stringify(entries, null, 2)], { type:"application/json" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `yunhe-diary-${today()}.json`;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function importData(event){
-  const file = event.target.files[0];
-  if(!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    try{
-      const data = JSON.parse(reader.result);
-      if(!Array.isArray(data)) throw new Error("invalid");
-      entries = data;
-      activeId = "";
-      persist();
-      renderList();
-      document.getElementById("editor").hidden = true;
-      document.getElementById("empty").hidden = false;
-    }catch(err){
-      alert("导入失败，请选择正确的日记 JSON 文件。");
-    }
-  };
-  reader.readAsText(file);
-}
-
-function boot(){
-  const session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
-
-  if(!session?.adminName || !session?.password){
-    window.location.href = "diary-login.html";
-    return;
-  }
-
-  accountName = session.adminName;
-  accountPassword = session.password;
-  localStorage.setItem(ACCOUNT_KEY, accountName);
-  loadEntries();
-  renderList();
-  loadFromCloud();
-}
-
-boot();
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js");
-  });
-}
-</script>
-
-</body>
+    <script src="scripts/pages/diary-app.js"></script>
+  </body>
 </html>

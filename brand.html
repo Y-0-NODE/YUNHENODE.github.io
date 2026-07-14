@@ -1,152 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>文章｜云鹤系统</title>
-
-<style>
-body{
-  margin:0;
-  background:#0a0a0a;
-  color:#eaeaea;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
-}
-
-header{
-  display:flex;
-  justify-content:space-between;
-  padding:20px 40px;
-  border-bottom:1px solid #141414;
-}
-
-.logo{color:#aaa;font-size:13px;letter-spacing:2px;}
-
-nav a{
-  color:#777;
-  margin-left:16px;
-  text-decoration:none;
-  font-size:13px;
-}
-
-nav a:hover{color:#fff;}
-
-main{
-  max-width:1100px;
-  margin:0 auto;
-  padding:60px 40px;
-}
-
-h1{font-size:42px;margin:0;}
-.intro{color:#777;margin-top:10px;}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-top:40px;
-}
-
-.card{
-  border:1px solid #151515;
-  background:#0a0a0a;
-  padding:18px;
-  border-radius:10px;
-  text-decoration:none;
-  color:inherit;
-  transition:.2s;
-}
-
-.card:hover{
-  border-color:#2a2a2a;
-  transform:translateY(-2px);
-}
-
-.card span{
-  font-size:12px;
-  color:#666;
-}
-
-.card h2{
-  font-size:15px;
-  margin:10px 0;
-}
-
-.card p{
-  font-size:12px;
-  color:#666;
-}
-
-hr{
-  border:0;
-  border-top:1px solid #141414;
-  margin:50px 0;
-}
-
-.article-body{
-  line-height:1.8;
-  color:#ddd;
-  margin-top:20px;
-}
-</style>
-</head>
-
-<body>
-  <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <title>品牌｜云鹤系统</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header class="topbar">
-  <a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a>
-  <nav>
-    <a href="index.html">首页</a>
-    <a href="video.html">视频</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-    <a href="about.html">关于我</a>
-  </nav>
-</header>
-
-<main class="home">
-  <p class="eyebrow">RESEARCH / BRAND</p>
-  <h1>品牌</h1>
-  <p class="intro">这里收录品牌结构、商业系统、用户路径相关内容。</p>
-
-  <h2>品牌视频</h2>
-
-<div class="grid">
-
-<a class="card" href="video-post.html">
-<h2>示例视频：品牌判断</h2>
-<p>点击进入视频模板</p>
-</a>
-
-</div>
-
-<h2 style="margin-top:60px;">品牌文章</h2>
-
-<div class="grid">
-
-<a class="card" href="post.html">
-<h2>示例文章：品牌分析</h2>
-<p>点击进入文章模板</p>
-</a>
-
-</div>
-
-<h2 style="margin-top:60px;">品牌案例</h2>
-
-<div class="grid">
-
-<a class="card" href="case-post.html">
-<h2>示例案例：品牌结构</h2>
-<p>点击进入案例模板</p>
-</a>
-
-</div>
-</main>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>品牌｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/brand.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo logo-back" href="index.html" aria-label="返回首页">YUNHENODE</a>
+      <nav>
+        <a href="index.html">首页</a><a href="video.html">视频</a><a href="article.html">文章</a
+        ><a href="case.html">案例</a><a href="about.html">关于我</a>
+      </nav>
+    </header>
+    <main class="home">
+      <p class="eyebrow">RESEARCH / BRAND</p>
+      <h1>品牌</h1>
+      <p class="intro">这里收录品牌结构、商业系统、用户路径相关内容。</p>
+      <h2>品牌视频</h2>
+      <div class="grid">
+        <a class="card" href="video-post.html"
+          ><h2>示例视频：品牌判断</h2>
+          <p>点击进入视频模板</p></a
+        >
+      </div>
+      <h2 class="section-title">品牌文章</h2>
+      <div class="grid">
+        <a class="card" href="post.html"
+          ><h2>示例文章：品牌分析</h2>
+          <p>点击进入文章模板</p></a
+        >
+      </div>
+      <h2 class="section-title">品牌案例</h2>
+      <div class="grid">
+        <a class="card" href="case-post.html"
+          ><h2>示例案例：品牌结构</h2>
+          <p>点击进入案例模板</p></a
+        >
+      </div>
+    </main>
+  </body>
 </html>

@@ -1,545 +1,263 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>关于我｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-body{
-  background:#0b0b0b;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>关于我｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/about.css" />
+  </head>
 
-.about-shell{
-  width:100%;
-  padding:132px clamp(22px,5vw,88px) 96px;
-}
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="index.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE</a
+      >
+      <nav>
+        <a href="index.html">首页</a>
+        <a href="article.html">文章</a>
+        <a href="case.html">案例</a>
+        <a href="video.html">视频</a>
+        <a href="thought.html">随笔</a>
+        <a href="gallery.html">摄影</a>
+        <a href="about.html">关于</a>
+      </nav>
+    </header>
 
-.about-hero{
-  max-width:1180px;
-  margin:0 auto 64px;
-}
+    <main class="about-shell">
+      <section class="about-hero">
+        <p class="eyebrow">关于云鹤系统 / ABOUT</p>
+        <h1>关于我</h1>
+        <p class="intro">
+          云鹤系统（YUNHE
+          SYSTEM）是一个持续运行的个人内容系统，用于记录现实观察、结构分析、案例判断与长期研究。
+        </p>
+      </section>
 
-.about-hero h1{
-  max-width:860px;
-  font-size:clamp(46px,5.5vw,82px);
-  line-height:1.04;
-  letter-spacing:0;
-  margin:18px 0 24px;
-}
+      <section class="about-layout">
+        <nav class="section-nav" id="section-nav">
+          <a href="#identity"><strong>我是谁</strong><span>Identity</span></a>
+          <a href="#method"><strong>我的方法</strong><span>Method</span></a>
+          <a href="#fields"><strong>研究方向</strong><span>Research</span></a>
+          <a href="#structure"><strong>内容组成</strong><span>Structure</span></a>
+          <a href="#guide"><strong>如何阅读</strong><span>Guide</span></a>
+          <a href="#collaboration"><strong>合作方式</strong><span>Collaboration</span></a>
+          <a href="#boundary"><strong>内容边界</strong><span>Boundary</span></a>
+          <a href="#update"><strong>更新方式</strong><span>Update</span></a>
+          <a href="#contact"><strong>联系方式</strong><span>Contact</span></a>
+        </nav>
 
-.about-hero .intro{
-  max-width:800px;
-  font-size:clamp(17px,1.45vw,21px);
-  line-height:1.9;
-  color:#c7c7c7;
-}
+        <div>
+          <section class="roadmap" aria-label="阅读路线图">
+            <div class="roadmap-head">
+              <span><strong>阅读路线</strong>READING ROUTE</span>
+              <span>首页 → 研究主题 → 文章 → 案例 → 视频 → 关于我</span>
+            </div>
+            <div class="route" id="route">
+              <div class="route-step active">
+                <strong>首页</strong><span>理解云鹤系统的整体入口。</span>
+              </div>
+              <div class="route-step">
+                <strong>研究主题</strong><span>从品牌、平台、城市、组织等方向进入。</span>
+              </div>
+              <div class="route-step">
+                <strong>文章</strong><span>阅读方法论、结构分析与系统记录。</span>
+              </div>
+              <div class="route-step">
+                <strong>案例</strong><span>查看问题、分析、判断和验证。</span>
+              </div>
+              <div class="route-step">
+                <strong>视频</strong><span>补充阶段性的表达与观察过程。</span>
+              </div>
+              <div class="route-step">
+                <strong>关于我</strong><span>理解网站边界、合作方式与更新机制。</span>
+              </div>
+            </div>
+          </section>
 
-.about-layout{
-  display:grid;
-  grid-template-columns:220px minmax(0,1fr);
-  gap:52px;
-  max-width:1180px;
-  margin:0 auto;
-}
+          <section id="identity" class="about-section">
+            <div class="section-label">Identity</div>
+            <h2>我是谁</h2>
+            <p>
+              我是云鹤系统的建立者。我的工作并不是提供结论，而是观察现实、拆解结构、建立判断。相比表达观点，我更关注一个系统如何运行，一个结构为什么形成，一个问题为什么发生，一个组织为什么失效，一个品牌为什么增长，一个平台为什么改变规则。
+            </p>
+            <div class="split-grid">
+              <article class="mini-card">
+                <span>POSITION</span>
+                <h3>持续性系统研究</h3>
+                <p>这不是即时评论，而是对现实结构的长期记录和反复修订。</p>
+              </article>
+              <article class="mini-card">
+                <span>FOCUS</span>
+                <h3>结构而非态度</h3>
+                <p>重点不是站队，而是说明为什么、依据是什么、系统如何运行。</p>
+              </article>
+            </div>
+          </section>
 
-.section-nav{
-  position:sticky;
-  top:100px;
-  align-self:start;
-  display:grid;
-  gap:8px;
-  padding-top:6px;
-}
+          <section id="method" class="about-section">
+            <div class="section-label">Method</div>
+            <h2>我的方法</h2>
+            <p>
+              云鹤系统主要采用结构化研究方式。每一个内容都会经历不同层级的分析，从观察到拆解，再到判断与验证。
+            </p>
+            <div class="split-grid">
+              <article class="mini-card">
+                <span>01</span>
+                <h3>观察</h3>
+                <p>记录现实事件。不预设结论。观察真实发生。</p>
+              </article>
+              <article class="mini-card">
+                <span>02</span>
+                <h3>拆解</h3>
+                <p>把复杂问题拆成品牌、平台、组织、用户、规则、流程、权限、空间、行为等模块。</p>
+              </article>
+              <article class="mini-card">
+                <span>03</span>
+                <h3>判断</h3>
+                <p>建立判断。不是站队，而是说明为什么、依据是什么、系统如何运行。</p>
+              </article>
+              <article class="mini-card">
+                <span>04</span>
+                <h3>验证</h3>
+                <p>持续跟踪现实变化，修正判断，增加新的案例，建立长期记录。</p>
+              </article>
+            </div>
+          </section>
 
-.section-nav a{
-  color:#858585;
-  text-decoration:none;
-  padding:12px 0;
-  border-bottom:1px solid #222;
-}
+          <section id="fields" class="about-section">
+            <div class="section-label">Research Fields</div>
+            <h2>研究方向</h2>
+            <p>网站主要围绕以下主题展开。每一个主题都可以进入文章、案例和视频三个层级。</p>
+            <div class="field-grid">
+              <article class="field">
+                <span>01</span>
+                <h3>品牌</h3>
+                <p>品牌结构、商业系统、用户路径、产品关系、消费行为、品牌定位。</p>
+              </article>
+              <article class="field">
+                <span>02</span>
+                <h3>平台</h3>
+                <p>平台规则、审核机制、客服系统、退出机制、权限关系、数字治理。</p>
+              </article>
+              <article class="field">
+                <span>03</span>
+                <h3>城市</h3>
+                <p>城市运行、公共系统、空间关系、基础设施、居民行为、公共服务。</p>
+              </article>
+              <article class="field">
+                <span>04</span>
+                <h3>组织</h3>
+                <p>组织结构、岗位关系、系统失效、流程设计、管理机制、协作方式。</p>
+              </article>
+              <article class="field">
+                <span>05</span>
+                <h3>消费</h3>
+                <p>消费体验、价格判断、服务路径、产品分析、用户决策、商业案例。</p>
+              </article>
+              <article class="field">
+                <span>06</span>
+                <h3>艺术</h3>
+                <p>视觉系统、文本表达、作品分析、展览观察、创作结构、表达方式。</p>
+              </article>
+              <article class="field">
+                <span>07</span>
+                <h3>空间</h3>
+                <p>住宅、街区、场所、公共空间、身体感知、环境关系。</p>
+              </article>
+              <article class="field">
+                <span>08</span>
+                <h3>梦境</h3>
+                <p>梦境记录、象征结构、潜意识材料、记忆关系、个人观察。</p>
+              </article>
+            </div>
+          </section>
 
-.section-nav a:hover,
-.section-nav a.active{
-  color:#fff;
-}
+          <section id="structure" class="about-section">
+            <div class="section-label">Content Structure</div>
+            <h2>内容组成</h2>
+            <p>
+              整个网站由视频、文章、案例与关于我四部分组成。它们不是孤立栏目，而是同一套研究系统里的不同表达层级。
+            </p>
+            <div class="content-flow">
+              <div class="flow-item">
+                <strong>视频</strong>
+                <p>记录阶段性表达，包括观察、案例、事件、研究过程和公开分享。</p>
+              </div>
+              <div class="flow-item">
+                <strong>文章</strong>
+                <p>完整的文字分析，包含方法论、结构分析、系统记录和长期研究。</p>
+              </div>
+              <div class="flow-item">
+                <strong>案例</strong>
+                <p>现实事件整理，包括问题、分析、判断、验证，采用持续更新方式维护。</p>
+              </div>
+              <div class="flow-item">
+                <strong>关于我</strong>
+                <p>介绍网站运行方式、研究范围、合作边界和内容说明。</p>
+              </div>
+            </div>
+          </section>
 
-.section-nav strong{
-  display:block;
-  font-size:14px;
-  line-height:1.3;
-  letter-spacing:0;
-}
+          <section id="guide" class="about-section">
+            <div class="section-label">Reading Guide</div>
+            <h2>如何阅读</h2>
+            <p>
+              本网站并不是按照发布时间组织内容。建议按照研究主题阅读。同一个主题可能持续更新数月甚至数年，文章之间互相关联，案例之间也会形成完整系统。
+            </p>
+          </section>
 
-.section-nav span{
-  display:block;
-  margin-top:4px;
-  color:#666;
-  font-size:10px;
-  letter-spacing:1.2px;
-  text-transform:uppercase;
-}
+          <section id="collaboration" class="about-section">
+            <div class="section-label">Collaboration</div>
+            <h2>合作方式</h2>
+            <p>
+              目前主要提供品牌分析、平台研究、组织结构分析、商业系统观察、案例研究、内容咨询与长期合作。如果研究方向一致，可以进一步交流合作。
+            </p>
+          </section>
 
-.section-nav a:hover span,
-.section-nav a.active span{
-  color:#8d8d8d;
-}
+          <section id="boundary" class="about-section">
+            <div class="section-label">Boundary</div>
+            <h2>内容边界</h2>
+            <p>
+              本站所有内容均为原创。所有案例均记录于对应时间节点。判断可能随着现实变化持续修订。未经授权不得进行商业转载。引用内容请注明来源。
+            </p>
+          </section>
 
-.roadmap{
-  margin-bottom:64px;
-  border-top:1px solid #222;
-  border-bottom:1px solid #222;
-  padding:28px 0 30px;
-}
+          <section id="update" class="about-section">
+            <div class="section-label">Update</div>
+            <h2>更新方式</h2>
+            <p>
+              云鹤系统持续更新，包括新增文章、新增案例、新增视频、补充历史内容、修订已有判断。更新不会按照固定周期，而是根据研究进展持续推进。
+            </p>
+          </section>
 
-.roadmap-head{
-  display:flex;
-  justify-content:space-between;
-  gap:24px;
-  color:#888;
-  font-size:12px;
-  letter-spacing:1.6px;
-  margin-bottom:24px;
-}
-
-.roadmap-head strong{
-  display:block;
-  color:#d6d6d6;
-  font-size:13px;
-  letter-spacing:0;
-  margin-bottom:4px;
-}
-
-.roadmap-head span{
-  display:block;
-}
-
-.route{
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:12px;
-}
-
-.route::before{
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  top:12px;
-  height:1px;
-  background:#2a2a2a;
-}
-
-.route-step{
-  position:relative;
-  padding-top:40px;
-  min-height:116px;
-  color:#aaa;
-}
-
-.route-step::before{
-  content:"";
-  position:absolute;
-  top:5px;
-  left:0;
-  width:13px;
-  height:13px;
-  border:1px solid #555;
-  background:#0b0b0b;
-  border-radius:50%;
-}
-
-.route-step.active::before{
-  background:#d8d8d8;
-  border-color:#d8d8d8;
-}
-
-.route-step strong{
-  display:block;
-  color:#f2f2f2;
-  font-size:16px;
-  margin-bottom:8px;
-}
-
-.route-step span{
-  display:block;
-  line-height:1.65;
-  font-size:13px;
-}
-
-.about-section{
-  scroll-margin-top:96px;
-  padding:56px 0;
-  border-top:1px solid #222;
-}
-
-.about-section:first-of-type{
-  border-top:0;
-  padding-top:0;
-}
-
-.section-label{
-  color:#777;
-  font-size:12px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:14px;
-}
-
-.about-section h2{
-  font-size:clamp(30px,3.2vw,46px);
-  line-height:1.15;
-  margin:0 0 22px;
-}
-
-.about-section p{
-  max-width:780px;
-  color:#cfcfcf;
-  font-size:16px;
-  line-height:1.95;
-}
-
-.split-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:18px;
-  margin-top:28px;
-}
-
-.mini-card{
-  border:1px solid #2a2a2a;
-  background:#101010;
-  padding:22px;
-  min-height:146px;
-}
-
-.mini-card span{
-  color:#777;
-  font-size:12px;
-  letter-spacing:1px;
-}
-
-.mini-card h3{
-  font-size:21px;
-  margin:24px 0 10px;
-}
-
-.mini-card p,
-.mini-card li{
-  color:#aaa;
-  font-size:15px;
-  line-height:1.8;
-}
-
-.mini-card ul{
-  padding-left:18px;
-  margin:0;
-}
-
-.field-grid{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-  margin-top:32px;
-}
-
-.field{
-  border:1px solid #2a2a2a;
-  background:#101010;
-  padding:20px;
-  min-height:148px;
-}
-
-.field h3{
-  font-size:21px;
-  margin:16px 0 10px;
-}
-
-.field p{
-  color:#aaa;
-  font-size:14px;
-  line-height:1.75;
-  margin:0;
-}
-
-.content-flow{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-  margin-top:32px;
-}
-
-.flow-item{
-  border-top:1px solid #333;
-  padding-top:18px;
-}
-
-.flow-item strong{
-  display:block;
-  font-size:21px;
-  margin-bottom:12px;
-}
-
-.flow-item p{
-  color:#aaa;
-  font-size:15px;
-  line-height:1.8;
-}
-
-.contact-line{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  margin-top:28px;
-}
-
-.contact-line a,
-.contact-line span{
-  display:grid;
-  gap:6px;
-  min-width:168px;
-  border:1px solid #2a2a2a;
-  color:#f2f2f2;
-  text-decoration:none;
-  padding:14px 16px;
-  background:#101010;
-}
-
-.contact-line strong{
-  color:#777;
-  font-size:12px;
-  letter-spacing:1px;
-  text-transform:uppercase;
-}
-
-.contact-line em{
-  color:#f0f0f0;
-  font-size:15px;
-  font-style:normal;
-  letter-spacing:0;
-}
-
-@media(max-width:980px){
-  .about-shell{
-    padding:48px 18px 70px;
-  }
-
-  .about-layout{
-    grid-template-columns:1fr;
-    gap:36px;
-  }
-
-  .section-nav{
-    position:relative;
-    top:auto;
-    display:flex;
-    overflow-x:auto;
-    gap:18px;
-    padding-bottom:8px;
-  }
-
-  .section-nav a{
-    white-space:nowrap;
-    border-bottom:0;
-  }
-
-  .route,
-  .split-grid,
-  .field-grid,
-  .content-flow{
-    grid-template-columns:1fr;
-  }
-
-  .route::before{
-    display:none;
-  }
-
-  .route-step{
-    min-height:auto;
-    padding:18px 0 18px 32px;
-    border-top:1px solid #222;
-  }
-
-  .route-step::before{
-    top:22px;
-    left:0;
-  }
-}
-</style>
-</head>
-
-<body>
-<header class="topbar">
-  <a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a>
-  <nav>
-    <a href="index.html">首页</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-    <a href="video.html">视频</a>
-    <a href="thought.html">随笔</a>
-    <a href="gallery.html">摄影</a>
-    <a href="about.html">关于</a>
-  </nav>
-</header>
-
-<main class="about-shell">
-  <section class="about-hero">
-    <p class="eyebrow">关于云鹤系统 / ABOUT</p>
-    <h1>关于我</h1>
-    <p class="intro">云鹤系统（YUNHE SYSTEM）是一个持续运行的个人内容系统，用于记录现实观察、结构分析、案例判断与长期研究。</p>
-  </section>
-
-  <section class="about-layout">
-    <nav class="section-nav" id="section-nav">
-      <a href="#identity"><strong>我是谁</strong><span>Identity</span></a>
-      <a href="#method"><strong>我的方法</strong><span>Method</span></a>
-      <a href="#fields"><strong>研究方向</strong><span>Research</span></a>
-      <a href="#structure"><strong>内容组成</strong><span>Structure</span></a>
-      <a href="#guide"><strong>如何阅读</strong><span>Guide</span></a>
-      <a href="#collaboration"><strong>合作方式</strong><span>Collaboration</span></a>
-      <a href="#boundary"><strong>内容边界</strong><span>Boundary</span></a>
-      <a href="#update"><strong>更新方式</strong><span>Update</span></a>
-      <a href="#contact"><strong>联系方式</strong><span>Contact</span></a>
-    </nav>
-
-    <div>
-      <section class="roadmap" aria-label="阅读路线图">
-        <div class="roadmap-head">
-          <span><strong>阅读路线</strong>READING ROUTE</span>
-          <span>首页 → 研究主题 → 文章 → 案例 → 视频 → 关于我</span>
-        </div>
-        <div class="route" id="route">
-          <div class="route-step active"><strong>首页</strong><span>理解云鹤系统的整体入口。</span></div>
-          <div class="route-step"><strong>研究主题</strong><span>从品牌、平台、城市、组织等方向进入。</span></div>
-          <div class="route-step"><strong>文章</strong><span>阅读方法论、结构分析与系统记录。</span></div>
-          <div class="route-step"><strong>案例</strong><span>查看问题、分析、判断和验证。</span></div>
-          <div class="route-step"><strong>视频</strong><span>补充阶段性的表达与观察过程。</span></div>
-          <div class="route-step"><strong>关于我</strong><span>理解网站边界、合作方式与更新机制。</span></div>
+          <section id="contact" class="about-section">
+            <div class="section-label">Contact</div>
+            <h2>联系方式</h2>
+            <p>如需合作，可通过以下方式联系。后续可以在这里补充具体链接。</p>
+            <div class="contact-line">
+              <a href="mailto:YUNHE-ZK@outlook.com"
+                ><strong>Email</strong><em>YUNHE-ZK@outlook.com</em></a
+              >
+              <span><strong>Behance</strong><em>云鹤系统</em></span>
+              <span><strong>GitHub</strong><em>YUNHENODE</em></span>
+              <span><strong>公众号</strong><em>云鹤系统</em></span>
+              <span><strong>小红书</strong><em>云鹤系统</em></span>
+            </div>
+          </section>
         </div>
       </section>
+    </main>
 
-      <section id="identity" class="about-section">
-        <div class="section-label">Identity</div>
-        <h2>我是谁</h2>
-        <p>我是云鹤系统的建立者。我的工作并不是提供结论，而是观察现实、拆解结构、建立判断。相比表达观点，我更关注一个系统如何运行，一个结构为什么形成，一个问题为什么发生，一个组织为什么失效，一个品牌为什么增长，一个平台为什么改变规则。</p>
-        <div class="split-grid">
-          <article class="mini-card"><span>POSITION</span><h3>持续性系统研究</h3><p>这不是即时评论，而是对现实结构的长期记录和反复修订。</p></article>
-          <article class="mini-card"><span>FOCUS</span><h3>结构而非态度</h3><p>重点不是站队，而是说明为什么、依据是什么、系统如何运行。</p></article>
-        </div>
-      </section>
-
-      <section id="method" class="about-section">
-        <div class="section-label">Method</div>
-        <h2>我的方法</h2>
-        <p>云鹤系统主要采用结构化研究方式。每一个内容都会经历不同层级的分析，从观察到拆解，再到判断与验证。</p>
-        <div class="split-grid">
-          <article class="mini-card"><span>01</span><h3>观察</h3><p>记录现实事件。不预设结论。观察真实发生。</p></article>
-          <article class="mini-card"><span>02</span><h3>拆解</h3><p>把复杂问题拆成品牌、平台、组织、用户、规则、流程、权限、空间、行为等模块。</p></article>
-          <article class="mini-card"><span>03</span><h3>判断</h3><p>建立判断。不是站队，而是说明为什么、依据是什么、系统如何运行。</p></article>
-          <article class="mini-card"><span>04</span><h3>验证</h3><p>持续跟踪现实变化，修正判断，增加新的案例，建立长期记录。</p></article>
-        </div>
-      </section>
-
-      <section id="fields" class="about-section">
-        <div class="section-label">Research Fields</div>
-        <h2>研究方向</h2>
-        <p>网站主要围绕以下主题展开。每一个主题都可以进入文章、案例和视频三个层级。</p>
-        <div class="field-grid">
-          <article class="field"><span>01</span><h3>品牌</h3><p>品牌结构、商业系统、用户路径、产品关系、消费行为、品牌定位。</p></article>
-          <article class="field"><span>02</span><h3>平台</h3><p>平台规则、审核机制、客服系统、退出机制、权限关系、数字治理。</p></article>
-          <article class="field"><span>03</span><h3>城市</h3><p>城市运行、公共系统、空间关系、基础设施、居民行为、公共服务。</p></article>
-          <article class="field"><span>04</span><h3>组织</h3><p>组织结构、岗位关系、系统失效、流程设计、管理机制、协作方式。</p></article>
-          <article class="field"><span>05</span><h3>消费</h3><p>消费体验、价格判断、服务路径、产品分析、用户决策、商业案例。</p></article>
-          <article class="field"><span>06</span><h3>艺术</h3><p>视觉系统、文本表达、作品分析、展览观察、创作结构、表达方式。</p></article>
-          <article class="field"><span>07</span><h3>空间</h3><p>住宅、街区、场所、公共空间、身体感知、环境关系。</p></article>
-          <article class="field"><span>08</span><h3>梦境</h3><p>梦境记录、象征结构、潜意识材料、记忆关系、个人观察。</p></article>
-        </div>
-      </section>
-
-      <section id="structure" class="about-section">
-        <div class="section-label">Content Structure</div>
-        <h2>内容组成</h2>
-        <p>整个网站由视频、文章、案例与关于我四部分组成。它们不是孤立栏目，而是同一套研究系统里的不同表达层级。</p>
-        <div class="content-flow">
-          <div class="flow-item"><strong>视频</strong><p>记录阶段性表达，包括观察、案例、事件、研究过程和公开分享。</p></div>
-          <div class="flow-item"><strong>文章</strong><p>完整的文字分析，包含方法论、结构分析、系统记录和长期研究。</p></div>
-          <div class="flow-item"><strong>案例</strong><p>现实事件整理，包括问题、分析、判断、验证，采用持续更新方式维护。</p></div>
-          <div class="flow-item"><strong>关于我</strong><p>介绍网站运行方式、研究范围、合作边界和内容说明。</p></div>
-        </div>
-      </section>
-
-      <section id="guide" class="about-section">
-        <div class="section-label">Reading Guide</div>
-        <h2>如何阅读</h2>
-        <p>本网站并不是按照发布时间组织内容。建议按照研究主题阅读。同一个主题可能持续更新数月甚至数年，文章之间互相关联，案例之间也会形成完整系统。</p>
-      </section>
-
-      <section id="collaboration" class="about-section">
-        <div class="section-label">Collaboration</div>
-        <h2>合作方式</h2>
-        <p>目前主要提供品牌分析、平台研究、组织结构分析、商业系统观察、案例研究、内容咨询与长期合作。如果研究方向一致，可以进一步交流合作。</p>
-      </section>
-
-      <section id="boundary" class="about-section">
-        <div class="section-label">Boundary</div>
-        <h2>内容边界</h2>
-        <p>本站所有内容均为原创。所有案例均记录于对应时间节点。判断可能随着现实变化持续修订。未经授权不得进行商业转载。引用内容请注明来源。</p>
-      </section>
-
-      <section id="update" class="about-section">
-        <div class="section-label">Update</div>
-        <h2>更新方式</h2>
-        <p>云鹤系统持续更新，包括新增文章、新增案例、新增视频、补充历史内容、修订已有判断。更新不会按照固定周期，而是根据研究进展持续推进。</p>
-      </section>
-
-      <section id="contact" class="about-section">
-        <div class="section-label">Contact</div>
-        <h2>联系方式</h2>
-        <p>如需合作，可通过以下方式联系。后续可以在这里补充具体链接。</p>
-        <div class="contact-line">
-          <a href="mailto:YUNHE-ZK@outlook.com"><strong>Email</strong><em>YUNHE-ZK@outlook.com</em></a>
-          <span><strong>Behance</strong><em>云鹤系统</em></span>
-          <span><strong>GitHub</strong><em>YUNHENODE</em></span>
-          <span><strong>公众号</strong><em>云鹤系统</em></span>
-          <span><strong>小红书</strong><em>云鹤系统</em></span>
-        </div>
-      </section>
-    </div>
-  </section>
-</main>
-
-<script>
-const navLinks = Array.from(document.querySelectorAll(".section-nav a"));
-const sections = navLinks.map(link => document.querySelector(link.getAttribute("href")));
-const routeSteps = Array.from(document.querySelectorAll(".route-step"));
-
-function updateActiveSection(){
-  const y = window.scrollY + 150;
-  let activeIndex = 0;
-
-  sections.forEach((section, index) => {
-    if(section && section.offsetTop <= y) activeIndex = index;
-  });
-
-  navLinks.forEach((link, index) => link.classList.toggle("active", index === activeIndex));
-}
-
-function updateRoute(){
-  const route = document.getElementById("route");
-  const rect = route.getBoundingClientRect();
-  const progress = Math.min(1, Math.max(0, (window.innerHeight * 0.72 - rect.top) / Math.max(1, rect.height)));
-  const activeCount = Math.max(1, Math.ceil(progress * routeSteps.length));
-  routeSteps.forEach((step, index) => step.classList.toggle("active", index < activeCount));
-}
-
-window.addEventListener("scroll", () => {
-  updateActiveSection();
-  updateRoute();
-});
-
-updateActiveSection();
-updateRoute();
-</script>
-</body>
+    <script src="scripts/pages/about.js"></script>
+  </body>
 </html>

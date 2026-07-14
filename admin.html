@@ -1,173 +1,302 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>后台｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.admin-grid{
-  margin-top:18px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>后台｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/admin.css" />
+  </head>
 
-.admin-section{
-  margin-top:58px;
-}
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav>
+        <a href="index.html">网站首页</a>
+        <a href="#create">创作</a>
+        <a href="#manage">管理</a>
+        <a href="media-center.html">媒体中心</a>
+        <a href="knowledge-system.html">知识系统</a>
+        <a href="backup.html">数据中心</a>
+        <a href="system-center.html">系统中心</a>
+      </nav>
+    </header>
 
-.admin-section-head{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:18px;
-  padding-bottom:14px;
-  border-bottom:1px solid #242424;
-}
+    <main class="home">
+      <p class="eyebrow">ADMIN CENTER</p>
+      <h1>后台</h1>
+      <p class="intro">
+        后台按照一条固定工作流组织：先创作，再管理，然后处理媒体与知识结构，最后进入数据和系统维护。
+      </p>
+      <nav class="workflow" aria-label="后台工作流">
+        <a href="#create">Create</a><a href="#manage">Manage</a><a href="#media">Media</a
+        ><a href="#knowledge">Knowledge</a><a href="#data">Data</a><a href="#system">System</a>
+      </nav>
 
-.admin-section-head h2{
-  margin:0;
-  font-size:clamp(25px,3vw,38px);
-}
+      <section id="create" class="admin-section">
+        <div class="admin-section-head">
+          <h2>① Content Creation｜内容创作</h2>
+          <p>CREATE</p>
+        </div>
+        <p class="stage-summary">负责所有内容的创建、导入、编辑和暂存。</p>
+        <div class="grid admin-grid">
+          <a class="card" href="publish.html"
+            ><span>CREATE 01</span>
+            <h3>New Content｜新建内容</h3>
+            <p>新建文章、视频与其他正式内容。</p></a
+          >
+          <a class="card" href="case-write.html"
+            ><span>CREATE 02</span>
+            <h3>Case Editor｜案例编辑</h3>
+            <p>使用案例协议和模板撰写案例。</p></a
+          >
+          <a class="card" href="wechat-import.html"
+            ><span>CREATE 03</span>
+            <h3>WeChat Import｜公众号导入</h3>
+            <p>导入公众号文章并完成主题分类。</p></a
+          >
+          <a class="card" href="article-draft.html"
+            ><span>CREATE 04</span>
+            <h3>Draft Box｜草稿箱</h3>
+            <p>继续编辑和整理未发布内容。</p></a
+          >
+        </div>
+      </section>
 
-.admin-section-head p{
-  margin:0;
-  color:#777;
-  letter-spacing:1px;
-}
+      <section id="manage" class="admin-section">
+        <div class="admin-section-head">
+          <h2>② Content Management｜内容管理</h2>
+          <p>MANAGE</p>
+        </div>
+        <p class="stage-summary">搜索、编辑、删除、分类和修改全部正式内容。</p>
+        <div class="grid admin-grid">
+          <a class="card" href="content-control.html?type=article"
+            ><span>MANAGE 01</span>
+            <h3>Article Manager｜文章管理</h3>
+            <p>编辑、删除、复制、归档、关联与恢复文章。</p></a
+          >
+          <a class="card" href="content-control.html?type=case"
+            ><span>MANAGE 02</span>
+            <h3>Case Manager｜案例管理</h3>
+            <p>统一管理案例与历史版本。</p></a
+          >
+          <a class="card" href="content-control.html?type=video"
+            ><span>MANAGE 03</span>
+            <h3>Video Manager｜视频管理</h3>
+            <p>统一管理视频内容与媒体引用。</p></a
+          >
+          <a class="card" href="search-center.html"
+            ><span>MANAGE 04</span>
+            <h3>Search Manager｜搜索管理</h3>
+            <p>管理全站搜索、SEO 和关键词索引。</p></a
+          >
+          <a class="card" href="content-control.html?type=thought"
+            ><span>MANAGE 05</span>
+            <h3>Quick Notes｜随笔管理</h3>
+            <p>管理随笔的发布、关联、归档与版本。</p></a
+          >
+          <a class="card" href="photography-manage.html"
+            ><span>MANAGE 06</span>
+            <h3>Photography Manager｜摄影管理</h3>
+            <p>管理摄影作品、发布状态、作品集和历史版本。</p></a
+          >
+        </div>
+      </section>
 
-.admin-grid .card{
-  min-height:190px;
-}
+      <section id="media" class="admin-section">
+        <div class="admin-section-head">
+          <h2>③ Media Center｜媒体中心</h2>
+          <p>MEDIA</p>
+        </div>
+        <p class="stage-summary">
+          摄影、视频、音频、封面、PDF 和素材只上传一次，文章、案例、首页与作品集统一引用。
+        </p>
+        <div class="grid admin-grid">
+          <a class="card" href="media-center.html#library"
+            ><span>MEDIA 01</span>
+            <h3>Media Library｜媒体库</h3>
+            <p>查看全部媒体资源。</p></a
+          >
+          <a class="card" href="media-manage.html"
+            ><span>MEDIA 02</span>
+            <h3>Upload Media｜媒体上传</h3>
+            <p>上传图片、视频、音频与 PDF。</p></a
+          >
+          <a class="card" href="photography-manage.html"
+            ><span>MEDIA 03</span>
+            <h3>Photography Archive｜摄影档案</h3>
+            <p>进入摄影作品独立管理页。</p></a
+          >
+          <a class="card" href="media-center.html#video"
+            ><span>MEDIA 04</span>
+            <h3>Video Library｜视频库</h3>
+            <p>管理影像与视频文件。</p></a
+          >
+          <a class="card" href="media-center.html#audio"
+            ><span>MEDIA 05</span>
+            <h3>Audio Library｜音频库</h3>
+            <p>管理音乐、录音和声音资料。</p></a
+          >
+          <a class="card" href="media-center.html#albums"
+            ><span>MEDIA 06</span>
+            <h3>Albums｜作品集</h3>
+            <p>按项目组织媒体作品。</p></a
+          >
+          <a class="card" href="media-center.html#collections"
+            ><span>MEDIA 07</span>
+            <h3>Collections｜专题</h3>
+            <p>按主题组织跨类型资源。</p></a
+          >
+          <a class="card" href="media-center.html#assets"
+            ><span>MEDIA 08</span>
+            <h3>Asset Manager｜素材管理</h3>
+            <p>管理封面、PDF 与通用素材。</p></a
+          >
+          <a class="card" href="media-center.html#metadata"
+            ><span>MEDIA 09</span>
+            <h3>Media Metadata｜媒体信息</h3>
+            <p>编辑名称、说明、日期和资源地址。</p></a
+          >
+          <a class="card" href="media-center.html#showcase"
+            ><span>MEDIA 10</span>
+            <h3>Showcase｜展览</h3>
+            <p>进入作品公开展示页。</p></a
+          >
+          <a class="card" href="media-center.html#usage"
+            ><span>MEDIA 11</span>
+            <h3>Media Usage｜媒体引用</h3>
+            <p>查看媒体地址并用于其他页面。</p></a
+          >
+        </div>
+      </section>
 
-.admin-grid .card h3{
-  font-size:23px;
-  margin:34px 0 10px;
-}
+      <section id="knowledge" class="admin-section">
+        <div class="admin-section-head">
+          <h2>④ Knowledge System｜知识系统</h2>
+          <p>KNOWLEDGE</p>
+        </div>
+        <p class="stage-summary">
+          统一维护研究模板、案例模板、知识层级、研究主题、文章分类和标签体系。
+        </p>
+        <div class="grid admin-grid">
+          <a class="card" href="knowledge-system.html#templates"
+            ><span>KNOWLEDGE 01</span>
+            <h3>Method Templates｜模板管理</h3>
+            <p>维护案例、方法和研究模板。</p></a
+          >
+          <a class="card" href="knowledge-system.html#topics"
+            ><span>KNOWLEDGE 02</span>
+            <h3>Topic Manager｜主题管理</h3>
+            <p>维护全站研究主题。</p></a
+          >
+          <a class="card" href="knowledge-system.html#levels"
+            ><span>KNOWLEDGE 03</span>
+            <h3>Knowledge Level｜知识层级</h3>
+            <p>维护观察、分析、判断、验证和方法层级。</p></a
+          >
+          <a class="card" href="knowledge-system.html#categories"
+            ><span>KNOWLEDGE 04</span>
+            <h3>Category Manager｜分类管理</h3>
+            <p>维护文章与档案分类。</p></a
+          >
+          <a class="card" href="knowledge-system.html#tags"
+            ><span>KNOWLEDGE 05</span>
+            <h3>Tag Manager｜标签管理</h3>
+            <p>维护全站标签体系。</p></a
+          >
+        </div>
+      </section>
 
-@media(max-width:800px){
-  .admin-section{margin-top:38px}
-  .admin-section-head{align-items:flex-start;flex-direction:column;gap:5px}
-  .admin-grid .card{min-height:145px}
-  .admin-grid .card h3{margin:22px 0 8px;font-size:21px}
-}
+      <section id="data" class="admin-section">
+        <div class="admin-section-head">
+          <h2>⑤ Data Center｜数据中心</h2>
+          <p>DATA</p>
+        </div>
+        <p class="stage-summary">导出整个网站，查看历史快照，并在必要时恢复数据。</p>
+        <div class="grid admin-grid">
+          <a class="card" href="backup.html#backup"
+            ><span>DATA 01</span>
+            <h3>Backup Center｜数据备份</h3>
+            <p>生成全站备份文件。</p></a
+          >
+          <a class="card" href="backup.html#export"
+            ><span>DATA 02</span>
+            <h3>Export｜导出</h3>
+            <p>导出文章、日记、媒体和历史。</p></a
+          >
+          <a class="card" href="backup.html#import"
+            ><span>DATA 03</span>
+            <h3>Import｜导入</h3>
+            <p>选择旧备份文件并预览。</p></a
+          >
+          <a class="card" href="backup.html#versions"
+            ><span>DATA 04</span>
+            <h3>Version History｜版本历史</h3>
+            <p>查看删除前的内容快照。</p></a
+          >
+          <a class="card" href="backup.html#restore"
+            ><span>DATA 05</span>
+            <h3>Restore｜恢复</h3>
+            <p>从备份或历史版本恢复内容。</p></a
+          >
+        </div>
+      </section>
 
-.admin-note{
-  border:1px solid #2a2a2a;
-  background:#111;
-  padding:22px;
-  margin-top:56px;
-  color:#aaa;
-  line-height:1.8;
-}
+      <section id="system" class="admin-section">
+        <div class="admin-section-head">
+          <h2>⑥ System Center｜系统中心</h2>
+          <p>SYSTEM</p>
+        </div>
+        <p class="stage-summary">维护网站运行、权限、API 配置、设计、日志和部署。</p>
+        <div class="grid admin-grid">
+          <a class="card" href="system-center.html#security"
+            ><span>SYSTEM 01</span>
+            <h3>Security Center｜安全中心</h3>
+            <p>检查后台验证和安全状态。</p></a
+          >
+          <a class="card" href="system-center.html#permission"
+            ><span>SYSTEM 02</span>
+            <h3>Permission｜权限</h3>
+            <p>维护管理员与访客的权限边界。</p></a
+          >
+          <a class="card" href="system-center.html#api"
+            ><span>SYSTEM 03</span>
+            <h3>API Keys｜API</h3>
+            <p>检查 Vercel 与 Supabase 环境变量。</p></a
+          >
+          <a class="card" href="design-settings.html"
+            ><span>SYSTEM 04</span>
+            <h3>Design System｜设计系统</h3>
+            <p>管理阅读主题、颜色和背景。</p></a
+          >
+          <a class="card" href="system-center.html#logs"
+            ><span>SYSTEM 05</span>
+            <h3>Logs｜日志</h3>
+            <p>进入部署日志与接口检查。</p></a
+          >
+          <a class="card" href="system-center.html#deployment"
+            ><span>SYSTEM 06</span>
+            <h3>Deployment｜部署</h3>
+            <p>查看 Vercel 部署和当前函数限制。</p></a
+          >
+        </div>
+      </section>
 
-.workflow{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:38px;
-}
-
-.workflow a{
-  color:#aaa;
-  text-decoration:none;
-  border-bottom:1px solid #333;
-  padding:8px 0;
-}
-
-.workflow a:not(:last-child)::after{
-  content:"→";
-  color:#555;
-  margin-left:8px;
-}
-
-.stage-summary{
-  max-width:760px;
-  color:#999;
-  line-height:1.7;
-  margin:14px 0 0;
-}
-</style>
-</head>
-
-<body>
-
-<header class="topbar">
-  <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
-  <nav>
-    <a href="index.html">网站首页</a>
-    <a href="#create">创作</a>
-    <a href="#manage">管理</a>
-    <a href="media-center.html">媒体中心</a>
-    <a href="knowledge-system.html">知识系统</a>
-    <a href="backup.html">数据中心</a>
-    <a href="system-center.html">系统中心</a>
-  </nav>
-</header>
-
-<main class="home">
-  <p class="eyebrow">ADMIN CENTER</p>
-  <h1>后台</h1>
-  <p class="intro">后台按照一条固定工作流组织：先创作，再管理，然后处理媒体与知识结构，最后进入数据和系统维护。</p>
-  <nav class="workflow" aria-label="后台工作流"><a href="#create">Create</a><a href="#manage">Manage</a><a href="#media">Media</a><a href="#knowledge">Knowledge</a><a href="#data">Data</a><a href="#system">System</a></nav>
-
-  <section id="create" class="admin-section"><div class="admin-section-head"><h2>① Content Creation｜内容创作</h2><p>CREATE</p></div><p class="stage-summary">负责所有内容的创建、导入、编辑和暂存。</p><div class="grid admin-grid">
-    <a class="card" href="publish.html"><span>CREATE 01</span><h3>New Content｜新建内容</h3><p>新建文章、视频与其他正式内容。</p></a>
-    <a class="card" href="case-write.html"><span>CREATE 02</span><h3>Case Editor｜案例编辑</h3><p>使用案例协议和模板撰写案例。</p></a>
-    <a class="card" href="wechat-import.html"><span>CREATE 03</span><h3>WeChat Import｜公众号导入</h3><p>导入公众号文章并完成主题分类。</p></a>
-    <a class="card" href="article-draft.html"><span>CREATE 04</span><h3>Draft Box｜草稿箱</h3><p>继续编辑和整理未发布内容。</p></a>
-  </div></section>
-
-  <section id="manage" class="admin-section"><div class="admin-section-head"><h2>② Content Management｜内容管理</h2><p>MANAGE</p></div><p class="stage-summary">搜索、编辑、删除、分类和修改全部正式内容。</p><div class="grid admin-grid">
-    <a class="card" href="content-control.html?type=article"><span>MANAGE 01</span><h3>Article Manager｜文章管理</h3><p>编辑、删除、复制、归档、关联与恢复文章。</p></a>
-    <a class="card" href="content-control.html?type=case"><span>MANAGE 02</span><h3>Case Manager｜案例管理</h3><p>统一管理案例与历史版本。</p></a>
-    <a class="card" href="content-control.html?type=video"><span>MANAGE 03</span><h3>Video Manager｜视频管理</h3><p>统一管理视频内容与媒体引用。</p></a>
-    <a class="card" href="search-center.html"><span>MANAGE 04</span><h3>Search Manager｜搜索管理</h3><p>管理全站搜索、SEO 和关键词索引。</p></a>
-    <a class="card" href="content-control.html?type=thought"><span>MANAGE 05</span><h3>Quick Notes｜随笔管理</h3><p>管理随笔的发布、关联、归档与版本。</p></a>
-    <a class="card" href="photography-manage.html"><span>MANAGE 06</span><h3>Photography Manager｜摄影管理</h3><p>管理摄影作品、发布状态、作品集和历史版本。</p></a>
-  </div></section>
-
-  <section id="media" class="admin-section"><div class="admin-section-head"><h2>③ Media Center｜媒体中心</h2><p>MEDIA</p></div><p class="stage-summary">摄影、视频、音频、封面、PDF 和素材只上传一次，文章、案例、首页与作品集统一引用。</p><div class="grid admin-grid">
-    <a class="card" href="media-center.html#library"><span>MEDIA 01</span><h3>Media Library｜媒体库</h3><p>查看全部媒体资源。</p></a>
-    <a class="card" href="media-manage.html"><span>MEDIA 02</span><h3>Upload Media｜媒体上传</h3><p>上传图片、视频、音频与 PDF。</p></a>
-    <a class="card" href="photography-manage.html"><span>MEDIA 03</span><h3>Photography Archive｜摄影档案</h3><p>进入摄影作品独立管理页。</p></a>
-    <a class="card" href="media-center.html#video"><span>MEDIA 04</span><h3>Video Library｜视频库</h3><p>管理影像与视频文件。</p></a>
-    <a class="card" href="media-center.html#audio"><span>MEDIA 05</span><h3>Audio Library｜音频库</h3><p>管理音乐、录音和声音资料。</p></a>
-    <a class="card" href="media-center.html#albums"><span>MEDIA 06</span><h3>Albums｜作品集</h3><p>按项目组织媒体作品。</p></a>
-    <a class="card" href="media-center.html#collections"><span>MEDIA 07</span><h3>Collections｜专题</h3><p>按主题组织跨类型资源。</p></a>
-    <a class="card" href="media-center.html#assets"><span>MEDIA 08</span><h3>Asset Manager｜素材管理</h3><p>管理封面、PDF 与通用素材。</p></a>
-    <a class="card" href="media-center.html#metadata"><span>MEDIA 09</span><h3>Media Metadata｜媒体信息</h3><p>编辑名称、说明、日期和资源地址。</p></a>
-    <a class="card" href="media-center.html#showcase"><span>MEDIA 10</span><h3>Showcase｜展览</h3><p>进入作品公开展示页。</p></a>
-    <a class="card" href="media-center.html#usage"><span>MEDIA 11</span><h3>Media Usage｜媒体引用</h3><p>查看媒体地址并用于其他页面。</p></a>
-  </div></section>
-
-  <section id="knowledge" class="admin-section"><div class="admin-section-head"><h2>④ Knowledge System｜知识系统</h2><p>KNOWLEDGE</p></div><p class="stage-summary">统一维护研究模板、案例模板、知识层级、研究主题、文章分类和标签体系。</p><div class="grid admin-grid">
-    <a class="card" href="knowledge-system.html#templates"><span>KNOWLEDGE 01</span><h3>Method Templates｜模板管理</h3><p>维护案例、方法和研究模板。</p></a>
-    <a class="card" href="knowledge-system.html#topics"><span>KNOWLEDGE 02</span><h3>Topic Manager｜主题管理</h3><p>维护全站研究主题。</p></a>
-    <a class="card" href="knowledge-system.html#levels"><span>KNOWLEDGE 03</span><h3>Knowledge Level｜知识层级</h3><p>维护观察、分析、判断、验证和方法层级。</p></a>
-    <a class="card" href="knowledge-system.html#categories"><span>KNOWLEDGE 04</span><h3>Category Manager｜分类管理</h3><p>维护文章与档案分类。</p></a>
-    <a class="card" href="knowledge-system.html#tags"><span>KNOWLEDGE 05</span><h3>Tag Manager｜标签管理</h3><p>维护全站标签体系。</p></a>
-  </div></section>
-
-  <section id="data" class="admin-section"><div class="admin-section-head"><h2>⑤ Data Center｜数据中心</h2><p>DATA</p></div><p class="stage-summary">导出整个网站，查看历史快照，并在必要时恢复数据。</p><div class="grid admin-grid">
-    <a class="card" href="backup.html#backup"><span>DATA 01</span><h3>Backup Center｜数据备份</h3><p>生成全站备份文件。</p></a>
-    <a class="card" href="backup.html#export"><span>DATA 02</span><h3>Export｜导出</h3><p>导出文章、日记、媒体和历史。</p></a>
-    <a class="card" href="backup.html#import"><span>DATA 03</span><h3>Import｜导入</h3><p>选择旧备份文件并预览。</p></a>
-    <a class="card" href="backup.html#versions"><span>DATA 04</span><h3>Version History｜版本历史</h3><p>查看删除前的内容快照。</p></a>
-    <a class="card" href="backup.html#restore"><span>DATA 05</span><h3>Restore｜恢复</h3><p>从备份或历史版本恢复内容。</p></a>
-  </div></section>
-
-  <section id="system" class="admin-section"><div class="admin-section-head"><h2>⑥ System Center｜系统中心</h2><p>SYSTEM</p></div><p class="stage-summary">维护网站运行、权限、API 配置、设计、日志和部署。</p><div class="grid admin-grid">
-    <a class="card" href="system-center.html#security"><span>SYSTEM 01</span><h3>Security Center｜安全中心</h3><p>检查后台验证和安全状态。</p></a>
-    <a class="card" href="system-center.html#permission"><span>SYSTEM 02</span><h3>Permission｜权限</h3><p>维护管理员与访客的权限边界。</p></a>
-    <a class="card" href="system-center.html#api"><span>SYSTEM 03</span><h3>API Keys｜API</h3><p>检查 Vercel 与 Supabase 环境变量。</p></a>
-    <a class="card" href="design-settings.html"><span>SYSTEM 04</span><h3>Design System｜设计系统</h3><p>管理阅读主题、颜色和背景。</p></a>
-    <a class="card" href="system-center.html#logs"><span>SYSTEM 05</span><h3>Logs｜日志</h3><p>进入部署日志与接口检查。</p></a>
-    <a class="card" href="system-center.html#deployment"><span>SYSTEM 06</span><h3>Deployment｜部署</h3><p>查看 Vercel 部署和当前函数限制。</p></a>
-  </div></section>
-
-  <div class="admin-note">
-    管理后台使用 Vercel 环境变量进行验证。管理员名称填写环境变量名，例如 YUNHE；密码填写该环境变量对应的值。
-  </div>
-</main>
-
-</body>
+      <div class="admin-note">
+        管理后台使用 Vercel 环境变量进行验证。管理员名称填写环境变量名，例如
+        YUNHE；密码填写该环境变量对应的值。
+      </div>
+    </main>
+  </body>
 </html>

@@ -1,194 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>文章草稿｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <title>文章草稿｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
 
-<style>
-body{
-  background:#0a0a0a;
-  color:#eaeaea;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
-  margin:0;
-}
+    <link rel="stylesheet" href="assets/styles/pages/article-draft.css" />
+  </head>
 
-header{
-  display:flex;
-  justify-content:space-between;
-  padding:20px 40px;
-  border-bottom:1px solid #141414;
-}
+  <body>
+    <header>
+      <a
+        class="logo logo-back"
+        href="index.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE</a
+      >
+      <nav>
+        <a href="article.html">返回文章</a>
+        <a href="index.html">首页</a>
+      </nav>
+    </header>
 
-.logo{color:#888;font-size:13px;}
+    <main>
+      <p style="color: #777; font-size: 12px; letter-spacing: 2px">ARTICLE / DRAFT</p>
+      <h1>文章草稿</h1>
+      <p style="color: #777">这里只显示未发布内容（status = draft）</p>
 
-nav a{
-  color:#666;
-  margin-left:16px;
-  text-decoration:none;
-  font-size:13px;
-}
+      <div id="list" class="grid"></div>
+    </main>
 
-main{
-  max-width:1100px;
-  margin:0 auto;
-  padding:60px 40px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-
-.card{
-  border:1px solid #151515;
-  padding:16px;
-  border-radius:10px;
-  background:#0a0a0a;
-  color:#eaeaea;
-}
-
-.card h2{font-size:16px;margin:10px 0;}
-.card p{font-size:12px;color:#777;}
-
-.badge{
-  font-size:11px;
-  color:#888;
-  border:1px solid #222;
-  padding:2px 6px;
-  display:inline-block;
-  margin-bottom:8px;
-}
-
-button{
-  margin-top:10px;
-  background:#111;
-  color:#aaa;
-  border:1px solid #222;
-  padding:6px 10px;
-  cursor:pointer;
-}
-
-button:hover{
-  border-color:#444;
-  color:#fff;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a>
-  <nav>
-    <a href="article.html">返回文章</a>
-    <a href="index.html">首页</a>
-  </nav>
-</header>
-
-<main>
-
-<p style="color:#777;font-size:12px;letter-spacing:2px;">ARTICLE / DRAFT</p>
-<h1>文章草稿</h1>
-<p style="color:#777;">这里只显示未发布内容（status = draft）</p>
-
-<div id="list" class="grid"></div>
-
-</main>
-
-<script>
-
-const SUPABASE_URL = "https://你的项目.supabase.co";
-const SUPABASE_KEY = "你的anon key";
-
-async function loadDraft(){
-
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/contents?status=eq.draft&order=created_at.desc`,
-    {
-      headers:{
-        apikey:SUPABASE_KEY,
-        Authorization:`Bearer ${SUPABASE_KEY}`
-      }
-    }
-  );
-
-  const data = await res.json();
-
-  const box = document.getElementById("list");
-
-  if(!data.length){
-    box.innerHTML = "<p style='color:#777'>暂无草稿</p>";
-    return;
-  }
-
-  box.innerHTML = data.map(item=>`
-    <div class="card">
-      <div class="badge">DRAFT</div>
-      <h2>${item.title}</h2>
-      <p>${item.intro || ""}</p>
-
-      <button onclick="publish('${item.id}')">发布</button>
-      <button onclick="del('${item.id}')">删除</button>
-    </div>
-  `).join("");
-}
-
-/* 发布草稿（改状态） */
-async function publish(id){
-
-  await fetch(`${SUPABASE_URL}/rest/v1/contents?id=eq.${id}`,{
-    method:"PATCH",
-    headers:{
-      apikey:SUPABASE_KEY,
-      Authorization:`Bearer ${SUPABASE_KEY}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      status:"published"
-    })
-  });
-
-  alert("已发布");
-  loadDraft();
-}
-
-/* 删除 */
-async function del(id){
-  const adminName = prompt("请输入数据管理员名称");
-
-  if(!adminName) return;
-
-  const password = prompt("请输入管理员密码");
-
-  if(!password) return;
-
-  const res = await fetch("/api/delete",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      id,
-      adminName,
-      password
-    })
-  });
-
-  if(!res.ok){
-    const result = await res.json().catch(() => ({}));
-    alert(result.error || "删除失败，请检查管理员密码或 Vercel 环境变量。");
-    return;
-  }
-
-  alert("已删除");
-  loadDraft();
-}
-
-loadDraft();
-
-</script>
-
-</body>
+    <script src="scripts/pages/article-draft.js"></script>
+  </body>
 </html>

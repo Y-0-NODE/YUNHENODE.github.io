@@ -1,276 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>内容发布后台｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.publish-panel{
-  border:1px solid #2a2a2a;
-  background:#111;
-  padding:24px;
-  margin-top:34px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>内容发布后台｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/publish.css" />
+  </head>
 
-.publish-panel label{
-  display:block;
-  color:#aaa;
-  margin:16px 0 8px;
-}
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav>
+        <a href="index.html">网站首页</a>
+        <a href="admin.html">后台首页</a>
+        <a href="publish.html">新建内容</a>
+        <a href="video.html">视频</a>
+        <a href="article.html">文章</a>
+        <a href="case.html">案例</a>
+      </nav>
+    </header>
 
-.publish-panel input,
-.publish-panel select,
-.publish-panel textarea{
-  width:100%;
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-}
+    <main class="home">
+      <p class="eyebrow">PUBLISH</p>
+      <h1>新建内容</h1>
+      <p class="intro">选择内容类型与研究主题，发布后自动进入对应目录。</p>
 
-.publish-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+      <section class="publish-panel">
+        <div class="publish-row">
+          <div>
+            <label for="admin-name">管理员名称</label>
+            <input id="admin-name" value="YUNHE" autocomplete="username" />
+          </div>
+          <div>
+            <label for="password">管理员密码</label>
+            <input id="password" type="password" autocomplete="current-password" />
+          </div>
+        </div>
 
-.publish-panel textarea{
-  min-height:110px;
-  resize:vertical;
-}
+        <div class="publish-row">
+          <div>
+            <label for="template">Template（模板）</label>
+            <select id="template" required>
+              <option value="" selected disabled>请选择模板</option>
+              <option value="A">A｜Case Archive（案例库）</option>
+              <option value="B">B｜Method Archive（方法库）</option>
+              <option value="C">C｜Research Notes（研究记录）</option>
+              <option value="D">D｜Project Archive（项目档案）</option>
+              <option value="E">E｜Media Archive（媒体库）</option>
+              <option value="X">X｜X Archive（未分类档案）</option>
+            </select>
+          </div>
+          <div>
+            <label for="knowledge-level">Knowledge Level（知识层级）</label>
+            <select id="knowledge-level" required>
+              <option value="" selected disabled>请选择知识层级</option>
+              <option value="Observation">Observation（观察）</option>
+              <option value="Analysis">Analysis（分析）</option>
+              <option value="Decision">Decision（判断）</option>
+              <option value="Validation">Validation（验证）</option>
+              <option value="Method">Method（方法）</option>
+            </select>
+          </div>
+        </div>
 
-#body{
-  min-height:260px;
-}
+        <div class="publish-row">
+          <div>
+            <label for="type">内容类型</label>
+            <select id="type">
+              <option value="article">文章</option>
+              <option value="video">视频</option>
+              <option value="case">案例</option>
+            </select>
+          </div>
+          <div>
+            <label for="topic">研究主题</label>
+            <select id="topic">
+              <optgroup label="人与关系">
+                <option value="情感与关系">情感与关系</option>
+                <option value="亲密关系与家庭">亲密关系与家庭</option>
+                <option value="沟通与冲突">沟通与冲突</option>
+                <option value="个体成长">个体成长</option>
+              </optgroup>
+              <optgroup label="组织与系统">
+                <option value="组织结构">组织结构</option>
+                <option value="系统机制">系统机制</option>
+                <option value="管理与协作">管理与协作</option>
+                <option value="平台与技术">平台与技术</option>
+              </optgroup>
+              <optgroup label="社会与现实">
+                <option value="社会观察">社会观察</option>
+                <option value="城市与空间">城市与空间</option>
+                <option value="消费与生活">消费与生活</option>
+                <option value="商业与品牌">商业与品牌</option>
+              </optgroup>
+              <optgroup label="创作与内在">
+                <option value="艺术与创作">艺术与创作</option>
+                <option value="方法与思考">方法与思考</option>
+                <option value="梦境与潜意识">梦境与潜意识</option>
+                <option value="未分类">未分类</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
 
-.publish-panel button{
-  margin-top:20px;
-  border:1px solid #2a2a2a;
-  background:#f2f2f2;
-  color:#0b0b0b;
-  padding:12px 16px;
-  font-weight:700;
-  cursor:pointer;
-}
+        <label for="title">主标题</label>
+        <input id="title" placeholder="例如：为什么成熟系统也会突然失效？" />
 
-@media(max-width:760px){
-  .publish-row{
-    grid-template-columns:1fr;
-  }
-}
-</style>
-</head>
+        <label for="subtitle">副标题</label>
+        <input id="subtitle" placeholder="例如：我在亚朵连续几天观察到的运营细节" />
 
-<body>
+        <label for="intro">摘要 / 卡片说明</label>
+        <textarea id="intro" placeholder="如果不填，列表会优先使用副标题。"></textarea>
 
-<header class="topbar">
-  <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
-  <nav>
-    <a href="index.html">网站首页</a>
-    <a href="admin.html">后台首页</a>
-    <a href="publish.html">新建内容</a>
-    <a href="video.html">视频</a>
-    <a href="article.html">文章</a>
-    <a href="case.html">案例</a>
-  </nav>
-</header>
+        <div class="publish-row">
+          <div>
+            <label for="original-date">原始撰写时间</label>
+            <input id="original-date" type="date" />
+          </div>
+          <div>
+            <label for="source">内容来源</label>
+            <select id="source">
+              <option value="本站撰写">本站撰写</option>
+              <option value="云鹤系统公众号转载">云鹤系统公众号转载</option>
+              <option value="公众号导入">公众号导入</option>
+              <option value="内部日记整理">内部日记整理</option>
+              <option value="外部链接摘录">外部链接摘录</option>
+            </select>
+          </div>
+        </div>
 
-<main class="home">
+        <label for="video">视频链接 / 原始链接</label>
+        <textarea id="video"></textarea>
 
-<p class="eyebrow">PUBLISH</p>
-<h1>新建内容</h1>
-<p class="intro">选择内容类型与研究主题，发布后自动进入对应目录。</p>
+        <label for="body">正文</label>
+        <textarea id="body"></textarea>
 
-<section class="publish-panel">
-  <div class="publish-row">
-    <div>
-      <label for="admin-name">管理员名称</label>
-      <input id="admin-name" value="YUNHE" autocomplete="username">
-    </div>
-    <div>
-      <label for="password">管理员密码</label>
-      <input id="password" type="password" autocomplete="current-password">
-    </div>
-  </div>
+        <button onclick="publishToSite()">发布到网站</button>
+      </section>
 
-  <div class="publish-row">
-    <div>
-      <label for="template">Template（模板）</label>
-      <select id="template" required>
-        <option value="" selected disabled>请选择模板</option>
-        <option value="A">A｜Case Archive（案例库）</option>
-        <option value="B">B｜Method Archive（方法库）</option>
-        <option value="C">C｜Research Notes（研究记录）</option>
-        <option value="D">D｜Project Archive（项目档案）</option>
-        <option value="E">E｜Media Archive（媒体库）</option>
-        <option value="X">X｜X Archive（未分类档案）</option>
-      </select>
-    </div>
-    <div>
-      <label for="knowledge-level">Knowledge Level（知识层级）</label>
-      <select id="knowledge-level" required>
-        <option value="" selected disabled>请选择知识层级</option>
-        <option value="Observation">Observation（观察）</option>
-        <option value="Analysis">Analysis（分析）</option>
-        <option value="Decision">Decision（判断）</option>
-        <option value="Validation">Validation（验证）</option>
-        <option value="Method">Method（方法）</option>
-      </select>
-    </div>
-  </div>
+      <pre
+        id="output"
+        style="white-space: pre-wrap; background: #111; padding: 20px; margin-top: 30px"
+      ></pre>
+    </main>
 
-  <div class="publish-row">
-    <div>
-      <label for="type">内容类型</label>
-      <select id="type">
-        <option value="article">文章</option>
-        <option value="video">视频</option>
-        <option value="case">案例</option>
-      </select>
-    </div>
-    <div>
-      <label for="topic">研究主题</label>
-      <select id="topic">
-        <optgroup label="人与关系">
-          <option value="情感与关系">情感与关系</option>
-          <option value="亲密关系与家庭">亲密关系与家庭</option>
-          <option value="沟通与冲突">沟通与冲突</option>
-          <option value="个体成长">个体成长</option>
-        </optgroup>
-        <optgroup label="组织与系统">
-          <option value="组织结构">组织结构</option>
-          <option value="系统机制">系统机制</option>
-          <option value="管理与协作">管理与协作</option>
-          <option value="平台与技术">平台与技术</option>
-        </optgroup>
-        <optgroup label="社会与现实">
-          <option value="社会观察">社会观察</option>
-          <option value="城市与空间">城市与空间</option>
-          <option value="消费与生活">消费与生活</option>
-          <option value="商业与品牌">商业与品牌</option>
-        </optgroup>
-        <optgroup label="创作与内在">
-          <option value="艺术与创作">艺术与创作</option>
-          <option value="方法与思考">方法与思考</option>
-          <option value="梦境与潜意识">梦境与潜意识</option>
-          <option value="未分类">未分类</option>
-        </optgroup>
-      </select>
-    </div>
-  </div>
+    <script src="scripts/pages/publish.js"></script>
 
-  <label for="title">主标题</label>
-  <input id="title" placeholder="例如：为什么成熟系统也会突然失效？">
-
-  <label for="subtitle">副标题</label>
-  <input id="subtitle" placeholder="例如：我在亚朵连续几天观察到的运营细节">
-
-  <label for="intro">摘要 / 卡片说明</label>
-  <textarea id="intro" placeholder="如果不填，列表会优先使用副标题。"></textarea>
-
-  <div class="publish-row">
-    <div>
-      <label for="original-date">原始撰写时间</label>
-      <input id="original-date" type="date">
-    </div>
-    <div>
-      <label for="source">内容来源</label>
-      <select id="source">
-        <option value="本站撰写">本站撰写</option>
-        <option value="云鹤系统公众号转载">云鹤系统公众号转载</option>
-        <option value="公众号导入">公众号导入</option>
-        <option value="内部日记整理">内部日记整理</option>
-        <option value="外部链接摘录">外部链接摘录</option>
-      </select>
-    </div>
-  </div>
-
-  <label for="video">视频链接 / 原始链接</label>
-  <textarea id="video"></textarea>
-
-  <label for="body">正文</label>
-  <textarea id="body"></textarea>
-
-  <button onclick="publishToSite()">发布到网站</button>
-</section>
-
-<pre id="output" style="white-space:pre-wrap;background:#111;padding:20px;margin-top:30px;"></pre>
-
-</main>
-
-<script>
-
-async function publishToSite() {
-
-  const adminName = document.getElementById("admin-name").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const type = document.getElementById("type").value;
-  const topic = document.getElementById("topic").value;
-  const template = document.getElementById("template").value;
-  const knowledgeLevel = document.getElementById("knowledge-level").value;
-  const title = document.getElementById("title").value.trim();
-  const subtitle = document.getElementById("subtitle").value.trim();
-  const intro = document.getElementById("intro").value.trim();
-  const originalDate = document.getElementById("original-date").value;
-  const source = document.getElementById("source").value;
-  const video = document.getElementById("video").value.trim();
-  const body = document.getElementById("body").value.trim();
-  const output = document.getElementById("output");
-
-  if (!adminName || !password || !title || !body || !template || !knowledgeLevel) {
-    output.textContent = "必填项缺失：管理员名称 / 密码 / 标题 / 正文 / 模板 / 知识层级";
-    return;
-  }
-
-  output.textContent = "正在发布...";
-
-  try {
-    const res = await fetch("/api/publish", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        adminName,
-        password,
-        title,
-        subtitle,
-        intro,
-        originalDate,
-        source,
-        body,
-        type,
-        topic,
-        template,
-        knowledgeLevel,
-        video
-      })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (res.ok) {
-      output.textContent =
-        "发布成功\n\n" +
-        "标题：" + title + "\n" +
-        "slug：" + data.slug + "\n" +
-        "访问链接：" + data.url;
-
-      alert("发布成功");
-    } else {
-      output.textContent =
-        "发布失败：\n" + (data.error || JSON.stringify(data, null, 2));
-    }
-
-  } catch (err) {
-    output.textContent =
-      "请求失败：\n" + err.message;
-  }
-}
-
-</script>
-
-<script src="knowledge-client.js"></script>
-</body>
+    <script src="scripts/core/knowledge-client.js"></script>
+  </body>
 </html>

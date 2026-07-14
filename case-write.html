@@ -1,490 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>撰写案例｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.workspace{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(320px,0.8fr);
-  gap:24px;
-  margin-top:40px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>撰写案例｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/case-write.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav>
+        <a href="case.html">案例首页</a>
+        <a href="case-list.html">案例列表</a>
+        <a href="article-manage.html?type=case">案例管理</a>
+        <a href="admin.html">后台首页</a>
+      </nav>
+    </header>
 
-.panel,
-.preview{
-  border:1px solid #2a2a2a;
-  background:#111;
-  padding:22px;
-}
+    <main class="home">
+      <p class="eyebrow">CASE WRITER</p>
+      <h1>撰写案例</h1>
+      <p class="intro">选择模板，填写材料，生成结构稳定、极简清晰的案例文本。</p>
 
-.panel label{
-  display:block;
-  color:#aaa;
-  margin:16px 0 8px;
-}
+      <section class="workspace">
+        <form
+          class="panel"
+          onsubmit="
+            event.preventDefault();
+            saveCase();
+          "
+        >
+          <label for="admin-name">管理员名称</label>
+          <input id="admin-name" value="YUNHE" autocomplete="username" />
 
-.panel input,
-.panel textarea,
-.panel select{
-  width:100%;
-  border:1px solid #2a2a2a;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-}
+          <label for="admin-password">管理员密码</label>
+          <input id="admin-password" type="password" autocomplete="current-password" />
 
-.panel textarea{
-  min-height:120px;
-  line-height:1.7;
-  resize:vertical;
-}
+          <label for="template">Template（模板）</label>
+          <select id="template" onchange="applyTemplate()">
+            <optgroup label="系统档案模板">
+              <option value="A">A｜Case Archive（案例库）</option>
+              <option value="B">B｜Method Archive（方法库）</option>
+              <option value="C">C｜Research Notes（研究记录）</option>
+              <option value="D">D｜Project Archive（项目档案）</option>
+              <option value="E">E｜Media Archive（媒体库）</option>
+              <option value="X">X｜X Archive（未分类档案）</option>
+            </optgroup>
+            <optgroup label="保留的原案例模板">
+              <option value="bo">Case 001｜BO H5 Modular Upgrade</option>
+              <option value="apple">Case 002｜Apple 幽灵账号问题</option>
+              <option value="architecture">Case 003｜网站架构</option>
+            </optgroup>
+          </select>
 
-.media-insert{
-  margin-top:22px;
-  padding-top:18px;
-  border-top:1px solid #2a2a2a;
-}
+          <label for="knowledge-level">Knowledge Level（知识层级）</label>
+          <select id="knowledge-level" onchange="renderPreview()" required>
+            <option value="Observation">Observation（观察）</option>
+            <option value="Analysis">Analysis（分析）</option>
+            <option value="Decision">Decision（判断）</option>
+            <option value="Validation">Validation（验证）</option>
+            <option value="Method">Method（方法）</option>
+          </select>
 
-.media-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+          <label for="title">标题</label>
+          <input id="title" oninput="renderPreview()" />
 
-.media-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
+          <label for="intro">一句简介</label>
+          <textarea id="intro" oninput="renderPreview()"></textarea>
 
-.media-actions button{
-  border:1px solid #2a2a2a;
-  background:#151515;
-  color:#f2f2f2;
-  padding:10px 14px;
-  cursor:pointer;
-}
+          <label for="topic">主题</label>
+          <select id="topic" onchange="renderPreview()">
+            <option value="平台">Platform（平台）</option>
+            <option value="品牌">Brand（品牌）</option>
+            <option value="组织">Organization（组织）</option>
+            <option value="城市">City（城市）</option>
+            <option value="消费">Consumption（消费）</option>
+            <option value="艺术">Art（艺术）</option>
+            <option value="空间">Space（空间）</option>
+            <option value="梦境">Dream（梦境）</option>
+            <option value="技术">Technology（技术）</option>
+            <option value="文化">Culture（文化）</option>
+            <option value="社会">Society（社会）</option>
+            <option value="未分类">Unknown（未分类）</option>
+          </select>
 
-.media-actions .light{
-  background:#f2f2f2;
-  color:#0b0b0b;
-  font-weight:700;
-}
+          <div id="section-fields" class="section-fields"></div>
 
-.section-fields{
-  display:grid;
-  gap:12px;
-  margin-top:18px;
-}
+          <div class="media-insert">
+            <h2>插入图片 / 视频</h2>
+            <p class="status">
+              可以直接上传文件，或者粘贴已有图片、视频地址。插入后会进入正文，文章页会自动显示成图片或播放器。
+            </p>
 
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
+            <div class="media-row">
+              <div>
+                <label for="media-kind">媒体类型</label>
+                <select id="media-kind">
+                  <option value="image">图片</option>
+                  <option value="video">视频</option>
+                </select>
+              </div>
+              <div>
+                <label for="media-target">插入位置</label>
+                <select id="media-target">
+                  <option value="random">随机插入到一个段落</option>
+                </select>
+              </div>
+            </div>
 
-.actions button,
-.actions a{
-  border:1px solid #2a2a2a;
-  background:#151515;
-  color:#f2f2f2;
-  padding:10px 14px;
-  text-decoration:none;
-  cursor:pointer;
-}
+            <label for="media-caption">说明文字</label>
+            <input id="media-caption" placeholder="例如：现场界面、验证截图、演示视频" />
 
-.actions .primary{
-  background:#f2f2f2;
-  color:#0b0b0b;
-  font-weight:700;
-}
+            <label for="media-url">已有图片 / 视频地址</label>
+            <input id="media-url" placeholder="https://..." />
 
-.preview{
-  position:sticky;
-  top:96px;
-  align-self:start;
-  white-space:pre-wrap;
-  line-height:1.85;
-  color:#d8d8d8;
-}
-
-.preview h2{
-  margin-top:0;
-}
-
-.status{
-  color:#aaa;
-  margin-top:16px;
-  line-height:1.7;
-}
-
-@media(max-width:900px){
-  .workspace{
-    grid-template-columns:1fr;
-  }
-
-  .media-row{
-    grid-template-columns:1fr;
-  }
-
-  .preview{
-    position:relative;
-    top:auto;
-  }
-}
-</style>
-</head>
-<body>
-<header class="topbar">
-  <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
-  <nav>
-    <a href="case.html">案例首页</a>
-    <a href="case-list.html">案例列表</a>
-    <a href="article-manage.html?type=case">案例管理</a>
-    <a href="admin.html">后台首页</a>
-  </nav>
-</header>
-
-<main class="home">
-  <p class="eyebrow">CASE WRITER</p>
-  <h1>撰写案例</h1>
-  <p class="intro">选择模板，填写材料，生成结构稳定、极简清晰的案例文本。</p>
-
-  <section class="workspace">
-    <form class="panel" onsubmit="event.preventDefault(); saveCase();">
-      <label for="admin-name">管理员名称</label>
-      <input id="admin-name" value="YUNHE" autocomplete="username">
-
-      <label for="admin-password">管理员密码</label>
-      <input id="admin-password" type="password" autocomplete="current-password">
-
-      <label for="template">Template（模板）</label>
-      <select id="template" onchange="applyTemplate()">
-        <optgroup label="系统档案模板">
-          <option value="A">A｜Case Archive（案例库）</option>
-          <option value="B">B｜Method Archive（方法库）</option>
-          <option value="C">C｜Research Notes（研究记录）</option>
-          <option value="D">D｜Project Archive（项目档案）</option>
-          <option value="E">E｜Media Archive（媒体库）</option>
-          <option value="X">X｜X Archive（未分类档案）</option>
-        </optgroup>
-        <optgroup label="保留的原案例模板">
-          <option value="bo">Case 001｜BO H5 Modular Upgrade</option>
-          <option value="apple">Case 002｜Apple 幽灵账号问题</option>
-          <option value="architecture">Case 003｜网站架构</option>
-        </optgroup>
-      </select>
-
-      <label for="knowledge-level">Knowledge Level（知识层级）</label>
-      <select id="knowledge-level" onchange="renderPreview()" required>
-        <option value="Observation">Observation（观察）</option>
-        <option value="Analysis">Analysis（分析）</option>
-        <option value="Decision">Decision（判断）</option>
-        <option value="Validation">Validation（验证）</option>
-        <option value="Method">Method（方法）</option>
-      </select>
-
-      <label for="title">标题</label>
-      <input id="title" oninput="renderPreview()">
-
-      <label for="intro">一句简介</label>
-      <textarea id="intro" oninput="renderPreview()"></textarea>
-
-      <label for="topic">主题</label>
-      <select id="topic" onchange="renderPreview()">
-        <option value="平台">Platform（平台）</option>
-        <option value="品牌">Brand（品牌）</option>
-        <option value="组织">Organization（组织）</option>
-        <option value="城市">City（城市）</option>
-        <option value="消费">Consumption（消费）</option>
-        <option value="艺术">Art（艺术）</option>
-        <option value="空间">Space（空间）</option>
-        <option value="梦境">Dream（梦境）</option>
-        <option value="技术">Technology（技术）</option>
-        <option value="文化">Culture（文化）</option>
-        <option value="社会">Society（社会）</option>
-        <option value="未分类">Unknown（未分类）</option>
-      </select>
-
-      <div id="section-fields" class="section-fields"></div>
-
-      <div class="media-insert">
-        <h2>插入图片 / 视频</h2>
-        <p class="status">可以直接上传文件，或者粘贴已有图片、视频地址。插入后会进入正文，文章页会自动显示成图片或播放器。</p>
-
-        <div class="media-row">
-          <div>
-            <label for="media-kind">媒体类型</label>
-            <select id="media-kind">
-              <option value="image">图片</option>
-              <option value="video">视频</option>
-            </select>
+            <div class="media-actions">
+              <button type="button" onclick="insertMediaUrl()">插入已有地址</button>
+              <button type="button" onclick="insertMediaUrl(true)">随机插入已有地址</button>
+              <a href="media-center.html" target="_blank">打开 Media Center</a>
+            </div>
           </div>
-          <div>
-            <label for="media-target">插入位置</label>
-            <select id="media-target">
-              <option value="random">随机插入到一个段落</option>
-            </select>
+
+          <div class="actions">
+            <button class="primary" type="submit">保存案例</button>
+            <button type="button" onclick="copyPreview()">复制生成文本</button>
+            <a href="case-list.html">查看案例列表</a>
           </div>
-        </div>
+          <div id="status" class="status"></div>
+        </form>
 
-        <label for="media-caption">说明文字</label>
-        <input id="media-caption" placeholder="例如：现场界面、验证截图、演示视频">
+        <article class="preview">
+          <h2>生成预览</h2>
+          <div id="preview"></div>
+        </article>
+      </section>
+    </main>
 
-        <label for="media-url">已有图片 / 视频地址</label>
-        <input id="media-url" placeholder="https://...">
-
-        <div class="media-actions">
-          <button type="button" onclick="insertMediaUrl()">插入已有地址</button>
-          <button type="button" onclick="insertMediaUrl(true)">随机插入已有地址</button>
-          <a href="media-center.html" target="_blank">打开 Media Center</a>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="primary" type="submit">保存案例</button>
-        <button type="button" onclick="copyPreview()">复制生成文本</button>
-        <a href="case-list.html">查看案例列表</a>
-      </div>
-      <div id="status" class="status"></div>
-    </form>
-
-    <article class="preview">
-      <h2>生成预览</h2>
-      <div id="preview"></div>
-    </article>
-  </section>
-</main>
-
-<script>
-
-const TEMPLATES = {
-  A:{
-    protocolTemplate:"A",
-    title:"",
-    intro:"用于现实案例、平台案例、品牌案例、组织案例、消费者案例与政府案例。",
-    topic:"未分类",
-    knowledgeLevel:"Validation",
-    sections:["Case Number（案例编号）","Problem（问题）","Observation（观察）","Analysis（分析）","Decision（判断）","Validation（验证）","Reference（参考资料）","Related Documents（相关文章）"]
-  },
-  B:{
-    protocolTemplate:"B",
-    title:"",
-    intro:"用于原创概念、原创理论、系统框架与判断模型。",
-    topic:"未分类",
-    knowledgeLevel:"Method",
-    sections:["Concept（概念）","Definition（定义）","Background（提出背景）","Mechanism（运行机制）","Application（适用范围）","Boundary（边界）","Common Misunderstandings（常见误区）","Related Cases（相关案例）","Conclusion（结论）"]
-  },
-  C:{
-    protocolTemplate:"C",
-    title:"",
-    intro:"用于每日研究、阶段记录、观察日志与思考过程。",
-    topic:"未分类",
-    knowledgeLevel:"Observation",
-    sections:["Date（日期）","Observation（观察）","Discovery（发现）","Current Thinking（当前思考）","Questions（问题）","Need Verification（待验证）","Future Direction（未来方向）","Update History（更新记录）"]
-  },
-  D:{
-    protocolTemplate:"D",
-    title:"",
-    intro:"用于网站开发、产品开发、维权记录与长期项目。",
-    topic:"未分类",
-    knowledgeLevel:"Analysis",
-    sections:["Project Name（项目名称）","Background（背景）","Goal（目标）","Problem（问题）","Process（过程）","Solution（方案）","Result（结果）","Iteration（迭代）","Current Status（当前状态）","Future Plan（未来计划）"]
-  },
-  E:{
-    protocolTemplate:"E",
-    title:"",
-    intro:"用于视频、摄影、图片、采访、演讲与录音档案。",
-    topic:"艺术",
-    knowledgeLevel:"Observation",
-    sections:["Media Type（媒体类型）","Introduction（简介）","Related Topics（相关主题）","Related Articles（相关文章）","Media Information（媒体信息）","Additional Notes（补充说明）"]
-  },
-  X:{
-    protocolTemplate:"X",
-    title:"",
-    intro:"用于暂时无法分类、以后需要重新整理的材料。",
-    topic:"未分类",
-    knowledgeLevel:"Observation",
-    sections:["Summary（摘要）","Current Observation（当前观察）","Current Thinking（当前思考）","Possible Categories（可能分类）","Need Future Classification（是否以后分类）","Next Step（下一步）","Related Materials（相关资料）","Current Status（当前状态）"]
-  },
-  bo:{
-    protocolTemplate:"A",
-    title:"Case 001 / BO H5 Modular Upgrade",
-    intro:"围绕 H5 模块升级的结构化判断与验证记录。",
-    topic:"技术",
-    knowledgeLevel:"Validation",
-    sections:["Problem（问题）","Analysis（分析）","Decision（决策）","Validation（验证）"]
-  },
-  apple:{
-    protocolTemplate:"A",
-    title:"Case 002 / Apple 幽灵账号问题",
-    intro:"围绕异常账号、系统排查和沟通处理的案例记录。",
-    topic:"平台",
-    knowledgeLevel:"Validation",
-    sections:["系统分析","排查流程","沟通策略"]
-  },
-  architecture:{
-    protocolTemplate:"D",
-    title:"Case 003 / 网站架构",
-    intro:"记录网站从代码、数据、部署到协作工具的基础架构。",
-    topic:"技术",
-    knowledgeLevel:"Analysis",
-    sections:["GitHub","Supabase","Vercel","Codex"]
-  }
-};
-
-function escapeHtml(value){
-  return String(value || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function applyTemplate(){
-  const template = TEMPLATES[document.getElementById("template").value] || TEMPLATES.X;
-  document.getElementById("title").value = template.title;
-  document.getElementById("intro").value = template.intro;
-  document.getElementById("topic").value = template.topic;
-  document.getElementById("knowledge-level").value = template.knowledgeLevel;
-  document.getElementById("section-fields").innerHTML = template.sections.map((name, index) => `
-    <label for="section-${index}">${escapeHtml(name)}</label>
-    <textarea id="section-${index}" data-section="${escapeHtml(name)}" oninput="renderPreview()" placeholder="填写 ${escapeHtml(name)}"></textarea>
-  `).join("");
-  document.getElementById("media-target").innerHTML = `
-    <option value="random">随机插入到一个段落</option>
-    ${template.sections.map((name, index) => `<option value="section-${index}">插入到 ${escapeHtml(name)}</option>`).join("")}
-  `;
-  renderPreview();
-}
-
-function getMediaLine(kind, caption, url){
-  const label = kind === "video" ? "视频" : "图片";
-  const text = caption ? `${label}: ${caption}` : label;
-  return `[${text}](${url})`;
-}
-
-function pickTargetTextarea(forceRandom){
-  const sections = Array.from(document.querySelectorAll("[data-section]"));
-  if(!sections.length) return null;
-
-  const selected = document.getElementById("media-target").value;
-  if(forceRandom || selected === "random"){
-    return sections[Math.floor(Math.random() * sections.length)];
-  }
-
-  return document.getElementById(selected) || sections[0];
-}
-
-function appendToSection(textarea, line){
-  const current = textarea.value.trim();
-  textarea.value = current ? `${current}\n\n${line}` : line;
-  textarea.focus();
-  renderPreview();
-}
-
-function insertMediaUrl(forceRandom){
-  const status = document.getElementById("status");
-  const url = document.getElementById("media-url").value.trim();
-  const kind = document.getElementById("media-kind").value;
-  const caption = document.getElementById("media-caption").value.trim();
-  const target = pickTargetTextarea(forceRandom);
-
-  if(!url){
-    status.textContent = "请先填写图片或视频地址。";
-    return;
-  }
-
-  if(!target){
-    status.textContent = "没有找到可以插入的位置。";
-    return;
-  }
-
-  appendToSection(target, getMediaLine(kind, caption, url));
-  status.textContent = "已经插入到正文。";
-}
-
-function buildCaseText(){
-  const title = document.getElementById("title").value.trim();
-  const intro = document.getElementById("intro").value.trim();
-  const topic = document.getElementById("topic").value;
-  const sections = Array.from(document.querySelectorAll("[data-section]"));
-  const body = [
-    title,
-    "",
-    intro,
-    "",
-    `主题：${topic}`,
-    "",
-    ...sections.flatMap(item => {
-      const label = item.dataset.section;
-      const value = item.value.trim() || "待填写";
-      return [label, value, ""];
-    })
-  ];
-
-  return body.join("\n").trim();
-}
-
-function renderPreview(){
-  document.getElementById("preview").textContent = buildCaseText();
-}
-
-async function copyPreview(){
-  await navigator.clipboard.writeText(buildCaseText());
-  document.getElementById("status").textContent = "已复制生成文本。";
-}
-
-async function saveCase(){
-  const status = document.getElementById("status");
-  const title = document.getElementById("title").value.trim();
-  const intro = document.getElementById("intro").value.trim();
-  const body = buildCaseText();
-  const presetKey = document.getElementById("template").value;
-  const template = TEMPLATES[presetKey]?.protocolTemplate || presetKey;
-  const knowledgeLevel = document.getElementById("knowledge-level").value;
-
-  if(!title || !body || !template || !knowledgeLevel){
-    status.textContent = "必填项缺失：标题、正文、模板或知识层级。";
-    return;
-  }
-
-  status.textContent = "正在保存案例...";
-
-  const res = await fetch("/api/publish", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName:document.getElementById("admin-name").value.trim(),
-      password:document.getElementById("admin-password").value.trim(),
-      title,
-      intro,
-      body,
-      type:"case",
-      topic:document.getElementById("topic").value,
-      template,
-      knowledgeLevel
-    })
-  });
-
-  const result = await res.json().catch(() => ({}));
-
-  if(!res.ok){
-    status.textContent = result.error || "保存失败。";
-    return;
-  }
-
-  status.innerHTML = `保存成功。<a href="${result.url}">打开案例</a>`;
-}
-
-applyTemplate();
-</script>
-<script src="knowledge-client.js"></script>
-</body>
+    <script src="scripts/pages/case-write.js"></script>
+    <script src="scripts/core/knowledge-client.js"></script>
+  </body>
 </html>

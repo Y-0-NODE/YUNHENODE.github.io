@@ -1,343 +1,93 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>随笔账户｜云鹤系统</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.profile-shell{
-  width:100%;
-  max-width:920px;
-  margin:0 auto;
-  padding:118px clamp(18px,5vw,56px) 78px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>随笔账户｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/thought-profile.css" />
+  </head>
+  <body>
+    <header class="topbar cms-topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav>
+        <a href="thought-manage.html">写随笔</a>
+        <a href="thought.html">公开随笔</a>
+        <a href="admin.html">后台</a>
+        <a href="index.html">网站首页</a>
+      </nav>
+    </header>
 
-.profile-shell h1{
-  margin:10px 0 12px;
-  font-size:clamp(42px,7vw,82px);
-  line-height:1;
-  letter-spacing:0;
-}
+    <main class="profile-shell">
+      <p class="eyebrow">MICRO NOTES PROFILE</p>
+      <h1>随笔账户</h1>
+      <p class="intro">这里只管理头像、显示名称和签名。写随笔请回到“写随笔”页面。</p>
 
-.panel{
-  border:1px solid #292929;
-  background:#101010;
-  padding:24px;
-  margin-top:26px;
-}
+      <section id="login-panel" class="panel">
+        <label for="admin-name">管理员名称</label>
+        <input id="admin-name" value="YUNHE" autocomplete="username" />
 
-label{
-  display:block;
-  color:#aaa;
-  margin:18px 0 8px;
-}
+        <label for="admin-password">管理员密码</label>
+        <input id="admin-password" type="password" autocomplete="current-password" />
 
-input,
-textarea{
-  width:100%;
-  border:1px solid #303030;
-  background:#0b0b0b;
-  color:#f2f2f2;
-  padding:12px;
-  border-radius:0;
-}
-
-textarea{
-  min-height:140px;
-  line-height:1.8;
-  resize:vertical;
-}
-
-.avatar-row{
-  display:grid;
-  grid-template-columns:120px minmax(0,1fr);
-  gap:20px;
-  align-items:center;
-  margin-top:14px;
-}
-
-.avatar-preview{
-  width:120px;
-  height:120px;
-  border:1px solid #333;
-  border-radius:50%;
-  background:#151515;
-  object-fit:cover;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
-
-button,
-.button{
-  border:1px solid #303030;
-  background:#151515;
-  color:#f2f2f2;
-  padding:10px 14px;
-  cursor:pointer;
-  text-decoration:none;
-}
-
-button.primary{
-  background:#f2f2f2;
-  color:#0b0b0b;
-  font-weight:700;
-}
-
-.status{
-  color:#888;
-  margin-top:16px;
-  line-height:1.7;
-}
-
-.hidden{
-  display:none;
-}
-
-@media(max-width:700px){
-  .profile-shell{
-    padding:24px 14px 56px;
-  }
-
-  .avatar-row{
-    grid-template-columns:1fr;
-  }
-}
-</style>
-</head>
-<body>
-<header class="topbar cms-topbar">
-  <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
-  <nav>
-    <a href="thought-manage.html">写随笔</a>
-    <a href="thought.html">公开随笔</a>
-    <a href="admin.html">后台</a>
-    <a href="index.html">网站首页</a>
-  </nav>
-</header>
-
-<main class="profile-shell">
-  <p class="eyebrow">MICRO NOTES PROFILE</p>
-  <h1>随笔账户</h1>
-  <p class="intro">这里只管理头像、显示名称和签名。写随笔请回到“写随笔”页面。</p>
-
-  <section id="login-panel" class="panel">
-    <label for="admin-name">管理员名称</label>
-    <input id="admin-name" value="YUNHE" autocomplete="username">
-
-    <label for="admin-password">管理员密码</label>
-    <input id="admin-password" type="password" autocomplete="current-password">
-
-    <div class="actions">
-      <button class="primary" type="button" onclick="login()">登录账户设置</button>
-    </div>
-    <div id="login-status" class="status"></div>
-  </section>
-
-  <section id="profile-panel" class="panel hidden">
-    <label for="profile-name">显示名称</label>
-    <input id="profile-name" value="云鹤系统">
-
-    <label for="profile-avatar-file">头像</label>
-    <div class="avatar-row">
-      <img id="profile-avatar-preview" class="avatar-preview" src="app-icon.svg" alt="头像预览">
-      <div>
-        <input id="profile-avatar-file" type="file" accept="image/*">
         <div class="actions">
-          <button type="button" onclick="cropSelectedAvatar()">裁切并使用头像</button>
+          <button class="primary" type="button" onclick="login()">登录账户设置</button>
         </div>
-        <div class="status">头像会在本页裁成正方形圆头像，并压缩后保存到数据库，不需要图片地址。</div>
-      </div>
-    </div>
+        <div id="login-status" class="status"></div>
+      </section>
 
-    <label for="profile-avatar">头像数据</label>
-    <input id="profile-avatar" placeholder="裁切头像后自动填写，也可以粘贴 https://..." oninput="updateAvatarPreview()">
+      <section id="profile-panel" class="panel hidden">
+        <label for="profile-name">显示名称</label>
+        <input id="profile-name" value="云鹤系统" />
 
-    <label for="profile-signature">签名</label>
-    <textarea id="profile-signature" placeholder="写一句显示在随笔页上方的话"></textarea>
+        <label for="profile-avatar-file">头像</label>
+        <div class="avatar-row">
+          <img
+            id="profile-avatar-preview"
+            class="avatar-preview"
+            src="app-icon.svg"
+            alt="头像预览"
+          />
+          <div>
+            <input id="profile-avatar-file" type="file" accept="image/*" />
+            <div class="actions">
+              <button type="button" onclick="cropSelectedAvatar()">裁切并使用头像</button>
+            </div>
+            <div class="status">
+              头像会在本页裁成正方形圆头像，并压缩后保存到数据库，不需要图片地址。
+            </div>
+          </div>
+        </div>
 
-    <div class="actions">
-      <button class="primary" type="button" onclick="saveProfile()">保存资料</button>
-      <a class="button" href="thought-manage.html">去写随笔</a>
-    </div>
-    <div id="profile-status" class="status"></div>
-  </section>
-</main>
+        <label for="profile-avatar">头像数据</label>
+        <input
+          id="profile-avatar"
+          placeholder="裁切头像后自动填写，也可以粘贴 https://..."
+          oninput="updateAvatarPreview()"
+        />
 
-<script>
-let ADMIN_NAME = "";
-let ADMIN_PASSWORD = "";
-let PROFILE = null;
+        <label for="profile-signature">签名</label>
+        <textarea id="profile-signature" placeholder="写一句显示在随笔页上方的话"></textarea>
 
-function parseProfile(row){
-  try{
-    return JSON.parse(row?.body || "{}");
-  }catch(e){
-    return {};
-  }
-}
+        <div class="actions">
+          <button class="primary" type="button" onclick="saveProfile()">保存资料</button>
+          <a class="button" href="thought-manage.html">去写随笔</a>
+        </div>
+        <div id="profile-status" class="status"></div>
+      </section>
+    </main>
 
-function formatBytes(bytes){
-  if(!bytes && bytes !== 0) return "";
-  if(bytes < 1024) return `${bytes} B`;
-  if(bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
-function imageFromFile(file){
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(img);
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("图片读取失败"));
-    };
-    img.src = url;
-  });
-}
-
-function canvasToDataUrl(canvas, type, quality){
-  return canvas.toDataURL(type, quality);
-}
-
-async function cropAvatarDataUrl(file){
-  const image = await imageFromFile(file);
-  const outputType = "image/jpeg";
-  const sourceSize = Math.min(image.width, image.height);
-  const sourceX = Math.max(0, Math.round((image.width - sourceSize) / 2));
-  const sourceY = Math.max(0, Math.round((image.height - sourceSize) / 2));
-  const attempts = [
-    { size:220, quality:0.72 },
-    { size:180, quality:0.68 },
-    { size:144, quality:0.62 },
-    { size:128, quality:0.58 }
-  ];
-  let best = "";
-
-  for(const attempt of attempts){
-    const canvas = document.createElement("canvas");
-    canvas.width = attempt.size;
-    canvas.height = attempt.size;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#0b0b0b";
-    ctx.fillRect(0, 0, attempt.size, attempt.size);
-    ctx.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, attempt.size, attempt.size);
-    best = canvasToDataUrl(canvas, outputType, attempt.quality);
-    if(best.length < 50000) break;
-  }
-
-  return {
-    dataUrl:best,
-    originalSize:file.size,
-    newSize:Math.round((best.length * 3) / 4)
-  };
-}
-
-function updateAvatarPreview(){
-  const url = document.getElementById("profile-avatar").value.trim() || "app-icon.svg";
-  document.getElementById("profile-avatar-preview").src = url;
-}
-
-async function adminList(type){
-  const res = await fetch("/api/admin-list", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ adminName:ADMIN_NAME, password:ADMIN_PASSWORD, type })
-  });
-  const result = await res.json().catch(() => ({}));
-  if(!res.ok) throw new Error(result.error || "读取失败");
-  return Array.isArray(result.data) ? result.data : [];
-}
-
-async function login(){
-  ADMIN_NAME = document.getElementById("admin-name").value.trim();
-  ADMIN_PASSWORD = document.getElementById("admin-password").value.trim();
-
-  if(!ADMIN_NAME || !ADMIN_PASSWORD){
-    document.getElementById("login-status").textContent = "请填写管理员名称和密码。";
-    return;
-  }
-
-  document.getElementById("login-status").textContent = "正在登录...";
-  try{
-    const profiles = await adminList("thought_profile");
-    PROFILE = profiles[0] || null;
-    const profile = parseProfile(PROFILE);
-    document.getElementById("profile-name").value = profile.name || "云鹤系统";
-    document.getElementById("profile-avatar").value = profile.avatar || "";
-    document.getElementById("profile-signature").value = profile.signature || "";
-    updateAvatarPreview();
-    document.getElementById("login-panel").classList.add("hidden");
-    document.getElementById("profile-panel").classList.remove("hidden");
-  }catch(e){
-    document.getElementById("login-status").textContent = e.message || "登录失败。";
-  }
-}
-
-async function cropSelectedAvatar(){
-  const status = document.getElementById("profile-status");
-  const file = document.getElementById("profile-avatar-file").files[0];
-  if(!file){
-    status.textContent = "请先选择头像图片。";
-    return;
-  }
-
-  try{
-    status.textContent = "正在裁切头像...";
-    const avatar = await cropAvatarDataUrl(file);
-    document.getElementById("profile-avatar").value = avatar.dataUrl;
-    updateAvatarPreview();
-    status.textContent = `头像已裁切并预览：${formatBytes(avatar.originalSize)} → ${formatBytes(avatar.newSize)}。满意后点击“保存资料”。`;
-  }catch(e){
-    status.textContent = e.message || "头像裁切失败。";
-  }
-}
-
-function profileBody(){
-  return JSON.stringify({
-    name:document.getElementById("profile-name").value.trim() || "云鹤系统",
-    avatar:document.getElementById("profile-avatar").value.trim(),
-    signature:document.getElementById("profile-signature").value.trim()
-  });
-}
-
-async function saveProfile(){
-  const payload = {
-    adminName:ADMIN_NAME,
-    password:ADMIN_PASSWORD,
-    title:"随笔个人资料",
-    intro:document.getElementById("profile-signature").value.trim(),
-    body:profileBody(),
-    topic:"public"
-  };
-
-  const url = PROFILE?.id ? "/api/update" : "/api/publish";
-  const requestBody = PROFILE?.id ? { ...payload, id:PROFILE.id } : { ...payload, type:"thought_profile" };
-
-  const res = await fetch(url, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(requestBody)
-  });
-  const result = await res.json().catch(() => ({}));
-  if(!res.ok){
-    document.getElementById("profile-status").textContent = result.error || "资料保存失败。";
-    return;
-  }
-  PROFILE = result.data || PROFILE;
-  document.getElementById("profile-status").textContent = "资料已保存。";
-}
-
-document.getElementById("profile-avatar-file").addEventListener("change", cropSelectedAvatar);
-</script>
-</body>
+    <script src="scripts/pages/thought-profile.js"></script>
+  </body>
 </html>

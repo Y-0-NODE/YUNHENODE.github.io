@@ -1,110 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>文章｜云鹤系统</title>
-
-<style>
-body{
-  margin:0;
-  background:#0a0a0a;
-  color:#eaeaea;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
-}
-
-header{
-  display:flex;
-  justify-content:space-between;
-  padding:20px 40px;
-  border-bottom:1px solid #141414;
-}
-
-.logo{color:#aaa;font-size:13px;letter-spacing:2px;}
-
-nav a{
-  color:#777;
-  margin-left:16px;
-  text-decoration:none;
-  font-size:13px;
-}
-
-nav a:hover{color:#fff;}
-
-main{
-  max-width:1100px;
-  margin:0 auto;
-  padding:60px 40px;
-}
-
-h1{font-size:42px;margin:0;}
-.intro{color:#777;margin-top:10px;}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-top:40px;
-}
-
-.card{
-  border:1px solid #151515;
-  background:#0a0a0a;
-  padding:18px;
-  border-radius:10px;
-  text-decoration:none;
-  color:inherit;
-  transition:.2s;
-}
-
-.card:hover{
-  border-color:#2a2a2a;
-  transform:translateY(-2px);
-}
-
-.card span{
-  font-size:12px;
-  color:#666;
-}
-
-.card h2{
-  font-size:15px;
-  margin:10px 0;
-}
-
-.card p{
-  font-size:12px;
-  color:#666;
-}
-
-hr{
-  border:0;
-  border-top:1px solid #141414;
-  margin:50px 0;
-}
-
-.article-body{
-  line-height:1.8;
-  color:#ddd;
-  margin-top:20px;
-}
-</style>
-</head>
-
-<body>
-  <!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="UTF-8"><title>艺术｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
-<body>
-<header class="topbar"><a class="logo logo-back" href="index.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE</a><nav><a href="index.html">首页</a><a href="video.html">视频</a><a href="article.html">文章</a><a href="case.html">案例</a><a href="about.html">关于我</a></nav></header>
-<main class="home">
-<p class="eyebrow">RESEARCH / ART</p>
-<h1>艺术</h1>
-<p class="intro">这里收录图像、文本、作品与表达系统相关内容。</p>
-<div class="grid">
-<div class="card"><h2>视频</h2><p>艺术相关视频。</p></div>
-<div class="card"><h2>文章</h2><p>艺术分析文章。</p></div>
-<div class="card"><h2>作品</h2><p>图像与文本作品。</p></div>
-</div>
-</main>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>艺术｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/art.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo logo-back" href="index.html" aria-label="返回首页">YUNHENODE</a>
+      <nav>
+        <a href="index.html">首页</a><a href="video.html">视频</a><a href="article.html">文章</a
+        ><a href="case.html">案例</a><a href="about.html">关于我</a>
+      </nav>
+    </header>
+    <main class="home">
+      <p class="eyebrow">RESEARCH / ART</p>
+      <h1>艺术</h1>
+      <p class="intro">这里收录图像、文本、作品与表达系统相关内容。</p>
+      <div class="grid">
+        <a class="card" href="video.html"
+          ><h2>视频</h2>
+          <p>艺术相关视频。</p></a
+        >
+        <a class="card" href="article.html"
+          ><h2>文章</h2>
+          <p>艺术分析文章。</p></a
+        >
+        <a class="card" href="gallery.html"
+          ><h2>作品</h2>
+          <p>图像与文本作品。</p></a
+        >
+      </div>
+    </main>
+  </body>
 </html>
