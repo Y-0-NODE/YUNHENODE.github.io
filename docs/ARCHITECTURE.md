@@ -13,12 +13,14 @@ specific article or case.
 
 ```text
 api/                 12 Vercel entry functions (stable public endpoints)
+admin/               CMS route inventory and maintenance boundary
 assets/styles/       shared visual system
 database/migrations/ repeatable Supabase migrations
 data/                generated static data
 docs/                architecture and maintenance documentation
 legacy/              retired code retained for reference
 lib/                 server-only repositories, services and request helpers
+pages/               public route inventory; root filenames remain compatibility entries
 scripts/core/        browser configuration, utilities and API client
 scripts/integrations external service adapters with stable root compatibility entries
 scripts/pages/       one controller per migrated page

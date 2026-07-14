@@ -9,12 +9,34 @@
     "content-list.json": "Supabase contents table",
     "local-gallery.json": "data/local-gallery.json"
   },
-  "retainedRootCompatibility": [
+  "archivedPages": [
+    "about-contact.html",
+    "about-cooperation.html",
+    "about-method.html",
+    "about-profile.html",
+    "art.html",
+    "brand.html",
+    "case-draft.html",
+    "city.html",
+    "consumption.html",
     "content-1782904492588-.html",
     "content-1782905129365.html",
     "content-1782909000817.html",
     "content-1782910180371.html",
+    "dream.html",
+    "organization.html",
+    "platform.html",
     "post-001.html",
+    "space.html",
+    "video-draft.html",
     "video-post-001.html"
+    ,"video-upload.html",
+    "wechat-connect.html"
+  ],
+  "archivedTemplates": [
+    "post.html",
+    "case-post.html",
+    "video-post.html",
+    "theme-template.html"
   ]
 }

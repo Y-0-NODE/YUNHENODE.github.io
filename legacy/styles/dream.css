@@ -1,0 +1,12 @@
+.diary-panel {
+  border: 1px solid #2a2a2a;
+  background: #111;
+  padding: 24px;
+  margin-top: 48px;
+  line-height: 1.8;
+  color: #aaa;
+}
+
+.diary-panel strong {
+  color: #f2f2f2;
+}

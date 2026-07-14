@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>内部日记｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/dream.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav>
+        <a href="admin.html">后台首页</a>
+        <a href="article-manage.html">文章管理</a>
+        <a href="index.html">网站首页</a>
+      </nav>
+    </header>
+
+    <main class="home">
+      <p class="eyebrow">PRIVATE DIARY</p>
+      <h1>内部日记</h1>
+      <p class="intro">这个页面预留给你自己的私人记录系统。</p>
+
+      <div class="diary-panel">
+        <strong>下一步可以做成两种方式：</strong>
+        <br />
+        方式一：网页内部日记，登录后写入 Supabase 私有表。
+        <br />
+        方式二：电脑 App，本地保存日记，再同步到网站后台。
+        <br /><br />
+        建议先做方式一，稳定后再接桌面 App。
+      </div>
+    </main>
+  </body>
+</html>

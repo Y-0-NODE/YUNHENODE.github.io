@@ -12,6 +12,9 @@
 - Formatted the active repository with Prettier.
 - Added automatic architecture, syntax, link, asset and function-count checks.
 - Added `legacy/` policy, manifest, orphaned files, old data and template snapshots.
+- Removed 26 deprecated HTML files from the active root and archived them under `legacy/`.
+- Removed orphan page scripts and styles from the active `scripts/pages` and page-style folders.
+- Consolidated repeated HTML escaping and date conversion in `scripts/core/utils.js`.
 - Preserved all current public route names and CMS entry points.
 
 ## Compatibility
