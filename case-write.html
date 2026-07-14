@@ -162,11 +162,23 @@
       <label for="admin-password">管理员密码</label>
       <input id="admin-password" type="password" autocomplete="current-password">
 
-      <label for="template">案例模板</label>
+      <label for="template">Template（模板）</label>
       <select id="template" onchange="applyTemplate()">
-        <option value="bo">Case 001 / BO H5 Modular Upgrade</option>
-        <option value="apple">Case 002 / Apple 幽灵账号问题</option>
-        <option value="architecture">Case 003 / 网站架构</option>
+        <option value="A">A｜Case Archive（案例库）</option>
+        <option value="B">B｜Method Archive（方法库）</option>
+        <option value="C">C｜Research Notes（研究记录）</option>
+        <option value="D">D｜Project Archive（项目档案）</option>
+        <option value="E">E｜Media Archive（媒体库）</option>
+        <option value="X">X｜X Archive（未分类档案）</option>
+      </select>
+
+      <label for="knowledge-level">Knowledge Level（知识层级）</label>
+      <select id="knowledge-level" onchange="renderPreview()" required>
+        <option value="Observation">Observation（观察）</option>
+        <option value="Analysis">Analysis（分析）</option>
+        <option value="Decision">Decision（判断）</option>
+        <option value="Validation">Validation（验证）</option>
+        <option value="Method">Method（方法）</option>
       </select>
 
       <label for="title">标题</label>
@@ -177,14 +189,18 @@
 
       <label for="topic">主题</label>
       <select id="topic" onchange="renderPreview()">
-        <option value="平台">平台</option>
-        <option value="品牌">品牌</option>
-        <option value="城市">城市</option>
-        <option value="组织">组织</option>
-        <option value="消费">消费</option>
-        <option value="艺术">艺术</option>
-        <option value="空间">空间</option>
-        <option value="技术">技术</option>
+        <option value="平台">Platform（平台）</option>
+        <option value="品牌">Brand（品牌）</option>
+        <option value="组织">Organization（组织）</option>
+        <option value="城市">City（城市）</option>
+        <option value="消费">Consumption（消费）</option>
+        <option value="艺术">Art（艺术）</option>
+        <option value="空间">Space（空间）</option>
+        <option value="梦境">Dream（梦境）</option>
+        <option value="技术">Technology（技术）</option>
+        <option value="文化">Culture（文化）</option>
+        <option value="社会">Society（社会）</option>
+        <option value="未分类">Unknown（未分类）</option>
       </select>
 
       <div id="section-fields" class="section-fields"></div>
@@ -246,23 +262,47 @@ const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
 
 const TEMPLATES = {
-  bo:{
-    title:"Case 001 / BO H5 Modular Upgrade",
-    intro:"围绕 H5 模块升级的结构化判断与验证记录。",
-    topic:"技术",
-    sections:["Problem（问题）","Analysis（分析）","Decision（决策）","Validation（验证）"]
+  A:{
+    title:"",
+    intro:"用于现实案例、平台案例、品牌案例、组织案例、消费者案例与政府案例。",
+    topic:"未分类",
+    knowledgeLevel:"Validation",
+    sections:["Case Number（案例编号）","Problem（问题）","Observation（观察）","Analysis（分析）","Decision（判断）","Validation（验证）","Reference（参考资料）","Related Documents（相关文章）"]
   },
-  apple:{
-    title:"Case 002 / Apple 幽灵账号问题",
-    intro:"围绕异常账号、系统排查和沟通处理的案例记录。",
-    topic:"平台",
-    sections:["系统分析","排查流程","沟通策略"]
+  B:{
+    title:"",
+    intro:"用于原创概念、原创理论、系统框架与判断模型。",
+    topic:"未分类",
+    knowledgeLevel:"Method",
+    sections:["Concept（概念）","Definition（定义）","Background（提出背景）","Mechanism（运行机制）","Application（适用范围）","Boundary（边界）","Common Misunderstandings（常见误区）","Related Cases（相关案例）","Conclusion（结论）"]
   },
-  architecture:{
-    title:"Case 003 / 网站架构",
-    intro:"记录网站从代码、数据、部署到协作工具的基础架构。",
-    topic:"技术",
-    sections:["GitHub","Supabase","Vercel","Codex"]
+  C:{
+    title:"",
+    intro:"用于每日研究、阶段记录、观察日志与思考过程。",
+    topic:"未分类",
+    knowledgeLevel:"Observation",
+    sections:["Date（日期）","Observation（观察）","Discovery（发现）","Current Thinking（当前思考）","Questions（问题）","Need Verification（待验证）","Future Direction（未来方向）","Update History（更新记录）"]
+  },
+  D:{
+    title:"",
+    intro:"用于网站开发、产品开发、维权记录与长期项目。",
+    topic:"未分类",
+    knowledgeLevel:"Analysis",
+    sections:["Project Name（项目名称）","Background（背景）","Goal（目标）","Problem（问题）","Process（过程）","Solution（方案）","Result（结果）","Iteration（迭代）","Current Status（当前状态）","Future Plan（未来计划）"]
+  },
+  E:{
+    title:"",
+    intro:"用于视频、摄影、图片、采访、演讲与录音档案。",
+    topic:"艺术",
+    knowledgeLevel:"Observation",
+    sections:["Media Type（媒体类型）","Introduction（简介）","Related Topics（相关主题）","Related Articles（相关文章）","Media Information（媒体信息）","Additional Notes（补充说明）"]
+  },
+  X:{
+    title:"",
+    intro:"用于暂时无法分类、以后需要重新整理的材料。",
+    topic:"未分类",
+    knowledgeLevel:"Observation",
+    sections:["Summary（摘要）","Current Observation（当前观察）","Current Thinking（当前思考）","Possible Categories（可能分类）","Need Future Classification（是否以后分类）","Next Step（下一步）","Related Materials（相关资料）","Current Status（当前状态）"]
   }
 };
 
@@ -280,6 +320,7 @@ function applyTemplate(){
   document.getElementById("title").value = template.title;
   document.getElementById("intro").value = template.intro;
   document.getElementById("topic").value = template.topic;
+  document.getElementById("knowledge-level").value = template.knowledgeLevel;
   document.getElementById("section-fields").innerHTML = template.sections.map((name, index) => `
     <label for="section-${index}">${escapeHtml(name)}</label>
     <textarea id="section-${index}" data-section="${escapeHtml(name)}" oninput="renderPreview()" placeholder="填写 ${escapeHtml(name)}"></textarea>
@@ -454,9 +495,11 @@ async function saveCase(){
   const title = document.getElementById("title").value.trim();
   const intro = document.getElementById("intro").value.trim();
   const body = buildCaseText();
+  const template = document.getElementById("template").value;
+  const knowledgeLevel = document.getElementById("knowledge-level").value;
 
-  if(!title || !body){
-    status.textContent = "标题和正文不能为空。";
+  if(!title || !body || !template || !knowledgeLevel){
+    status.textContent = "必填项缺失：标题、正文、模板或知识层级。";
     return;
   }
 
@@ -472,7 +515,9 @@ async function saveCase(){
       intro,
       body,
       type:"case",
-      topic:document.getElementById("topic").value
+      topic:document.getElementById("topic").value,
+      template,
+      knowledgeLevel
     })
   });
 
