@@ -1,15 +1,46 @@
+body {
+  position: relative;
+  min-height: 100vh;
+  background: #f8f8f6;
+  color: #111;
+}
+
+body::before {
+  position: fixed;
+  inset: 72px auto 0 0;
+  z-index: -1;
+  width: min(76vw, 1080px);
+  content: "";
+  background: url("../../images/visitor-ink-bg.jpg") left center / contain no-repeat;
+  pointer-events: none;
+}
+
+.topbar {
+  background: rgba(248, 248, 246, 0.9);
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.topbar .logo,
+.topbar .logo:visited,
+.topbar .logo:hover,
+.topbar .logo:focus-visible,
+.topbar nav a,
+.topbar nav a:hover {
+  color: #111;
+}
+
 .visitor-shell {
-  width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 150px clamp(20px, 5vw, 56px) 90px;
+  width: min(760px, calc(100% - 40px));
+  margin: 0 clamp(20px, 7vw, 110px) 0 auto;
+  padding: 150px 0 90px;
 }
 
 .visitor-hero {
   min-height: 46vh;
   display: grid;
   align-content: center;
-  border-bottom: 1px solid #292929;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
   padding-bottom: 54px;
 }
 
@@ -23,9 +54,13 @@
 
 .visitor-hero p {
   max-width: 760px;
-  color: #cfcfcf;
+  color: #343434;
   font-size: 20px;
   line-height: 1.8;
+}
+
+.eyebrow {
+  color: #555;
 }
 
 .visitor-grid {
@@ -38,15 +73,28 @@
 .visitor-card {
   display: block;
   min-height: 230px;
-  border: 1px solid #2a2a2a;
-  background: #101010;
-  color: #f2f2f2;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: rgba(248, 248, 246, 0.82);
+  color: #111;
   text-decoration: none;
   padding: 26px;
+  backdrop-filter: blur(10px);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.visitor-card:hover,
+.visitor-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.94);
+  outline: none;
 }
 
 .visitor-card span {
-  color: #777;
+  color: #666;
   font-size: 13px;
 }
 
@@ -58,27 +106,43 @@
 }
 
 .visitor-card p {
-  color: #aaa;
+  color: #444;
   line-height: 1.75;
   max-width: 520px;
 }
 
 .visitor-note {
   margin-top: 52px;
-  border-top: 1px solid #292929;
+  border-top: 1px solid rgba(0, 0, 0, 0.18);
   padding-top: 20px;
-  color: #8f8f8f;
+  color: #555;
   font-size: 14px;
   line-height: 1.8;
 }
 
 @media (max-width: 760px) {
+  body::before {
+    inset: 96px 0 auto;
+    width: 100%;
+    height: 100vw;
+    background-position: left top;
+    background-size: 100vw auto;
+  }
+
+  .topbar nav a {
+    border-color: rgba(0, 0, 0, 0.14);
+    background: rgba(255, 255, 255, 0.7);
+  }
+
   .visitor-shell {
-    padding: 34px 14px 58px;
+    width: auto;
+    margin: 0 14px;
+    padding: 28px 0 58px;
   }
 
   .visitor-hero {
     min-height: auto;
+    padding-top: min(54vw, 220px);
     padding-bottom: 34px;
   }
 
