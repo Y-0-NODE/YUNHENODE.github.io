@@ -236,38 +236,6 @@ button.danger{
   display:none;
 }
 
-.cms-back-logo{
-  position:relative;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:0;
-  background:transparent;
-  color:#f2f2f2;
-  padding:8px 0;
-  font-size:18px;
-  font-weight:700;
-  letter-spacing:2px;
-  cursor:pointer;
-}
-
-.cms-back-logo .back-mark{
-  color:#858585;
-  border:1px solid #343434;
-  padding:1px 5px 2px;
-  font-size:11px;
-  font-weight:400;
-  letter-spacing:0;
-  line-height:1;
-  opacity:.72;
-}
-
-.cms-back-logo:hover .back-mark,
-.cms-back-logo:focus-visible .back-mark{
-  color:#c8c8c8;
-  border-color:#555;
-}
-
 @media(max-width:860px){
   .manage-shell{
     padding:24px 14px 56px;
@@ -304,29 +272,12 @@ button.danger{
     min-height:160px;
   }
 
-  .cms-back-logo{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:3px;
-    padding:4px 0;
-    font-size:15px;
-  }
-
-  .cms-back-logo .back-mark{
-    order:-1;
-    border:0;
-    padding:0;
-    font-size:12px;
-  }
 }
 </style>
 </head>
 <body>
 <header class="topbar cms-topbar">
-  <button class="cms-back-logo" type="button" onclick="goBack()" aria-label="返回上一页">
-    <span>YUNHENODE CMS</span>
-    <small class="back-mark" aria-hidden="true">↩</small>
-  </button>
+  <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
   <nav>
     <a href="thought.html">公开随笔</a>
     <a href="thought-profile.html">账户</a>
@@ -427,14 +378,6 @@ button.danger{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-function goBack(){
-  if(window.history.length > 1){
-    window.history.back();
-    return;
-  }
-  window.location.href = "admin.html";
-}
-
 let ADMIN_NAME = "";
 let ADMIN_PASSWORD = "";
 let POSTS = [];
