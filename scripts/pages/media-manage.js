@@ -309,3 +309,4 @@ async function uploadMedia() {
 }
 
 setupSelectedFilePreview();
+
