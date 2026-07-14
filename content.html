@@ -545,24 +545,11 @@ fetch(`${SUPABASE_URL}/rest/v1/contents?select=title,intro,body,type,topic,creat
 
 function renderArticleTools(post){
   const tools = document.getElementById("manage-tools");
-  const manageParams = new URLSearchParams();
   const contentType = post.type === "case" ? "case" : "article";
-  const typeLabel = contentType === "case" ? "案例" : "文章";
   const listUrl = contentType === "case" ? "case-list.html" : "article-list.html";
-  const createUrl = contentType === "case" ? "case-write.html" : "publish.html";
   document.getElementById("back-link").href = listUrl;
-
-  if(id) manageParams.set("id", id);
-  if(slug) manageParams.set("slug", slug);
-  if(post.title) manageParams.set("title", post.title);
-  manageParams.set("type", contentType);
-
-  tools.hidden = false;
-  tools.innerHTML = `
-    <a href="article-manage.html?${manageParams.toString()}">编辑/删除${typeLabel}</a>
-    <a href="article-manage.html?type=${contentType}">${typeLabel}管理</a>
-    <a href="${createUrl}">新建${typeLabel}</a>
-  `;
+  tools.hidden = true;
+  tools.innerHTML = "";
 }
 </script>
 </body>
