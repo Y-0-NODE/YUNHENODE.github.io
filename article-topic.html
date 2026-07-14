@@ -1,59 +1,106 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><title>主题文章｜云鹤系统</title><link rel="stylesheet" href="style.css"></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主题文章｜云鹤系统</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.status{color:#888;margin-top:32px;line-height:1.8;}
+.topic-list{display:grid;gap:14px;margin-top:46px;}
+.topic-row{
+  display:grid;
+  grid-template-columns:150px minmax(0,1fr);
+  gap:26px;
+  border-top:1px solid #2a2a2a;
+  padding:24px 0;
+  color:#f2f2f2;
+  text-decoration:none;
+}
+.topic-row .date{color:#888;font-size:14px;line-height:1.8;}
+.topic-row h2{margin:0;font-size:clamp(27px,4vw,52px);line-height:1.1;}
+.topic-row p{color:#999;line-height:1.8;margin:14px 0 0;}
+@media(max-width:700px){.topic-row{grid-template-columns:1fr;gap:8px;}}
+</style>
+</head>
 <body>
-<header class="topbar"><div class="logo">YUNHENODE</div><nav><a href="article-category.html">返回分类</a><a href="article.html">返回文章</a></nav></header>
+<header class="topbar">
+  <div class="logo">YUNHENODE</div>
+  <nav>
+    <a href="visitor.html">访客入口</a>
+    <a href="article-list.html">文章</a>
+    <a href="article-category.html">分类</a>
+    <a href="case-list.html">案例</a>
+    <a href="gallery.html">作品</a>
+  </nav>
+</header>
 
 <main class="home">
-<p class="eyebrow">ARTICLE / TOPIC</p>
-<h1 id="title">主题文章</h1>
-<p class="intro">这里显示该主题下的文章。</p>
-<div id="list" class="grid"></div>
+  <p class="eyebrow">ARTICLE / TOPIC</p>
+  <h1 id="title">主题文章</h1>
+  <p id="intro" class="intro">这里显示该主题下的公开文章。</p>
+  <div id="status" class="status">正在加载文章...</div>
+  <section id="list" class="topic-list"></section>
 </main>
 
 <script>
-async function loadTopic(){
- const params = new URLSearchParams(location.search);
-const topic = params.get("topic");
+const SUPABASE_URL = "https://ndraugyrdnecqqcyfzjt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM";
 
-fetch(`${SUPABASE_URL}/rest/v1/contents?topic=eq.${topic}`, {
-  headers:{
-    apikey: KEY,
-    Authorization:`Bearer ${KEY}`
-  }
-})
-.then(r=>r.json())
-.then(data=>{
-  document.getElementById("list").innerHTML = data.map(item=>`
-    <a href="content.html?slug=${item.slug}" class="card">
-      <h2>${item.title}</h2>
-      <p>${item.intro}</p>
-    </a>
-  `).join("");
-});
-
-  const res = await fetch("content-list.json");
-  const data = await res.json();
-
-  const articles = data.filter(item =>
-    item.type === "article" && (item.topic === topic || item.tag === topic)
-  );
-
-  const box = document.getElementById("list");
-
-  if (!articles.length) {
-    box.innerHTML = "<p>暂无该主题文章。</p>";
-    return;
-  }
-
-  box.innerHTML = articles.map(item => `
-    <a class="card" href="${item.url}">
-      <span>${item.topic || item.tag || "ARTICLE"}</span>
-      <h2>${item.title}</h2>
-      <p>${item.intro}</p>
-    </a>
-  `).join("");
+function escapeHtml(value){
+  return String(value || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
+
+function articleUrl(item){
+  if(item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
+  return `content.html?id=${encodeURIComponent(item.id)}`;
+}
+
+async function loadTopic(){
+  const topic = new URLSearchParams(location.search).get("topic") || "未分类";
+  const title = document.getElementById("title");
+  const status = document.getElementById("status");
+  const list = document.getElementById("list");
+  title.textContent = topic;
+  document.title = `${topic}｜文章分类｜云鹤系统`;
+
+  try{
+    const query = `select=id,title,slug,intro,topic,created_at&type=eq.article&topic=eq.${encodeURIComponent(topic)}&order=created_at.desc`;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/contents?${query}`, {
+      headers:{
+        apikey:SUPABASE_KEY,
+        Authorization:`Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if(!res.ok) throw new Error("load failed");
+    const data = await res.json();
+    const articles = Array.isArray(data) ? data : [];
+
+    if(!articles.length){
+      status.textContent = `“${topic}”分类下暂时没有文章。`;
+      return;
+    }
+
+    status.textContent = `共 ${articles.length} 篇文章。`;
+    list.innerHTML = articles.map(item => `
+      <a class="topic-row" href="${articleUrl(item)}">
+        <div class="date">${escapeHtml(item.topic || topic)}<br>${String(item.created_at || "").slice(0,10)}</div>
+        <div>
+          <h2>${escapeHtml(item.title || "未命名文章")}</h2>
+          <p>${escapeHtml(item.intro || "")}</p>
+        </div>
+      </a>
+    `).join("");
+  }catch(e){
+    status.textContent = "主题文章加载失败，请检查 Supabase 配置。";
+  }
+}
+
 loadTopic();
 </script>
 </body>
