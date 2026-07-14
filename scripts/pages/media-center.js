@@ -11,6 +11,13 @@ function preview(x) {
   if (x.kind === "document") return '<div class="file-icon">PDF</div>';
   return `<img src="${esc(x.url)}" alt="${esc(x.title || "媒体")}">`;
 }
+function previewLink(x) {
+  const content = preview(x);
+  if (!["photo", "asset"].includes(x.kind) || !x.url) {
+    return `<div class="preview">${content}</div>`;
+  }
+  return `<a class="preview" href="${esc(x.url)}" target="_blank" rel="noopener" title="点击查看大图">${content}</a>`;
+}
 function render() {
   const q = document.getElementById("query").value.toLowerCase(),
     kind = document.getElementById("kind").value;
@@ -24,7 +31,7 @@ function render() {
     rows
       .map(
         x =>
-          `<article class="media-card"><div class="preview">${preview(x)}</div><div class="meta"><h2>${esc(x.title || "未命名资源")}</h2><p>${esc(x.description || x.kind || "")}</p><div class="actions"><button onclick="copyUrl('${encodeURIComponent(x.url || "")}')">复制引用地址</button><a class="button" href="media-edit.html?id=${encodeURIComponent(x.id)}">编辑信息</a></div></div></article>`
+          `<article class="media-card">${previewLink(x)}<div class="meta"><h2>${esc(x.title || "未命名资源")}</h2><p>${esc(x.description || x.kind || "")}</p><div class="actions">${["photo", "asset"].includes(x.kind) && x.url ? `<a class="button" href="${esc(x.url)}" target="_blank" rel="noopener">查看大图</a>` : ""}<button onclick="copyUrl('${encodeURIComponent(x.url || "")}')">复制引用地址</button><a class="button" href="media-edit.html?id=${encodeURIComponent(x.id)}">编辑信息</a></div></div></article>`
       )
       .join("") || '<p class="status">该类型暂无资源。</p>';
 }
