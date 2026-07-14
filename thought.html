@@ -221,7 +221,9 @@ function parseProfile(row){
 
 function renderMedia(text){
   const media = [];
-  const body = String(text || "").replace(/\[(图片|视频)(?::\s*([^\]]+))?\]\((https?:\/\/[^)]+)\)/g, (_, kind, caption, url) => {
+  const body = String(text || "")
+  .replace(/\n*<!--yunhe-meta:[\s\S]*?-->\s*$/m, "")
+  .replace(/\[(图片|视频)(?::\s*([^\]]+))?\]\((https?:\/\/[^)]+)\)/g, (_, kind, caption, url) => {
     media.push({ kind, caption: caption || "", url });
     return "";
   }).trim();
