@@ -58,20 +58,11 @@ async function loadGallery() {
   status.textContent = "正在加载作品...";
   try {
     const cacheKey = Date.now();
-    const [remoteResult, localResult] = await Promise.all([
-      loadJson(`./api/media-list?refresh=${cacheKey}`, { data: [] }),
-      loadJson(`./data/local-gallery.json?refresh=${cacheKey}`, [])
-    ]);
-    const remoteList = Array.isArray(remoteResult.data)
+    const remoteResult = await loadJson(`./api/media-list?refresh=${cacheKey}`, { data: [] });
+    const list = Array.isArray(remoteResult.data)
       ? remoteResult.data.filter(item => ["photo", "video"].includes(item.kind))
       : [];
-    const remoteUrls = new Set(remoteList.map(item => item.url));
-    const localList = Array.isArray(localResult)
-      ? localResult.filter(item => !remoteUrls.has(item.url))
-      : [];
-    const list = [...remoteList, ...localList].sort((a, b) =>
-      String(b.created_at || "").localeCompare(String(a.created_at || ""))
-    );
+    list.sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
     if (!list.length) {
       status.textContent = "暂时没有作品。";
       gallery.innerHTML = "";
