@@ -157,15 +157,45 @@
           <label for="topic">主题分类</label>
           <select id="topic" onchange="renderPreview()">
             <option value="auto">自动判断</option>
-            <option value="平台">平台</option>
-            <option value="品牌">品牌</option>
-            <option value="城市">城市</option>
-            <option value="组织">组织</option>
-            <option value="消费">消费</option>
-            <option value="艺术">艺术</option>
-            <option value="空间">空间</option>
-            <option value="技术">技术</option>
-            <option value="梦境">梦境</option>
+            <optgroup label="原有分类（全部保留）">
+              <option value="平台">平台</option>
+              <option value="品牌">品牌</option>
+              <option value="城市">城市</option>
+              <option value="组织">组织</option>
+              <option value="消费">消费</option>
+              <option value="艺术">艺术</option>
+              <option value="空间">空间</option>
+              <option value="技术">技术</option>
+              <option value="梦境">梦境</option>
+            </optgroup>
+            <optgroup label="人与关系">
+              <option value="情感与关系">情感与关系</option>
+              <option value="亲密关系与家庭">亲密关系与家庭</option>
+              <option value="沟通与冲突">沟通与冲突</option>
+              <option value="个体成长">个体成长</option>
+            </optgroup>
+            <optgroup label="组织与系统">
+              <option value="组织结构">组织结构</option>
+              <option value="系统机制">系统机制</option>
+              <option value="管理与协作">管理与协作</option>
+              <option value="平台与技术">平台与技术</option>
+            </optgroup>
+            <optgroup label="社会与现实">
+              <option value="社会观察">社会观察</option>
+              <option value="城市与空间">城市与空间</option>
+              <option value="消费与生活">消费与生活</option>
+              <option value="商业与品牌">商业与品牌</option>
+            </optgroup>
+            <optgroup label="创作与内在">
+              <option value="艺术与创作">艺术与创作</option>
+              <option value="方法与思考">方法与思考</option>
+              <option value="梦境与潜意识">梦境与潜意识</option>
+            </optgroup>
+            <optgroup label="协议补充分类">
+              <option value="文化">Culture（文化）</option>
+              <option value="社会">Society（社会）</option>
+              <option value="未分类">Unknown（未分类）</option>
+            </optgroup>
           </select>
         </div>
       </div>
@@ -202,15 +232,31 @@
 
 <script>
 const TOPIC_RULES = [
-  ["技术", ["github", "supabase", "vercel", "codex", "api", "h5", "网站", "架构", "模块", "部署", "数据库", "系统"]],
-  ["平台", ["apple", "账号", "微信", "公众号", "小程序", "平台", "系统", "后台"]],
-  ["品牌", ["品牌", "logo", "视觉", "包装", "定位", "传播"]],
-  ["城市", ["城市", "街区", "地方", "社区", "公共", "现场"]],
-  ["组织", ["组织", "公司", "团队", "机构", "协作"]],
-  ["消费", ["消费", "用户", "产品", "购买", "服务", "体验"]],
-  ["艺术", ["艺术", "摄影", "影像", "展览", "作品", "图像"]],
-  ["空间", ["空间", "建筑", "场地", "室内", "装置"]],
-  ["梦境", ["梦", "梦境", "潜意识", "象征"]]
+  ["亲密关系与家庭", ["亲密关系", "婚姻", "伴侣", "夫妻", "家庭", "父母", "亲子", "婆媳"]],
+  ["沟通与冲突", ["沟通", "冲突", "争吵", "表达", "协商", "误解", "冷战", "和解"]],
+  ["情感与关系", ["情感", "感情", "关系", "恋爱", "分手", "依恋", "信任", "边界"]],
+  ["个体成长", ["成长", "自我", "选择", "焦虑", "情绪", "心理", "疗愈", "反思"]],
+  ["组织结构", ["组织结构", "权责", "岗位", "层级", "部门", "架构调整", "职能"]],
+  ["系统机制", ["系统机制", "运行机制", "失效", "闭环", "规则", "权限", "治理", "退出机制"]],
+  ["管理与协作", ["管理", "协作", "团队", "流程", "执行", "决策", "项目管理", "分工"]],
+  ["平台与技术", ["github", "supabase", "vercel", "codex", "api", "h5", "数据库", "部署", "算法", "软件", "人工智能"]],
+  ["社会观察", ["社会观察", "社会现象", "群体", "公共议题", "政策", "舆论", "时代", "现实"]],
+  ["城市与空间", ["城市", "街区", "社区", "空间", "建筑", "场地", "室内", "公共空间"]],
+  ["消费与生活", ["消费", "购买", "服务", "体验", "生活方式", "日常", "用户体验"]],
+  ["商业与品牌", ["品牌", "商业", "市场", "营销", "logo", "包装", "定位", "传播"]],
+  ["艺术与创作", ["艺术", "摄影", "影像", "展览", "作品", "图像", "创作", "设计"]],
+  ["方法与思考", ["方法", "方法论", "框架", "模型", "判断模型", "判断方法", "分析方法", "研究方法"]],
+  ["梦境与潜意识", ["梦境", "潜意识", "象征", "梦中", "做梦"]],
+  ["文化", ["文化", "传统", "习俗", "审美", "历史", "叙事"]],
+  ["平台", ["apple", "账号", "微信", "公众号", "小程序", "平台", "后台"]],
+  ["技术", ["网站", "架构", "模块", "技术", "系统开发"]],
+  ["组织", ["组织", "公司", "机构"]],
+  ["品牌", ["品牌"]],
+  ["城市", ["城市", "地方"]],
+  ["消费", ["消费", "产品"]],
+  ["艺术", ["艺术", "作品"]],
+  ["空间", ["空间", "建筑"]],
+  ["梦境", ["梦"]]
 ];
 
 function cleanLines(text){
@@ -224,8 +270,13 @@ function cleanLines(text){
 
 function detectTopic(text){
   const lower = String(text || "").toLowerCase();
-  const found = TOPIC_RULES.find(([, words]) => words.some(word => lower.includes(word)));
-  return found ? found[0] : "平台";
+  const ranked = TOPIC_RULES.map(([topic, words], priority) => {
+    const matches = words.filter(word => lower.includes(String(word).toLowerCase()));
+    const score = matches.reduce((total, word) => total + Math.max(1, String(word).length), 0);
+    return { topic, score, matchCount:matches.length, priority };
+  }).filter(item => item.matchCount > 0)
+    .sort((a, b) => b.score - a.score || b.matchCount - a.matchCount || a.priority - b.priority);
+  return ranked[0]?.topic || "未分类";
 }
 
 function detectType(text){
