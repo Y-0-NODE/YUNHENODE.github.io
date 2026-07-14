@@ -96,6 +96,32 @@
 
   <div class="publish-row">
     <div>
+      <label for="template">Template（模板）</label>
+      <select id="template" required>
+        <option value="" selected disabled>请选择模板</option>
+        <option value="A">A｜Case Archive（案例库）</option>
+        <option value="B">B｜Method Archive（方法库）</option>
+        <option value="C">C｜Research Notes（研究记录）</option>
+        <option value="D">D｜Project Archive（项目档案）</option>
+        <option value="E">E｜Media Archive（媒体库）</option>
+        <option value="X">X｜X Archive（未分类档案）</option>
+      </select>
+    </div>
+    <div>
+      <label for="knowledge-level">Knowledge Level（知识层级）</label>
+      <select id="knowledge-level" required>
+        <option value="" selected disabled>请选择知识层级</option>
+        <option value="Observation">Observation（观察）</option>
+        <option value="Analysis">Analysis（分析）</option>
+        <option value="Decision">Decision（判断）</option>
+        <option value="Validation">Validation（验证）</option>
+        <option value="Method">Method（方法）</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="publish-row">
+    <div>
       <label for="type">内容类型</label>
       <select id="type">
         <option value="article">文章</option>
@@ -181,6 +207,8 @@ async function publishToSite() {
   const password = document.getElementById("password").value.trim();
   const type = document.getElementById("type").value;
   const topic = document.getElementById("topic").value;
+  const template = document.getElementById("template").value;
+  const knowledgeLevel = document.getElementById("knowledge-level").value;
   const title = document.getElementById("title").value.trim();
   const subtitle = document.getElementById("subtitle").value.trim();
   const intro = document.getElementById("intro").value.trim();
@@ -190,8 +218,8 @@ async function publishToSite() {
   const body = document.getElementById("body").value.trim();
   const output = document.getElementById("output");
 
-  if (!adminName || !password || !title || !body) {
-    output.textContent = "必填项缺失：管理员名称 / 密码 / 标题 / 正文";
+  if (!adminName || !password || !title || !body || !template || !knowledgeLevel) {
+    output.textContent = "必填项缺失：管理员名称 / 密码 / 标题 / 正文 / 模板 / 知识层级";
     return;
   }
 
@@ -214,6 +242,8 @@ async function publishToSite() {
         body,
         type,
         topic,
+        template,
+        knowledgeLevel,
         video
       })
     });
