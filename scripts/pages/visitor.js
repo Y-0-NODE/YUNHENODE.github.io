@@ -14,6 +14,8 @@ function injectVisitorBrowseStyles() {
     body.visitor-browse-mode .intro,body.visitor-browse-mode .status,body.visitor-browse-mode .eyebrow,body.visitor-browse-mode p{color:#444}
     body.visitor-browse-mode .card,body.visitor-browse-mode .article-row,body.visitor-browse-mode .work,body.visitor-browse-mode .mini-card,body.visitor-browse-mode .about-section,body.visitor-browse-mode .roadmap,body.visitor-browse-mode .route-step{background:#fff!important;color:#111!important;border-color:#ddd!important}
     body.visitor-browse-mode .card h2,body.visitor-browse-mode .article-row h2,body.visitor-browse-mode .work h2,body.visitor-browse-mode h1,body.visitor-browse-mode h2,body.visitor-browse-mode h3{color:#111!important}
+    body.visitor-browse-mode .article-row h2{font-size:clamp(20px,2.2vw,32px)!important;line-height:1.25!important}
+    body.visitor-browse-mode .reading-shell>h1{font-size:clamp(32px,4.2vw,60px)!important;line-height:1.12!important}
     body.visitor-browse-mode .article-row:visited,body.visitor-browse-mode .article-row:active{color:#111!important}
     body.visitor-browse-mode button,body.visitor-browse-mode input,body.visitor-browse-mode select{background:#fff!important;color:#111!important;border-color:#bbb!important}
     body.visitor-browse-mode .detail{background:rgba(255,255,255,.97)!important;color:#111!important}

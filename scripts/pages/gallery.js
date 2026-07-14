@@ -14,6 +14,15 @@ async function loadJson(url, fallback) {
 
 const formatDateTime = window.YunheUtils.formatDateTime;
 
+const PUBLIC_MEDIA_API = "https://yunhenode-github-io-qwu7.vercel.app/api/media-list";
+
+async function loadPublishedMedia(cacheKey) {
+  const localResult = await loadJson(`./api/media-list?refresh=${cacheKey}`, null);
+  if (localResult?.success && Array.isArray(localResult.data)) return localResult;
+
+  return loadJson(`${PUBLIC_MEDIA_API}?refresh=${cacheKey}`, { data: [] });
+}
+
 function openDetail(index) {
   const item = WORKS[index];
   if (!item) return;
@@ -58,7 +67,7 @@ async function loadGallery() {
   status.textContent = "正在加载作品...";
   try {
     const cacheKey = Date.now();
-    const remoteResult = await loadJson(`./api/media-list?refresh=${cacheKey}`, { data: [] });
+    const remoteResult = await loadPublishedMedia(cacheKey);
     const list = Array.isArray(remoteResult.data)
       ? remoteResult.data.filter(item => ["photo", "video"].includes(item.kind))
       : [];
