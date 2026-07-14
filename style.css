@@ -41,7 +41,6 @@ select {
 .logo-back {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
   color: #f2f2f2;
   background: transparent;
   border: 0;
@@ -51,26 +50,11 @@ select {
   cursor: pointer;
 }
 
-.logo-back::after {
-  content: "↩";
-  color: #777;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0;
-  opacity: .62;
-}
-
 .logo-back:hover,
 .logo-back:focus-visible {
   color: #fff;
 }
 
-.logo-back:hover::after,
-.logo-back:focus-visible::after {
-  color: #aaa;
-  opacity: .85;
-}
 
 nav a {
   color: #cfcfcf;

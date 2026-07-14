@@ -52,7 +52,7 @@ function inferCoverImage(body) {
 function buildMeta(body, data, current, previous) {
   const requestedTemplate = String(data?.template || previous.template || "").toUpperCase();
   const requestedLevel = String(data?.knowledgeLevel || data?.knowledge_level || previous.knowledge_level || "");
-  const template = ALLOWED_TEMPLATES.has(requestedTemplate) ? requestedTemplate : defaultTemplate(current.type);
+  const template = /^[A-Z][A-Z0-9]{0,2}$/.test(requestedTemplate) ? requestedTemplate : defaultTemplate(current.type);
   const knowledgeLevel = ALLOWED_LEVELS.has(requestedLevel) ? requestedLevel : "Observation";
   const summary = String(data?.intro || data?.subtitle || previous.summary || cleanBody(body).slice(0, 160)).trim();
   const updatedAt = new Date().toISOString();
@@ -67,6 +67,7 @@ function buildMeta(body, data, current, previous) {
     topic: current.topic,
     type: current.type,
     knowledge_level: knowledgeLevel,
+    archive: String(data?.archive || previous.archive || "未分类档案"),
     status: String(data?.status || previous.status || "Published"),
     visibility: String(data?.visibility || previous.visibility || "Public"),
     keywords: normalizeKeywords(data?.keywords || previous.keywords, current.title, current.topic, current.type, template),

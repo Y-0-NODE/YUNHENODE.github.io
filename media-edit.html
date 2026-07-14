@@ -51,6 +51,12 @@
   border-color:#5a2a26;
 }
 
+.panel button.primary{
+  background:#f2f2f2;
+  border-color:#f2f2f2;
+  color:#0b0b0b;
+}
+
 .preview{
   max-width:420px;
   margin-top:18px;
@@ -114,7 +120,7 @@
     <label>上传日期</label>
     <div id="created-at" class="readonly">未标注</div>
 
-    <button type="button" onclick="saveWork()">保存修改</button>
+    <button id="save-work" class="primary" type="button" onclick="saveWork()">保存修改</button>
     <button class="danger" type="button" onclick="deleteWork()">删除作品</button>
     <a href="gallery-manage.html">返回作品管理</a>
     <div id="status" class="status">正在读取作品...</div>

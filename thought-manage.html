@@ -141,19 +141,6 @@ textarea{
   gap:12px;
 }
 
-.emoji-row{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.emoji-row button{
-  min-width:40px;
-  padding:7px 9px;
-  font-size:18px;
-  line-height:1;
-}
-
 button,
 .button{
   border:1px solid #303030;
@@ -341,17 +328,6 @@ button.danger{
             <button type="button" onclick="uploadPostImage()">上传图片并插入</button>
             <button type="button" onclick="insertMediaUrl()">插入已有地址</button>
           </div>
-          <div>
-            <label>常用表情</label>
-            <div class="emoji-row" aria-label="常用表情">
-              <button type="button" onclick="insertEmoji('🌿')">🌿</button>
-              <button type="button" onclick="insertEmoji('✨')">✨</button>
-              <button type="button" onclick="insertEmoji('📍')">📍</button>
-              <button type="button" onclick="insertEmoji('📝')">📝</button>
-              <button type="button" onclick="insertEmoji('💭')">💭</button>
-              <button type="button" onclick="insertEmoji('🖼️')">🖼️</button>
-            </div>
-          </div>
           <div id="post-media-status" class="status"></div>
         </div>
 
@@ -376,7 +352,6 @@ button.danger{
   </section>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 let ADMIN_NAME = "";
 let ADMIN_PASSWORD = "";
@@ -489,12 +464,18 @@ function insertTextToPost(text){
   textarea.setSelectionRange(position, position);
 }
 
-function insertEmoji(emoji){
-  insertTextToPost(emoji);
+function fileToDataUrl(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("手机无法读取这张图片，请换一张 JPG / PNG / WebP。"));
+    reader.readAsDataURL(file);
+  });
 }
 
-async function signedUpload(file, options){
-  const signRes = await fetch("./api/media-sign-upload", {
+async function uploadThroughServer(file, options){
+  const dataUrl = await fileToDataUrl(file);
+  const uploadRes = await fetch("./api/media-inline-upload", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({
@@ -502,36 +483,15 @@ async function signedUpload(file, options){
       password:ADMIN_PASSWORD,
       kind:options.kind || "photo",
       fileName:file.name,
-      contentType:file.type || "application/octet-stream"
+      contentType:file.type || "image/jpeg",
+      dataUrl,
+      title:options.title || file.name,
+      description:options.description || ""
     })
   });
-
-  const sign = await signRes.json().catch(() => ({}));
-  if(!signRes.ok) throw new Error(sign.error || "申请上传通道失败。");
-
-  const client = window.supabase.createClient("https://ndraugyrdnecqqcyfzjt.supabase.co", "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM");
-  const uploadResult = await client.storage
-    .from(sign.bucket)
-    .uploadToSignedUrl(sign.path, sign.token, file);
-
-  if(uploadResult.error) throw new Error(uploadResult.error.message || "上传失败。");
-
-  await fetch("./api/media-record", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD,
-      kind:options.kind || "photo",
-      title:options.title || file.name,
-      description:options.description || "",
-      fileName:file.name,
-      path:sign.path,
-      url:sign.publicUrl
-    })
-  }).catch(() => null);
-
-  return sign.publicUrl;
+  const result = await uploadRes.json().catch(() => ({}));
+  if(!uploadRes.ok) throw new Error(result.error || "图片上传失败。");
+  return result.publicUrl;
 }
 
 async function uploadPostImage(){
@@ -549,11 +509,6 @@ async function uploadPostImage(){
     return;
   }
 
-  if(!window.supabase){
-    status.textContent = "上传组件还没加载好，请刷新页面后再试。";
-    return;
-  }
-
   try{
     status.textContent = "正在压缩随笔图片...";
     const image = await compressImage(file, {
@@ -568,7 +523,7 @@ async function uploadPostImage(){
       ]
     });
     status.textContent = `图片已压缩：${formatBytes(image.originalSize)} → ${formatBytes(image.newSize)}，正在上传...`;
-    const url = await signedUpload(image.file, {
+    const url = await uploadThroughServer(image.file, {
       kind:"photo",
       title:caption,
       description:"从随笔管理页插入的图片"
@@ -579,6 +534,13 @@ async function uploadPostImage(){
     status.textContent = e.message || "图片上传失败。";
   }
 }
+
+document.getElementById("post-image-file").addEventListener("change", event => {
+  const file = event.target.files && event.target.files[0];
+  document.getElementById("post-media-status").textContent = file
+    ? `已选择：${file.name}。点击“上传图片并插入”继续。`
+    : "";
+});
 
 function insertMediaUrl(){
   const status = document.getElementById("post-media-status");

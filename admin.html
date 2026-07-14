@@ -7,7 +7,47 @@
 <link rel="stylesheet" href="style.css">
 <style>
 .admin-grid{
-  margin-top:56px;
+  margin-top:18px;
+}
+
+.admin-section{
+  margin-top:58px;
+}
+
+.admin-section-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:18px;
+  padding-bottom:14px;
+  border-bottom:1px solid #242424;
+}
+
+.admin-section-head h2{
+  margin:0;
+  font-size:clamp(25px,3vw,38px);
+}
+
+.admin-section-head p{
+  margin:0;
+  color:#777;
+  letter-spacing:1px;
+}
+
+.admin-grid .card{
+  min-height:190px;
+}
+
+.admin-grid .card h3{
+  font-size:23px;
+  margin:34px 0 10px;
+}
+
+@media(max-width:800px){
+  .admin-section{margin-top:38px}
+  .admin-section-head{align-items:flex-start;flex-direction:column;gap:5px}
+  .admin-grid .card{min-height:145px}
+  .admin-grid .card h3{margin:22px 0 8px;font-size:21px}
 }
 
 .admin-note{
@@ -44,87 +84,37 @@
 <main class="home">
   <p class="eyebrow">ADMIN CENTER</p>
   <h1>后台</h1>
-  <p class="intro">集中管理发布、文章、草稿与内部记录。</p>
+  <p class="intro">按创作、管理、研究、数据和系统五个工作区管理全站。</p>
 
-  <div class="grid admin-grid">
-    <a class="card" href="publish.html">
-      <span>01</span>
-      <h2>新建内容</h2>
-      <p>发布文章、视频、案例。</p>
-    </a>
+  <section class="admin-section"><div class="admin-section-head"><h2>Content Creation｜内容创作</h2><p>CREATE</p></div><div class="grid admin-grid">
+    <a class="card" href="publish.html"><span>01</span><h3>New Content｜新建内容</h3><p>新建并发布文章、案例与视频内容。</p></a>
+    <a class="card" href="case-write.html"><span>02</span><h3>Case Editor｜案例撰写</h3><p>使用案例模板撰写、预览和保存。</p></a>
+    <a class="card" href="wechat-import.html"><span>03</span><h3>WeChat Import｜公众号导入</h3><p>导入公众号文章并匹配主题分类。</p></a>
+    <a class="card" href="media-manage.html"><span>04</span><h3>Media Upload｜媒体上传</h3><p>上传摄影、图片和影像作品。</p></a>
+  </div></section>
 
-    <a class="card" href="article-manage.html">
-      <span>02</span>
-      <h2>文章管理</h2>
-      <p>搜索、编辑、删除文章。</p>
-    </a>
+  <section class="admin-section"><div class="admin-section-head"><h2>Content Management｜内容管理</h2><p>MANAGE</p></div><div class="grid admin-grid">
+    <a class="card" href="article-manage.html"><span>05</span><h3>Article Manager｜文章管理</h3><p>搜索、编辑、分类和删除文章。</p></a>
+    <a class="card" href="article-manage.html?type=case"><span>06</span><h3>Case Manager｜案例管理</h3><p>打开、编辑、修改和删除案例。</p></a>
+    <a class="card" href="article-draft.html"><span>07</span><h3>Draft Box｜草稿箱</h3><p>继续编辑未发布的内容。</p></a>
+    <a class="card" href="thought-manage.html"><span>08</span><h3>Quick Notes｜随笔管理</h3><p>发布图文随笔，管理公开和私密状态。</p></a>
+  </div></section>
 
-    <a class="card" href="thought-manage.html">
-      <span>03</span>
-      <h2>随笔管理</h2>
-      <p>发布短随笔，设置公开或仅自己可见。</p>
-    </a>
+  <section class="admin-section"><div class="admin-section-head"><h2>Research System｜研究系统</h2><p>RESEARCH</p></div><div class="grid admin-grid">
+    <a class="card" href="thought-profile.html"><span>09</span><h3>Notebook Profile｜随笔主页</h3><p>设置随笔头像、名称、签名和主页信息。</p></a>
+    <a class="card" href="diary.html"><span>10</span><h3>Private Journal｜内部日记</h3><p>进入私人记录与本机日记系统。</p></a>
+  </div></section>
 
-    <a class="card" href="thought-profile.html">
-      <span>04</span>
-      <h2>随笔账户</h2>
-      <p>设置头像、显示名称和签名。</p>
-    </a>
+  <section class="admin-section"><div class="admin-section-head"><h2>Data Center｜数据中心</h2><p>DATA</p></div><div class="grid admin-grid">
+    <a class="card" href="backup.html"><span>11</span><h3>Backup Center｜数据备份</h3><p>导出网站内容、日记与媒体索引。</p></a>
+  </div></section>
 
-    <a class="card" href="wechat-import.html">
-      <span>05</span>
-      <h2>公众号导入</h2>
-      <p>粘贴公众号内容，自动匹配板块和主题并保存。</p>
-    </a>
-
-    <a class="card" href="article-draft.html">
-      <span>06</span>
-      <h2>草稿箱</h2>
-      <p>检查未发布内容。</p>
-    </a>
-
-    <a class="card" href="diary.html">
-      <span>07</span>
-      <h2>内部日记</h2>
-      <p>进入私人记录和本机日记 App。</p>
-    </a>
-
-    <a class="card" href="media-manage.html">
-      <span>08</span>
-      <h2>作品上传</h2>
-      <p>上传摄影作品和影像作品。</p>
-    </a>
-
-    <a class="card" href="backup.html">
-      <span>09</span>
-      <h2>数据备份</h2>
-      <p>导出网站内容、日记和作品索引。</p>
-    </a>
-
-    <a class="card" href="case-write.html">
-      <span>10</span>
-      <h2>案例撰写</h2>
-      <p>选择模板，生成极简案例文本并保存。</p>
-    </a>
-
-    <a class="card" href="article-manage.html?type=case">
-      <span>11</span>
-      <h2>案例管理</h2>
-      <p>搜索、打开、编辑、修改和删除案例。</p>
-    </a>
-
-    <a class="card" href="maintenance.html">
-      <span>12</span>
-      <h2>维护与防御</h2>
-      <p>检查权限、备份、安全头和部署限制。</p>
-    </a>
-
-    <a class="card" href="design-settings.html">
-      <span>13</span>
-      <h2>设计设置</h2>
-      <p>自定义阅读页主题、强调色和背景图。</p>
-    </a>
-  </div>
+  <section class="admin-section"><div class="admin-section-head"><h2>System Maintenance｜系统维护</h2><p>SYSTEM</p></div><div class="grid admin-grid">
+    <a class="card" href="maintenance.html"><span>12</span><h3>Security Center｜安全中心</h3><p>检查管理权限、部署状态、安全头与备份。</p></a>
+    <a class="card" href="design-settings.html"><span>13</span><h3>Design System｜设计系统</h3><p>管理阅读主题、颜色、背景和视觉规则。</p></a>
+    <a class="card" href="search-center.html"><span>14</span><h3>Search Center｜搜索中心</h3><p>全站搜索、SEO 索引、标签管理和关键词库。</p></a>
+    <a class="card" href="knowledge-system.html"><span>15</span><h3>Knowledge System｜知识系统</h3><p>管理模板、主题、知识层级、档案和关联规则。</p></a>
+  </div></section>
 
   <div class="admin-note">
     管理后台使用 Vercel 环境变量进行验证。管理员名称填写环境变量名，例如 YUNHE；密码填写该环境变量对应的值。
