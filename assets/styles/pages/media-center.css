@@ -76,6 +76,9 @@ button,
   display: grid;
   place-items: center;
   overflow: hidden;
+  width: 100%;
+  padding: 0;
+  border: 0;
 }
 .preview img,
 .preview video {
@@ -133,6 +136,42 @@ button,
 }
 .hidden {
   display: none;
+}
+.media-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  padding: clamp(14px, 4vw, 48px);
+  background: rgba(0, 0, 0, 0.92);
+  overflow: auto;
+}
+.media-viewer.is-open {
+  display: grid;
+  place-items: center;
+}
+.media-viewer-inner {
+  width: min(1600px, 100%);
+}
+.media-viewer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+  color: #eee;
+}
+.media-viewer-bar strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.media-viewer-image {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 120px);
+  object-fit: contain;
+  background: #050505;
 }
 @media (max-width: 850px) {
   .shell {
