@@ -4,7 +4,9 @@ const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
-const source = process.argv[2] ? path.resolve(process.argv[2]) : path.join(root, "local-media-source");
+const source = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(root, "local-media-source");
 const outputDir = path.join(root, "assets", "local-gallery");
 const dataDir = path.join(root, "data");
 const dataFile = path.join(dataDir, "local-gallery.json");
@@ -18,20 +20,18 @@ function ensureDir(dir) {
 }
 
 function slugify(value) {
-  return String(value || "work")
-    .normalize("NFKD")
-    .replace(/[^\w-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 80) || "work";
+  return (
+    String(value || "work")
+      .normalize("NFKD")
+      .replace(/[^\w-]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 80) || "work"
+  );
 }
 
 function fileHash(file) {
-  return crypto
-    .createHash("sha1")
-    .update(fs.readFileSync(file))
-    .digest("hex")
-    .slice(0, 12);
+  return crypto.createHash("sha1").update(fs.readFileSync(file)).digest("hex").slice(0, 12);
 }
 
 function walk(dir) {
@@ -81,23 +81,41 @@ function convertImage(file, titleBase) {
   const thumbDest = path.join(outputDir, thumbName);
   const largeDest = path.join(outputDir, largeName);
 
-  execFileSync("sips", [
-    "-s", "format", "jpeg",
-    "-s", "formatOptions", "78",
-    "--resampleHeightWidthMax", "1200",
-    file,
-    "--out",
-    thumbDest
-  ], { stdio: "ignore" });
+  execFileSync(
+    "sips",
+    [
+      "-s",
+      "format",
+      "jpeg",
+      "-s",
+      "formatOptions",
+      "78",
+      "--resampleHeightWidthMax",
+      "1200",
+      file,
+      "--out",
+      thumbDest
+    ],
+    { stdio: "ignore" }
+  );
 
-  execFileSync("sips", [
-    "-s", "format", "jpeg",
-    "-s", "formatOptions", "88",
-    "--resampleHeightWidthMax", "4096",
-    file,
-    "--out",
-    largeDest
-  ], { stdio: "ignore" });
+  execFileSync(
+    "sips",
+    [
+      "-s",
+      "format",
+      "jpeg",
+      "-s",
+      "formatOptions",
+      "88",
+      "--resampleHeightWidthMax",
+      "4096",
+      file,
+      "--out",
+      largeDest
+    ],
+    { stdio: "ignore" }
+  );
 
   return {
     url: `assets/local-gallery/${thumbName}`,

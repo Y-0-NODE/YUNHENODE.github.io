@@ -1,0 +1,20 @@
+{
+  "policy": "Retained for historical reference; do not extend.",
+  "moved": {
+    "app-icon-svg": "app-icon.svg",
+    "gallery-manage": "photography-manage.html",
+    "manifest-webmanifes": "manifest.webmanifest",
+    "service-worker-js": "service-worker.js",
+    "api/Add file/Create new file/admin.html": "admin.html",
+    "content-list.json": "Supabase contents table",
+    "local-gallery.json": "data/local-gallery.json"
+  },
+  "retainedRootCompatibility": [
+    "content-1782904492588-.html",
+    "content-1782905129365.html",
+    "content-1782909000817.html",
+    "content-1782910180371.html",
+    "post-001.html",
+    "video-post-001.html"
+  ]
+}
