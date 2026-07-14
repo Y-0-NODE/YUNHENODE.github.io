@@ -33,3 +33,4 @@ npm run sync:gallery
 详细说明见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)。
 运维说明见 [`docs/OPERATIONS.md`](docs/OPERATIONS.md)。
 重构结果见 [`docs/REFACTOR-REPORT.md`](docs/REFACTOR-REPORT.md)。
+
