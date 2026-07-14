@@ -46,9 +46,15 @@ module.exports = async function handler(req, res) {
     const env = requireSupabaseEnv();
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
-    const title = String(data?.title || "").trim();
-    const body = withMeta(data?.body, data);
-    const intro = String(data?.intro || data?.subtitle || "").trim();
+ const title = String(data?.title || "").trim();
+const contentType = String(data?.type || "article");
+const plainBody = cleanBody(data?.body);
+
+const body = ["article", "case"].includes(contentType)
+  ? withMeta(plainBody, data)
+  : plainBody;
+
+const intro = String(data?.intro || data?.subtitle || "").trim();
 
     if (!title || !body) {
       return res.status(400).json({ success: false, error: "标题和正文不能为空" });
@@ -63,7 +69,7 @@ module.exports = async function handler(req, res) {
         intro,
         body,
         video: data?.video || "",
-        type: data?.type || "article",
+        type: contentType,
         topic: data?.topic || "未分类",
         slug,
         created_at: new Date().toISOString()
