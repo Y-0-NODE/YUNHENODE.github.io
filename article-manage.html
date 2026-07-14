@@ -183,6 +183,8 @@
     <a href="article.html">文章</a>
     <a href="article-list.html">文章列表</a>
     <a href="case-list.html">案例列表</a>
+    <a href="article-manage.html?type=case">案例管理</a>
+    <a href="admin.html">后台首页</a>
     <a href="publish.html">新建内容</a>
   </nav>
 </header>
@@ -238,6 +240,30 @@
         </div>
       </div>
 
+      <div class="media-row">
+        <div>
+          <label for="edit-template">Template（模板）</label>
+          <select id="edit-template">
+            <option value="A">A｜Case Archive（案例库）</option>
+            <option value="B">B｜Method Archive（方法库）</option>
+            <option value="C">C｜Research Notes（研究记录）</option>
+            <option value="D">D｜Project Archive（项目档案）</option>
+            <option value="E">E｜Media Archive（媒体库）</option>
+            <option value="X">X｜X Archive（未分类档案）</option>
+          </select>
+        </div>
+        <div>
+          <label for="edit-knowledge-level">Knowledge Level（知识层级）</label>
+          <select id="edit-knowledge-level">
+            <option value="Observation">Observation（观察）</option>
+            <option value="Analysis">Analysis（分析）</option>
+            <option value="Decision">Decision（判断）</option>
+            <option value="Validation">Validation（验证）</option>
+            <option value="Method">Method（方法）</option>
+          </select>
+        </div>
+      </div>
+
       <label for="edit-topic">主题</label>
       <select id="edit-topic">
         <optgroup label="人与关系">
@@ -274,6 +300,8 @@
           <option value="空间">空间</option>
           <option value="技术">技术</option>
           <option value="梦境">梦境</option>
+          <option value="文化">文化</option>
+          <option value="社会">社会</option>
         </optgroup>
       </select>
 
@@ -389,18 +417,23 @@ function render(list){
   }
 
   status.textContent = "";
-  box.innerHTML = list.map(item => `
-    <div class="manage-item">
-      <div class="meta">${item.topic || "未分类"} / ${item.type || "article"} / ID ${item.id}</div>
-      <h2>${splitTitle(item.title).title || `未命名${TYPE_LABEL}`}</h2>
-      <p>${splitTitle(item.title).subtitle || item.intro || ""}</p>
-      <div class="actions">
-        <a href="${articleUrl(item)}">打开${TYPE_LABEL}</a>
-        <button type="button" onclick="openEditor('${item.id}')">编辑${TYPE_LABEL}</button>
-        <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除${TYPE_LABEL}</button>
+  box.innerHTML = list.map(item => {
+    const protocol = readMeta(item.body || "");
+    const template = protocol.template || (item.type === "case" ? "A" : "X");
+    const level = protocol.knowledge_level || "Observation";
+    return `
+      <div class="manage-item">
+        <div class="meta">${item.topic || "未分类"} / Template ${template} / ${level} / ID ${item.id}</div>
+        <h2>${splitTitle(item.title).title || `未命名${TYPE_LABEL}`}</h2>
+        <p>${splitTitle(item.title).subtitle || item.intro || ""}</p>
+        <div class="actions">
+          <a href="${articleUrl(item)}">打开${TYPE_LABEL}</a>
+          <button type="button" onclick="openEditor('${item.id}')">编辑${TYPE_LABEL}</button>
+          <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除${TYPE_LABEL}</button>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function applySearch(){
@@ -509,6 +542,8 @@ function openEditor(id){
   document.getElementById("edit-intro").value = item.intro || "";
   document.getElementById("edit-original-date").value = meta.originalDate || "";
   document.getElementById("edit-source").value = meta.source || "本站撰写";
+  document.getElementById("edit-template").value = meta.template || (CONTENT_TYPE === "case" ? "A" : "X");
+  document.getElementById("edit-knowledge-level").value = meta.knowledge_level || "Observation";
   document.getElementById("edit-topic").value = item.topic || "未分类";
   document.getElementById("edit-body").value = cleanBody(item.body || "");
   document.getElementById("media-caption").value = "";
@@ -673,6 +708,8 @@ async function saveEdit(){
     intro: document.getElementById("edit-intro").value.trim(),
     originalDate: document.getElementById("edit-original-date").value,
     source: document.getElementById("edit-source").value,
+    template: document.getElementById("edit-template").value,
+    knowledgeLevel: document.getElementById("edit-knowledge-level").value,
     topic: document.getElementById("edit-topic").value,
     body: document.getElementById("edit-body").value.trim(),
     adminName: ADMIN_NAME,
