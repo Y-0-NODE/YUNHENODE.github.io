@@ -97,7 +97,7 @@
 <header class="topbar">
   <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
   <nav>
-    <a href="gallery-manage">作品管理</a>
+    <a href="photography-manage.html">摄影作品管理</a>
     <a href="admin.html">后台首页</a>
   </nav>
 </header>
@@ -105,10 +105,16 @@
 <main class="home">
   <p class="eyebrow">LOCAL MEDIA EDIT</p>
   <h1>编辑本地作品</h1>
-  <p class="intro">本地文件夹作品不在数据库里。这里会生成一个说明文件，用它改作品名称、介绍和拍摄日期。</p>
+  <p class="intro">第一次保存会把这件本地作品登记到 Supabase，之后可以直接编辑，不需要下载说明文件。</p>
 
   <section class="panel">
     <div id="preview" class="preview"></div>
+
+    <label for="admin-name">管理员名称</label>
+    <input id="admin-name" value="YUNHE">
+
+    <label for="admin-password">管理员密码</label>
+    <input id="admin-password" type="password">
 
     <label for="title">作品名称</label>
     <input id="title" type="text">
@@ -122,20 +128,10 @@
     <label>上传日期</label>
     <div id="created-at" class="readonly">未标注</div>
 
-    <button class="primary" type="button" onclick="downloadSidecar()">保存修改（下载说明文件）</button>
-    <button class="danger" type="button" onclick="downloadDeleteSidecar()">删除/隐藏这个本地作品</button>
-    <a href="gallery-manage">返回作品管理</a>
+    <button class="primary" type="button" onclick="saveDirectly()">保存修改</button>
+    <a href="photography-manage.html">返回摄影作品管理</a>
     <div id="status" class="status">正在读取作品...</div>
 
-    <div class="steps">
-      <strong>你下载后这样做：</strong><br>
-      1. 把下载的说明文件放进本地 <code>local-media-source</code> 文件夹。<br>
-      2. 说明文件要和原照片放在同一个文件夹里。<br>
-      3. 重新运行同步命令。<br>
-      4. 把新的 <code>data/local-gallery.json</code> 上传到 GitHub。<br>
-      5. 如果是删除作品，也可以顺手删除 GitHub 里对应的 <code>assets/local-gallery</code> 图片文件。<br>
-      <div class="code">cd /Users/sunnian/Documents/Codex/2026-07-03/jin/work/YUNHENODE.github.io<br>node scripts/sync-local-gallery.js local-media-source</div>
-    </div>
   </section>
 </main>
 
@@ -187,65 +183,64 @@ async function loadWork(){
   document.getElementById("description").value = CURRENT.description || "";
   document.getElementById("shot-at").value = toDateInput(CURRENT.shot_at);
   document.getElementById("created-at").textContent = formatDateTime(CURRENT.created_at);
-  status.textContent = "修改后点击“下载说明文件”。";
+  status.textContent = "填写管理员密码后，可以直接保存。";
 }
 
-function downloadSidecar(){
+async function saveDirectly(){
   const status = document.getElementById("status");
   if(!CURRENT){
     status.textContent = "没有正在编辑的作品。";
     return;
   }
 
+  const adminName = document.getElementById("admin-name").value.trim();
+  const password = document.getElementById("admin-password").value;
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
   const shotAt = document.getElementById("shot-at").value;
-  const content = [
-    `标题: ${title || CURRENT.title || "未命名作品"}`,
-    `说明: ${description}`,
-    `拍摄日期: ${shotAt || ""}`,
-    `类型: ${CURRENT.kind === "video" ? "video" : "photo"}`
-  ].join("\n");
-  const blob = new Blob([content], { type:"text/plain;charset=utf-8" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = CURRENT.sidecar_name || `${title || CURRENT.title || "作品"}.txt`;
-  document.body.appendChild(link);
-  link.click();
-  URL.revokeObjectURL(link.href);
-  link.remove();
-  status.textContent = `已下载 ${link.download}。把它放回 local-media-source，再重新同步。`;
-}
-
-function downloadDeleteSidecar(){
-  const status = document.getElementById("status");
-  if(!CURRENT){
-    status.textContent = "没有正在编辑的作品。";
+  if(!adminName || !password){
+    status.textContent = "请填写管理员名称和密码。";
     return;
   }
 
-  const ok = confirm("确定让这个本地作品从网站隐藏吗？");
-  if(!ok) return;
-
-  const title = document.getElementById("title").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const shotAt = document.getElementById("shot-at").value;
-  const content = [
-    `标题: ${title || CURRENT.title || "未命名作品"}`,
-    `说明: ${description}`,
-    `拍摄日期: ${shotAt || ""}`,
-    `类型: ${CURRENT.kind === "video" ? "video" : "photo"}`,
-    "删除: true"
-  ].join("\n");
-  const blob = new Blob([content], { type:"text/plain;charset=utf-8" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = CURRENT.sidecar_name || `${title || CURRENT.title || "作品"}.txt`;
-  document.body.appendChild(link);
-  link.click();
-  URL.revokeObjectURL(link.href);
-  link.remove();
-  status.textContent = `已下载删除标记 ${link.download}。把它放回 local-media-source，再重新同步。`;
+  status.textContent = "正在保存到摄影作品库…";
+  try{
+    const listResult = await fetch("./api/media-list", { cache:"no-store" })
+      .then(response => response.json())
+      .catch(() => ({ data:[] }));
+    const existing = (Array.isArray(listResult.data) ? listResult.data : [])
+      .find(item => item.url === CURRENT.url);
+    const endpoint = existing ? "./api/media-update" : "./api/media-record";
+    const payload = existing ? {
+      adminName,
+      password,
+      id:existing.id,
+      title:title || CURRENT.title || "未命名作品",
+      description,
+      shot_at:shotAt || null
+    } : {
+      adminName,
+      password,
+      title:title || CURRENT.title || "未命名作品",
+      description,
+      shot_at:shotAt || null,
+      kind:CURRENT.kind === "video" ? "video" : "photo",
+      url:CURRENT.url,
+      path:`external/local-gallery-${Date.now()}`,
+      fileName:CURRENT.sidecar_name || "local-work"
+    };
+    const response = await fetch(endpoint, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok || !result.success) throw new Error(result.error || "保存失败");
+    status.textContent = "保存成功。现在它已经进入 Supabase 摄影作品库。";
+    setTimeout(() => { location.href = "photography-manage.html"; }, 900);
+  }catch(error){
+    status.textContent = error.message || "保存失败。";
+  }
 }
 
 loadWork();
