@@ -1,4 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
+const mediaMetadata = require("../shared/metadata").media;
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -25,7 +26,8 @@ module.exports = async function handler(req, res) {
   if (error) {
     const message = `${error.message || ""} ${error.details || ""}`;
     const isColumnMismatch = /column|schema cache|status|path/i.test(message);
-    if (!isColumnMismatch) return res.status(500).json({ success: false, error: error.message || error });
+    if (!isColumnMismatch)
+      return res.status(500).json({ success: false, error: error.message || error });
 
     const fallback = await supabase
       .from("media_items")
@@ -40,7 +42,7 @@ module.exports = async function handler(req, res) {
 
   const cleaned = (data || []).map(item => ({
     ...item,
-    description: String(item.description || "").replace(/\n*<!--yunhe-media-meta:[\s\S]*?-->\s*$/m, "").trim()
+    description: mediaMetadata.strip(item.description)
   }));
   return res.status(200).json({ success: true, data: cleaned });
 };

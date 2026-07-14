@@ -1,4 +1,5 @@
 const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
+const { normalizeMediaKind } = require("../lib/media-model");
 
 const BUCKET = "media";
 const MAX_INLINE_BYTES = 2 * 1024 * 1024;
@@ -13,12 +14,12 @@ const ALLOWED_MIME_TYPES = [
   "application/octet-stream",
   "video/mp4",
   "video/quicktime",
-  "video/webm"
-  ,"audio/mpeg"
-  ,"audio/mp4"
-  ,"audio/wav"
-  ,"audio/x-m4a"
-  ,"application/pdf"
+  "video/webm",
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/wav",
+  "audio/x-m4a",
+  "application/pdf"
 ];
 
 function safeFileName(name) {
@@ -26,10 +27,6 @@ function safeFileName(name) {
     .replace(/[/\\?%*:|"<>]/g, "-")
     .replace(/\s+/g, "-")
     .slice(0, 120);
-}
-
-function normalizeKind(value) {
-  return ["photo", "video", "audio", "document", "asset"].includes(value) ? value : "asset";
 }
 
 function getSupabaseEnv() {
@@ -67,7 +64,8 @@ async function storageRequest(path, options = {}) {
   }
 
   if (!response.ok) {
-    const message = data?.message || data?.error || text || `Supabase Storage HTTP ${response.status}`;
+    const message =
+      data?.message || data?.error || text || `Supabase Storage HTTP ${response.status}`;
     const error = new Error(message);
     error.status = response.status;
     error.data = data;
@@ -134,16 +132,19 @@ async function uploadInlineImage(body) {
 
   const path = `thought/${Date.now()}-${safeFileName(body?.fileName || "thought-image.jpg")}`;
   const env = getSupabaseEnv();
-  const upload = await fetch(`${env.url}/storage/v1/object/${BUCKET}/${path.split("/").map(encodeURIComponent).join("/")}`, {
-    method: "POST",
-    headers: {
-      apikey: env.key,
-      Authorization: `Bearer ${env.key}`,
-      "Content-Type": contentType,
-      "x-upsert": "false"
-    },
-    body: buffer
-  });
+  const upload = await fetch(
+    `${env.url}/storage/v1/object/${BUCKET}/${path.split("/").map(encodeURIComponent).join("/")}`,
+    {
+      method: "POST",
+      headers: {
+        apikey: env.key,
+        Authorization: `Bearer ${env.key}`,
+        "Content-Type": contentType,
+        "x-upsert": "false"
+      },
+      body: buffer
+    }
+  );
 
   if (!upload.ok) {
     const detail = await upload.text();
@@ -168,7 +169,7 @@ module.exports = async function handler(req, res) {
     const env = requireSupabaseEnv();
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
-    const kind = normalizeKind(body?.kind);
+    const kind = normalizeMediaKind(body?.kind);
     const safeName = safeFileName(body?.fileName);
     const path = `${kind}/${Date.now()}-${safeName}`;
 

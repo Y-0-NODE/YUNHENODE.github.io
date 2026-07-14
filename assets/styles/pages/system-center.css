@@ -1,0 +1,57 @@
+.system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 38px;
+}
+.panel {
+  border: 1px solid #292929;
+  background: #101010;
+  padding: 22px;
+  scroll-margin-top: 100px;
+}
+.panel h2 {
+  margin: 0 0 12px;
+}
+.panel p,
+.status {
+  color: #999;
+  line-height: 1.75;
+}
+.actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.button,
+button {
+  display: inline-block;
+  border: 1px solid #333;
+  background: #151515;
+  color: #eee;
+  padding: 10px 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.health {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.health div {
+  border-left: 2px solid #444;
+  padding-left: 10px;
+  color: #aaa;
+}
+.health .ok {
+  border-color: #77a982;
+}
+.health .bad {
+  border-color: #b06767;
+}
+@media (max-width: 800px) {
+  .system-grid {
+    grid-template-columns: 1fr;
+  }
+}

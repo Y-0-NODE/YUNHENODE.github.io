@@ -1,0 +1,151 @@
+.shell {
+  max-width: 1320px;
+  margin: auto;
+  padding: 130px clamp(18px, 5vw, 64px) 70px;
+}
+.panel {
+  border: 1px solid #292929;
+  background: #101010;
+  padding: 20px;
+  margin-top: 20px;
+}
+.hidden {
+  display: none !important;
+}
+.login {
+  max-width: 560px;
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.wide {
+  grid-column: 1/-1;
+}
+label {
+  display: block;
+  color: #999;
+  margin: 10px 0 7px;
+}
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid #303030;
+  background: #0b0b0b;
+  color: #eee;
+  padding: 11px;
+}
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+button {
+  border: 1px solid #333;
+  background: #151515;
+  color: #eee;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.primary {
+  background: #eee;
+  color: #111;
+  font-weight: 700;
+}
+.actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 22px;
+}
+.metric {
+  border: 1px solid #292929;
+  padding: 18px;
+  background: #101010;
+}
+.metric b {
+  display: block;
+  font-size: 30px;
+}
+.metric span,
+.status {
+  color: #888;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(330px, 0.75fr);
+  gap: 18px;
+}
+.result-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+.result {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #292929;
+  background: #0d0d0d;
+  padding: 15px;
+  color: #eee;
+}
+.result b {
+  display: block;
+  font-size: 17px;
+}
+.result small {
+  display: block;
+  color: #777;
+  margin-top: 7px;
+}
+.keywords {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.keyword {
+  border: 1px solid #2d2d2d;
+  padding: 6px 8px;
+  color: #aaa;
+  font-size: 13px;
+}
+.section-title {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+.query-row {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  gap: 10px;
+}
+.hint {
+  color: #777;
+  line-height: 1.7;
+  font-size: 13px;
+}
+@media (max-width: 850px) {
+  .shell {
+    padding: 28px 14px 55px;
+  }
+  .workspace,
+  .fields {
+    grid-template-columns: 1fr;
+  }
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .query-row {
+    grid-template-columns: 1fr;
+  }
+  .wide {
+    grid-column: auto;
+  }
+}

@@ -1,0 +1,131 @@
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.panel,
+.preview {
+  border: 1px solid #2a2a2a;
+  background: #111;
+  padding: 22px;
+}
+
+.panel label {
+  display: block;
+  color: #aaa;
+  margin: 16px 0 8px;
+}
+
+.panel input,
+.panel textarea,
+.panel select {
+  width: 100%;
+  border: 1px solid #2a2a2a;
+  background: #0b0b0b;
+  color: #f2f2f2;
+  padding: 12px;
+}
+
+.panel textarea {
+  min-height: 120px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.media-insert {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.media-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.media-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.media-actions button {
+  border: 1px solid #2a2a2a;
+  background: #151515;
+  color: #f2f2f2;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.media-actions .light {
+  background: #f2f2f2;
+  color: #0b0b0b;
+  font-weight: 700;
+}
+
+.section-fields {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.actions button,
+.actions a {
+  border: 1px solid #2a2a2a;
+  background: #151515;
+  color: #f2f2f2;
+  padding: 10px 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.actions .primary {
+  background: #f2f2f2;
+  color: #0b0b0b;
+  font-weight: 700;
+}
+
+.preview {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  white-space: pre-wrap;
+  line-height: 1.85;
+  color: #d8d8d8;
+}
+
+.preview h2 {
+  margin-top: 0;
+}
+
+.status {
+  color: #aaa;
+  margin-top: 16px;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .media-row {
+    grid-template-columns: 1fr;
+  }
+
+  .preview {
+    position: relative;
+    top: auto;
+  }
+}

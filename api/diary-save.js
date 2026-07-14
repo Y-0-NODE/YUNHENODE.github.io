@@ -31,13 +31,16 @@ module.exports = async function handler(req, res) {
       updated_at: new Date().toISOString()
     };
 
-    const data = await supabaseRequest("/rest/v1/diary_entries?on_conflict=id&select=id,title,entry_date,mood,tags,body,created_at,updated_at", {
-      method: "POST",
-      headers: {
-        Prefer: "resolution=merge-duplicates,return=representation"
-      },
-      body: JSON.stringify(row)
-    });
+    const data = await supabaseRequest(
+      "/rest/v1/diary_entries?on_conflict=id&select=id,title,entry_date,mood,tags,body,created_at,updated_at",
+      {
+        method: "POST",
+        headers: {
+          Prefer: "resolution=merge-duplicates,return=representation"
+        },
+        body: JSON.stringify(row)
+      }
+    );
 
     return res.status(200).json({ success: true, data: data?.[0] || row });
   } catch (e) {

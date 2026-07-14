@@ -1,0 +1,92 @@
+.layout {
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  gap: 18px;
+  margin-top: 30px;
+}
+.panel {
+  border: 1px solid #292929;
+  background: #101010;
+  padding: 20px;
+}
+.panel h2 {
+  margin-top: 0;
+}
+.list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #0b0b0b;
+  color: #ddd;
+  border: 1px solid #292929;
+  padding: 13px;
+  margin: 8px 0;
+  cursor: pointer;
+}
+.list button.active {
+  border-color: #aaa;
+}
+.muted,
+.status {
+  color: #999;
+  line-height: 1.7;
+}
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.fields label {
+  display: block;
+  color: #aaa;
+}
+.fields input,
+.fields textarea,
+.fields select,
+.login input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #090909;
+  color: #eee;
+  border: 1px solid #333;
+  padding: 11px;
+  margin-top: 7px;
+}
+.fields textarea {
+  min-height: 100px;
+}
+.wide {
+  grid-column: 1/-1;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 18px 0;
+}
+.actions button,
+.actions a,
+.login button {
+  border: 1px solid #373737;
+  background: #151515;
+  color: #eee;
+  padding: 10px 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.danger {
+  color: #ffaaa2 !important;
+}
+.history article {
+  border-top: 1px solid #292929;
+  padding: 12px 0;
+}
+@media (max-width: 800px) {
+  .layout,
+  .fields {
+    grid-template-columns: 1fr;
+  }
+  .wide {
+    grid-column: auto;
+  }
+}

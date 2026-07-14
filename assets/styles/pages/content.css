@@ -1,0 +1,270 @@
+:root {
+  color-scheme: dark;
+  --bg: #090909;
+  --surface: #101010;
+  --line: #252525;
+  --text: #eeeeee;
+  --muted: #9a9a9a;
+  --soft: #cfcfcf;
+  --accent: #ffffff;
+  --bg-image: none;
+  --bg-opacity: 0.18;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      rgba(9, 9, 9, calc(1 - var(--bg-opacity))),
+      rgba(9, 9, 9, calc(1 - var(--bg-opacity)))
+    ),
+    var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
+  z-index: -1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.reading-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 32px clamp(24px, 5vw, 104px) 104px;
+}
+
+.article-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  min-height: 48px;
+  margin-bottom: 86px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid #222;
+  color: var(--muted);
+}
+
+.article-tools a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  border-bottom: 2px solid transparent;
+  padding: 0 2px;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.article-tools a:hover {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+h1 {
+  max-width: 1500px;
+  font-size: clamp(42px, 6.6vw, 92px);
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: 0;
+}
+
+#intro {
+  color: var(--soft);
+  font-size: 18px;
+  line-height: 1.85;
+  margin: 18px 0 16px;
+  max-width: 1120px;
+}
+
+#subtitle {
+  color: var(--soft);
+  font-size: clamp(22px, 2.4vw, 34px);
+  line-height: 1.35;
+  font-weight: 700;
+  margin: 18px 0 22px;
+  max-width: 1280px;
+}
+
+.article-meta-footer,
+.article-meta-top {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0 0 48px;
+}
+
+.article-meta-footer {
+  margin: 56px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.article-body {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.doc-title {
+  font-size: 30px;
+  line-height: 1.25;
+  font-weight: 800;
+  margin: 20px 0 26px;
+}
+
+.section-title {
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: 800;
+  margin: 52px 0 18px;
+  padding-top: 34px;
+  border-top: 1px solid var(--line);
+}
+
+.sub-title {
+  color: var(--soft);
+  font-size: 19px;
+  line-height: 1.5;
+  font-weight: 700;
+  margin: 30px 0 10px;
+}
+
+.paragraph {
+  color: #d8d8d8;
+  font-size: 16px;
+  line-height: 1.95;
+  margin: 0 0 14px;
+  white-space: pre-wrap;
+  max-width: 1180px;
+}
+
+.numbered {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  color: #dcdcdc;
+  font-size: 16px;
+  line-height: 1.85;
+  margin: 0 0 8px;
+  max-width: 1180px;
+}
+
+.numbered span {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.meta-line {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 18px;
+  max-width: 1180px;
+}
+
+.source-link {
+  color: #a8a8a8;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 22px 0;
+  max-width: 1180px;
+}
+
+.source-link a {
+  color: #bdbdbd;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.source-link a:hover {
+  color: #ffffff;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.media-block {
+  width: 100%;
+  max-width: 1480px;
+  margin: 34px 0 42px;
+}
+
+.media-block img,
+.media-block video {
+  display: block;
+  width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  background: #050505;
+  border: 1px solid var(--line);
+}
+
+.media-block figcaption {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+
+@media (max-width: 700px) {
+  .reading-shell {
+    padding: 28px 18px 64px;
+  }
+
+  h1 {
+    font-size: clamp(34px, 12vw, 52px);
+  }
+
+  .article-tools {
+    margin-bottom: 36px;
+    width: 100%;
+  }
+
+  #intro {
+    font-size: 16px;
+    margin-bottom: 34px;
+  }
+
+  .doc-title {
+    font-size: 24px;
+  }
+
+  .section-title {
+    font-size: 22px;
+  }
+}

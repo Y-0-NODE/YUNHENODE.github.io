@@ -30,7 +30,9 @@ module.exports = async function handler(req, res) {
     const env = requireSupabaseEnv();
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
-    const data = await supabaseRequest("/rest/v1/diary_entries?select=id,title,entry_date,mood,tags,body,created_at,updated_at&order=updated_at.desc");
+    const data = await supabaseRequest(
+      "/rest/v1/diary_entries?select=id,title,entry_date,mood,tags,body,created_at,updated_at&order=updated_at.desc"
+    );
 
     return res.status(200).json({ success: true, data: data || [] });
   } catch (e) {

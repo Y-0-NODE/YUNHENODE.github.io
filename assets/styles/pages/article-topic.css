@@ -1,0 +1,40 @@
+.status {
+  color: #888;
+  margin-top: 32px;
+  line-height: 1.8;
+}
+.topic-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 46px;
+}
+.topic-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 26px;
+  border-top: 1px solid #2a2a2a;
+  padding: 24px 0;
+  color: #f2f2f2;
+  text-decoration: none;
+}
+.topic-row .date {
+  color: #888;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.topic-row h2 {
+  margin: 0;
+  font-size: clamp(27px, 4vw, 52px);
+  line-height: 1.1;
+}
+.topic-row p {
+  color: #999;
+  line-height: 1.8;
+  margin: 14px 0 0;
+}
+@media (max-width: 700px) {
+  .topic-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

@@ -1,0 +1,140 @@
+.thought-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 130px 24px 80px;
+}
+
+.profile {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 22px;
+  align-items: center;
+  padding-bottom: 34px;
+  border-bottom: 1px solid #262626;
+}
+
+.avatar {
+  width: 84px;
+  height: 84px;
+  border: 1px solid #333;
+  border-radius: 50%;
+  background: #151515;
+  object-fit: cover;
+}
+
+.profile h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  margin: 0 0 10px;
+  letter-spacing: 0;
+}
+
+.profile p {
+  color: #aaa;
+  font-size: 17px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.feed {
+  display: grid;
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.post {
+  position: relative;
+  border: 1px solid #242424;
+  background: #101010;
+  padding: 22px;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #777;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.post-body {
+  white-space: pre-wrap;
+  color: #e6e6e6;
+  font-size: 17px;
+  line-height: 1.78;
+}
+
+.post img,
+.post video {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  margin-top: 18px;
+  border: 1px solid #252525;
+  background: #050505;
+}
+
+.visitor-note {
+  border-top: 1px solid #242424;
+  margin-top: 42px;
+  padding-top: 22px;
+  color: #8d8d8d;
+  line-height: 1.8;
+}
+
+.status {
+  color: #888;
+  margin-top: 28px;
+}
+
+@media (max-width: 760px) {
+  .thought-shell {
+    padding: 24px 12px 52px;
+  }
+
+  .profile {
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 14px;
+    padding-bottom: 22px;
+  }
+
+  .avatar {
+    width: 54px;
+    height: 54px;
+  }
+
+  .profile h1 {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  .profile p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .feed {
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .post {
+    padding: 16px;
+  }
+
+  .post-meta {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .post-body {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .visitor-note {
+    font-size: 14px;
+    margin-top: 28px;
+  }
+}

@@ -1,0 +1,83 @@
+.settings {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+  gap: 24px;
+  margin-top: 42px;
+}
+
+.panel,
+.sample {
+  border: 1px solid #2a2a2a;
+  background: #111;
+  padding: 22px;
+}
+
+.panel label {
+  display: block;
+  color: #aaa;
+  margin: 16px 0 8px;
+}
+
+.panel input,
+.panel select {
+  width: 100%;
+  border: 1px solid #2a2a2a;
+  background: #0b0b0b;
+  color: #f2f2f2;
+  padding: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.actions button,
+.actions a {
+  border: 1px solid #2a2a2a;
+  background: #151515;
+  color: #f2f2f2;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.actions .primary {
+  background: #f2f2f2;
+  color: #0b0b0b;
+  font-weight: 700;
+}
+
+.sample {
+  min-height: 360px;
+  background-size: cover;
+  background-position: center;
+}
+
+.sample h2 {
+  font-size: 42px;
+  margin: 0 0 18px;
+}
+
+.sample h3 {
+  font-size: 26px;
+  margin: 34px 0 12px;
+}
+
+.sample p {
+  color: #ccc;
+  line-height: 1.8;
+}
+
+.status {
+  color: #aaa;
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .settings {
+    grid-template-columns: 1fr;
+  }
+}

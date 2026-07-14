@@ -8,7 +8,8 @@ function getSupabaseKeyInfo() {
 
   if (!key) return { role: "missing", kind: "missing" };
   if (key.startsWith("sb_secret_")) return { role: "secret-key", kind: "supabase-secret-key" };
-  if (key.startsWith("sb_publishable_")) return { role: "wrong-publishable-key", kind: "publishable-key" };
+  if (key.startsWith("sb_publishable_"))
+    return { role: "wrong-publishable-key", kind: "publishable-key" };
 
   try {
     const payload = key.split(".")[1];
@@ -24,17 +25,23 @@ function getSupabaseKeyInfo() {
 
 async function findArticle({ id, slug, title }) {
   if (id) {
-    const rows = await supabaseRequest(`/rest/v1/contents?select=*&id=eq.${encodeURIComponent(id)}&limit=1`);
+    const rows = await supabaseRequest(
+      `/rest/v1/contents?select=*&id=eq.${encodeURIComponent(id)}&limit=1`
+    );
     if (rows?.length === 1) return { article: rows[0], matchedBy: "id" };
   }
 
   if (slug) {
-    const rows = await supabaseRequest(`/rest/v1/contents?select=*&slug=eq.${encodeURIComponent(slug)}&limit=2`);
+    const rows = await supabaseRequest(
+      `/rest/v1/contents?select=*&slug=eq.${encodeURIComponent(slug)}&limit=2`
+    );
     if (rows?.length === 1) return { article: rows[0], matchedBy: "slug" };
   }
 
   if (title) {
-    const rows = await supabaseRequest(`/rest/v1/contents?select=*&type=eq.article&title=eq.${encodeURIComponent(title)}&limit=2`);
+    const rows = await supabaseRequest(
+      `/rest/v1/contents?select=*&type=eq.article&title=eq.${encodeURIComponent(title)}&limit=2`
+    );
     if (rows?.length === 1) return { article: rows[0], matchedBy: "title" };
     if (rows?.length > 1) {
       throw new Error(`找到多篇标题同为「${title}」的文章，为避免误删，请刷新管理页后再删除`);
@@ -99,7 +106,9 @@ module.exports = async function handler(req, res) {
       headers: { Prefer: "return=minimal" }
     });
 
-    const remainingRows = await supabaseRequest(`/rest/v1/contents?select=id&id=eq.${encodeURIComponent(found.article.id)}&limit=1`);
+    const remainingRows = await supabaseRequest(
+      `/rest/v1/contents?select=id&id=eq.${encodeURIComponent(found.article.id)}&limit=1`
+    );
     if (remainingRows && remainingRows.length > 0) {
       const keyInfo = getSupabaseKeyInfo();
       return res.status(500).json({

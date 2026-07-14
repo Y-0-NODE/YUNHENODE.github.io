@@ -1,0 +1,165 @@
+.login-panel,
+.manage-item,
+.editor-panel,
+.tool-panel {
+  border: 1px solid #2a2a2a;
+  background: #111;
+  padding: 22px;
+}
+
+.login-panel {
+  margin-top: 36px;
+  max-width: 520px;
+}
+
+.login-panel label {
+  display: block;
+  color: #aaa;
+  margin: 16px 0 10px;
+}
+
+.login-panel input {
+  width: 100%;
+  border: 1px solid #2a2a2a;
+  background: #0b0b0b;
+  color: #f2f2f2;
+  padding: 12px;
+}
+
+.tool-panel {
+  margin-top: 28px;
+}
+
+.tool-panel input {
+  width: 100%;
+  border: 1px solid #2a2a2a;
+  background: #0b0b0b;
+  color: #f2f2f2;
+  padding: 12px;
+}
+
+.login-panel button,
+.actions a,
+.actions button,
+.media-actions button,
+.editor-actions button {
+  border: 1px solid #2a2a2a;
+  background: #0b0b0b;
+  color: #ddd;
+  padding: 10px 14px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.login-panel button {
+  margin-top: 18px;
+  width: 100%;
+  max-width: 420px;
+  background: #f2f2f2;
+  color: #0b0b0b;
+  font-weight: 700;
+}
+
+.login-panel button:hover,
+.actions a:hover,
+.actions button:hover,
+.media-actions button:hover,
+.editor-actions button:hover {
+  background: #dcdcdc;
+}
+
+.manage-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.manage-item h2 {
+  font-size: 24px;
+  margin: 10px 0 12px;
+}
+
+.meta {
+  color: #777;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.actions .danger {
+  color: #ff9a9a;
+  border-color: #4a2525;
+}
+
+.status {
+  color: #888;
+  margin-top: 28px;
+  line-height: 1.7;
+}
+
+.editor-panel {
+  margin-top: 32px;
+}
+
+.editor-panel label {
+  display: block;
+  color: #aaa;
+  margin: 16px 0 8px;
+}
+
+.editor-panel input,
+.editor-panel select,
+.editor-panel textarea {
+  width: 100%;
+  border: 1px solid #2a2a2a;
+  background: #0b0b0b;
+  color: #f2f2f2;
+  padding: 12px;
+}
+
+.editor-panel textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.media-insert {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.media-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.media-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .media-row {
+    grid-template-columns: 1fr;
+  }
+}

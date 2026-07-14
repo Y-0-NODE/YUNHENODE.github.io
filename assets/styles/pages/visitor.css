@@ -1,0 +1,106 @@
+.visitor-shell {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 150px clamp(20px, 5vw, 56px) 90px;
+}
+
+.visitor-hero {
+  min-height: 46vh;
+  display: grid;
+  align-content: center;
+  border-bottom: 1px solid #292929;
+  padding-bottom: 54px;
+}
+
+.visitor-hero h1 {
+  max-width: 980px;
+  margin: 16px 0 20px;
+  font-size: clamp(52px, 8vw, 112px);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.visitor-hero p {
+  max-width: 760px;
+  color: #cfcfcf;
+  font-size: 20px;
+  line-height: 1.8;
+}
+
+.visitor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 46px;
+}
+
+.visitor-card {
+  display: block;
+  min-height: 230px;
+  border: 1px solid #2a2a2a;
+  background: #101010;
+  color: #f2f2f2;
+  text-decoration: none;
+  padding: 26px;
+}
+
+.visitor-card span {
+  color: #777;
+  font-size: 13px;
+}
+
+.visitor-card h2 {
+  margin: 46px 0 14px;
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.visitor-card p {
+  color: #aaa;
+  line-height: 1.75;
+  max-width: 520px;
+}
+
+.visitor-note {
+  margin-top: 52px;
+  border-top: 1px solid #292929;
+  padding-top: 20px;
+  color: #8f8f8f;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+@media (max-width: 760px) {
+  .visitor-shell {
+    padding: 34px 14px 58px;
+  }
+
+  .visitor-hero {
+    min-height: auto;
+    padding-bottom: 34px;
+  }
+
+  .visitor-hero h1 {
+    font-size: 44px;
+  }
+
+  .visitor-hero p {
+    font-size: 16px;
+  }
+
+  .visitor-grid {
+    grid-template-columns: 1fr;
+    margin-top: 28px;
+  }
+
+  .visitor-card {
+    min-height: 170px;
+    padding: 20px;
+  }
+
+  .visitor-card h2 {
+    margin-top: 34px;
+  }
+}
