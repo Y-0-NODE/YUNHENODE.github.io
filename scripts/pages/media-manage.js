@@ -91,6 +91,40 @@ function fileToDataUrl(file) {
   });
 }
 
+function setupSelectedFilePreview() {
+  const input = document.getElementById("file");
+  if (!input || document.getElementById("selected-file-preview")) return;
+  const preview = document.createElement("div");
+  preview.id = "selected-file-preview";
+  preview.className = "hint";
+  preview.style.display = "none";
+  input.insertAdjacentElement("afterend", preview);
+  let objectUrl = "";
+
+  input.addEventListener("change", () => {
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrl = "";
+    const file = input.files?.[0];
+    if (!file) {
+      preview.style.display = "none";
+      preview.innerHTML = "";
+      return;
+    }
+
+    preview.style.display = "block";
+    preview.textContent = `即将上传：${file.name}（${formatBytes(file.size)}）`;
+    if (file.type.startsWith("image/")) {
+      objectUrl = URL.createObjectURL(file);
+      const image = document.createElement("img");
+      image.src = objectUrl;
+      image.alt = "准备上传的摄影作品预览";
+      image.style.cssText =
+        "display:block;width:100%;max-height:360px;object-fit:contain;margin-top:12px;background:#080808";
+      preview.appendChild(image);
+    }
+  });
+}
+
 async function uploadMedia() {
   const selectedFile = document.getElementById("file").files[0];
   const status = document.getElementById("status");
@@ -267,5 +301,11 @@ async function uploadMedia() {
     return;
   }
 
-  status.textContent = "上传成功，资源已进入 Media Center，可在内容中通过地址引用。";
+  if (kind === "photo" || kind === "video") {
+    status.innerHTML = `上传成功，作品已经自动进入“摄影与作品”。<a href="gallery.html?refresh=${Date.now()}">立即查看摄影与作品</a>`;
+  } else {
+    status.innerHTML = `上传成功，资源已进入 Media Center。<a href="media-center.html?refresh=${Date.now()}">立即查看媒体中心</a>`;
+  }
 }
+
+setupSelectedFilePreview();
