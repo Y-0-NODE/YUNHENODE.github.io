@@ -164,11 +164,11 @@
 <header class="topbar">
   <div class="logo">YUNHENODE</div>
   <nav>
-    <a href="index.html">首页</a>
-    <a href="video.html">视频</a>
-    <a href="article.html">文章</a>
-    <a href="gallery.html">艺术摄影</a>
-    <a href="about.html">关于我</a>
+    <a href="visitor.html">访客入口</a>
+    <a href="article-list.html">文章</a>
+    <a href="case-list.html">案例</a>
+    <a href="gallery.html">作品</a>
+    <a href="about.html">关于</a>
   </nav>
 </header>
 
@@ -185,7 +185,6 @@
   <div class="detail-inner">
     <div class="detail-bar">
       <button type="button" onclick="closeDetail()">关闭</button>
-      <a id="detail-manage" href="media-manage.html" style="display:none;">编辑/删除作品</a>
     </div>
     <div id="detail-media" class="detail-media"></div>
     <div class="detail-meta">
@@ -251,17 +250,6 @@ function openDetail(index){
   document.getElementById("detail-time").textContent = formatDateTime(item.created_at);
   document.getElementById("detail-shot-time").textContent = item.shot_at || "未标注";
   document.getElementById("detail-source").textContent = item.source === "local-folder" ? "本地摄影文件夹" : "作品库";
-
-  const manage = document.getElementById("detail-manage");
-  if(item.id && item.source !== "local-folder"){
-    manage.href = `media-edit.html?id=${encodeURIComponent(item.id)}`;
-    manage.style.display = "";
-  }else if(item.source === "local-folder"){
-    manage.href = `local-gallery-edit.html?url=${encodeURIComponent(item.url || "")}`;
-    manage.style.display = "";
-  }else{
-    manage.style.display = "none";
-  }
 
   detail.classList.add("is-open");
   detail.setAttribute("aria-hidden", "false");
