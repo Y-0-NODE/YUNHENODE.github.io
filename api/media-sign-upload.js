@@ -2,6 +2,7 @@ const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
 const { normalizeMediaKind } = require("../lib/media-model");
 
 const BUCKET = "media";
+const BUCKET_FILE_LIMIT = 20 * 1024 * 1024;
 const MAX_INLINE_BYTES = 2 * 1024 * 1024;
 const INLINE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const ALLOWED_MIME_TYPES = [
@@ -86,7 +87,7 @@ async function ensureBucket() {
         id: BUCKET,
         name: BUCKET,
         public: true,
-        file_size_limit: 5368709120,
+        file_size_limit: BUCKET_FILE_LIMIT,
         allowed_mime_types: ALLOWED_MIME_TYPES
       })
     });
@@ -97,7 +98,7 @@ async function ensureBucket() {
     method: "PUT",
     body: JSON.stringify({
       public: true,
-      file_size_limit: 5368709120,
+      file_size_limit: BUCKET_FILE_LIMIT,
       allowed_mime_types: ALLOWED_MIME_TYPES
     })
   });
