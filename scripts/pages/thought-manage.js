@@ -4,14 +4,7 @@ let POSTS = [];
 let PROFILE = null;
 let EDITING_ID = "";
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+const escapeHtml = window.YunheUtils.escapeHtml;
 
 function formatDate(value) {
   const date = new Date(value);

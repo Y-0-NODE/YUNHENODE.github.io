@@ -33,14 +33,7 @@ function setTitle(text) {
   document.getElementById("title").innerText = text;
 }
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+const escapeHtml = window.YunheUtils.escapeHtml;
 
 function splitTitle(title) {
   const text = String(title || "").trim();

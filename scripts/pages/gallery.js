@@ -1,13 +1,6 @@
 let WORKS = [];
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+const escapeHtml = window.YunheUtils.escapeHtml;
 
 async function loadJson(url, fallback) {
   try {
@@ -19,13 +12,7 @@ async function loadJson(url, fallback) {
   }
 }
 
-function formatDateTime(value) {
-  if (!value) return "未标注";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-  const pad = n => String(n).padStart(2, "0");
-  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-}
+const formatDateTime = window.YunheUtils.formatDateTime;
 
 function openDetail(index) {
   const item = WORKS[index];

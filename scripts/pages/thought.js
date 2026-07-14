@@ -1,14 +1,7 @@
 const SUPABASE_URL = window.YUNHE_CONFIG.supabaseUrl;
 const SUPABASE_KEY = window.YUNHE_CONFIG.supabaseKey;
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+const escapeHtml = window.YunheUtils.escapeHtml;
 
 function formatDate(value) {
   if (!value) return "";

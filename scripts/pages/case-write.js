@@ -128,14 +128,7 @@ const TEMPLATES = {
   }
 };
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+const escapeHtml = window.YunheUtils.escapeHtml;
 
 function applyTemplate() {
   const template = TEMPLATES[document.getElementById("template").value] || TEMPLATES.X;

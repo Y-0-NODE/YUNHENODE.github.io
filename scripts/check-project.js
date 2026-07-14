@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const root = path.resolve(__dirname, "..");
 const apiDir = path.join(root, "api");
@@ -18,17 +19,38 @@ function listFiles(dir, predicate) {
 
 const apiFiles = listFiles(apiDir, file => file.endsWith(".js"));
 if (apiFiles.length > 12) failures.push(`Serverless functions: ${apiFiles.length} (maximum 12)`);
+const apiHashes = new Map();
+for (const file of apiFiles) {
+  const hash = crypto.createHash("sha1").update(fs.readFileSync(file)).digest("hex");
+  if (apiHashes.has(hash)) {
+    failures.push(
+      `Duplicate API implementation: ${path.basename(apiHashes.get(hash))} and ${path.basename(file)}`
+    );
+  }
+  apiHashes.set(hash, file);
+}
 
 for (const directory of [
   "assets/styles",
+  "admin",
   "scripts/core",
   "scripts/pages",
   "shared",
   "lib/services",
   "database/migrations",
-  "legacy"
+  "legacy",
+  "pages"
 ]) {
   if (!fs.existsSync(path.join(root, directory))) failures.push(`Missing directory: ${directory}`);
+}
+
+const legacyManifest = JSON.parse(fs.readFileSync(path.join(root, "legacy/manifest.json"), "utf8"));
+for (const retired of [
+  ...(legacyManifest.archivedPages || []),
+  ...(legacyManifest.archivedTemplates || [])
+]) {
+  if (fs.existsSync(path.join(root, retired)))
+    failures.push(`Retired file still active: ${retired}`);
 }
 
 for (const file of listFiles(root, file => file.endsWith(".js"))) {

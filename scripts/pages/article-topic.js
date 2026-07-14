@@ -19,14 +19,7 @@ const TOPIC_ALIASES = {
   未分类: ["未分类", ""]
 };
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+const escapeHtml = window.YunheUtils.escapeHtml;
 function articleUrl(item) {
   if (item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
   return `content.html?id=${encodeURIComponent(item.id)}`;
