@@ -82,7 +82,7 @@
 <header class="topbar">
   <div class="logo">YUNHENODE CMS</div>
   <nav>
-    <a href="gallery.html">艺术摄影</a>
+    <a href="gallery-manage.html">作品管理</a>
     <a href="media-manage.html">上传作品</a>
     <a href="admin.html">后台首页</a>
   </nav>
@@ -116,7 +116,7 @@
 
     <button type="button" onclick="saveWork()">保存修改</button>
     <button class="danger" type="button" onclick="deleteWork()">删除作品</button>
-    <a href="gallery.html">返回作品页</a>
+    <a href="gallery-manage.html">返回作品管理</a>
     <div id="status" class="status">正在读取作品...</div>
   </section>
 </main>
@@ -258,7 +258,7 @@ async function deleteWork(){
     ? `作品记录已删除。提醒：${result.storageWarning}`
     : "作品已删除，正在返回作品页。";
   setTimeout(() => {
-    location.href = `gallery.html?v=${Date.now()}`;
+    location.href = `gallery-manage.html?v=${Date.now()}`;
   }, 600);
 }
 
