@@ -47,6 +47,9 @@ async function getSearchIndex() {
         knowledge_level: meta.knowledge_level || "",
         archive: meta.archive || "",
         related_documents: Array.isArray(meta.related_documents) ? meta.related_documents : [],
+        collections: Array.isArray(meta.collections) ? meta.collections : [],
+        media_files: Array.isArray(meta.media_files) ? meta.media_files : [],
+        lifecycle: /_archived$/.test(row.type) ? "archived" : (/_private$/.test(row.type) ? "private" : (row.type === "thought" && row.topic !== "public" ? row.topic : "published")),
         seo_title: meta.seo_title || row.title || "",
         seo_description: meta.seo_description || row.intro || ""
       };
@@ -133,8 +136,14 @@ module.exports = async function handler(req, res) {
 
     const allowedTypes = ["article", "case", "video", "thought", "thought_profile"];
     const requestedType = allowedTypes.includes(data?.type) ? data.type : "article";
-    const contents = await supabaseRequest(`/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at&type=eq.${requestedType}&order=created_at.desc`);
-    return res.status(200).json({ success: true, data: Array.isArray(contents) ? contents : [] });
+    const typeFilter = requestedType === "thought" ? `eq.${requestedType}` : `in.(${requestedType},${requestedType}_private,${requestedType}_archived)`;
+    const contents = await supabaseRequest(`/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at&type=${typeFilter}&order=created_at.desc`);
+    const normalized = (Array.isArray(contents) ? contents : []).map(row => ({
+      ...row,
+      lifecycle:/_archived$/.test(row.type) ? "archived" : (/_private$/.test(row.type) ? "private" : (row.type === "thought" && row.topic !== "public" ? row.topic : "published")),
+      base_type:String(row.type || requestedType).replace(/_(archived|private)$/, "")
+    }));
+    return res.status(200).json({ success: true, data: normalized });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message, detail: error.data || null });
   }

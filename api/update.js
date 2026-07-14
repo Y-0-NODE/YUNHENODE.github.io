@@ -77,6 +77,8 @@ function buildMeta(body, data, current, previous) {
     updated_at: updatedAt,
     version: String(data?.version || previous.version || "v1.0"),
     related_documents: Array.isArray(data?.relatedDocuments) ? data.relatedDocuments : (previous.related_documents || []),
+    collections: Array.isArray(data?.collections) ? data.collections : (previous.collections || []),
+    media_files: Array.isArray(data?.mediaFiles) ? data.mediaFiles : (previous.media_files || []),
     cover_image: String(data?.coverImage || previous.cover_image || inferCoverImage(body)),
     seo_title: String(data?.seoTitle || previous.seo_title || current.title),
     seo_description: String(data?.seoDescription || previous.seo_description || summary).slice(0, 200),
@@ -91,7 +93,7 @@ function withMeta(body, meta) {
 }
 
 function shouldEmbedMeta(type) {
-  return type !== "thought" && type !== "thought_profile";
+  return type !== "thought_profile";
 }
 
 module.exports = async function handler(req, res) {
@@ -110,12 +112,36 @@ module.exports = async function handler(req, res) {
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
     const { id, title, intro, topic, body } = data || {};
-    if (!id || !title || !body) {
+    if (!id) {
+      return res.status(400).json({ success: false, error: "缺少内容 ID" });
+    }
+
+    if (data?.action === "lifecycle") {
+      const rows = await supabaseRequest(`/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=*`, { method:"GET" });
+      const current = rows?.[0];
+      if (!current) return res.status(404).json({ success:false, error:"没有找到这条内容" });
+      await supabaseRequest("/rest/v1/content_backups", {
+        method:"POST", headers:{ Prefer:"return=minimal" },
+        body:JSON.stringify({ content_id:current.id, operation:`lifecycle_${data?.lifecycle || "update"}`, snapshot:current, created_by:data?.adminName })
+      }).catch(() => null);
+      const rawType = String(current.type || "article");
+      const baseType = rawType.replace(/_(archived|private)$/, "");
+      const lifecycle = ["published", "private", "archived"].includes(data?.lifecycle) ? data.lifecycle : "published";
+      const patch = baseType === "thought"
+        ? { topic:lifecycle === "published" ? "public" : lifecycle }
+        : { type:lifecycle === "published" ? baseType : `${baseType}_${lifecycle}` };
+      const updated = await supabaseRequest(`/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=*`, {
+        method:"PATCH", headers:{ Prefer:"return=representation" }, body:JSON.stringify(patch)
+      });
+      return res.status(200).json({ success:true, lifecycle, data:updated?.[0] || null });
+    }
+
+    if (!title || !body) {
       return res.status(400).json({ success: false, error: "缺少文章 ID、标题或正文" });
     }
 
     const currentRows = await supabaseRequest(
-      `/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=body,type,slug,created_at`,
+      `/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=*`,
       { method: "GET" }
     ).catch(() => []);
 
@@ -133,6 +159,12 @@ module.exports = async function handler(req, res) {
       createdAt: stored.created_at || previous.created_at || ""
     }, previous);
     const nextBody = shouldEmbedMeta(contentType) ? withMeta(plainBody, meta) : plainBody;
+
+    await supabaseRequest("/rest/v1/content_backups", {
+      method:"POST",
+      headers:{ Prefer:"return=minimal" },
+      body:JSON.stringify({ content_id:id, operation:"edit", snapshot:stored, created_by:data?.adminName })
+    }).catch(() => null);
 
     const updatedRows = await supabaseRequest(
       `/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=id,title,slug,intro,body,type,topic,created_at`,

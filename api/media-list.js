@@ -38,5 +38,9 @@ module.exports = async function handler(req, res) {
 
   if (error) return res.status(500).json({ success: false, error: error.message || error });
 
-  return res.status(200).json({ success: true, data: data || [] });
+  const cleaned = (data || []).map(item => ({
+    ...item,
+    description: String(item.description || "").replace(/\n*<!--yunhe-media-meta:[\s\S]*?-->\s*$/m, "").trim()
+  }));
+  return res.status(200).json({ success: true, data: cleaned });
 };

@@ -79,6 +79,8 @@ function buildMeta(body, data, system) {
     updated_at: system.createdAt,
     version: String(data?.version || "v1.0"),
     related_documents: Array.isArray(data?.relatedDocuments) ? data.relatedDocuments : [],
+    collections: Array.isArray(data?.collections) ? data.collections : [],
+    media_files: Array.isArray(data?.mediaFiles) ? data.mediaFiles : [],
     cover_image: String(data?.coverImage || inferCoverImage(body)),
     seo_title: String(data?.seoTitle || system.title),
     seo_description: String(data?.seoDescription || summary).slice(0, 200),
@@ -93,7 +95,7 @@ function withMeta(body, meta) {
 }
 
 function shouldEmbedMeta(type) {
-  return type !== "thought" && type !== "thought_profile";
+  return type !== "thought_profile";
 }
 
 module.exports = async function handler(req, res) {
