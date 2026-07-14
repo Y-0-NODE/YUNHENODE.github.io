@@ -53,22 +53,33 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: "缺少文章 ID、标题或正文" });
     }
 
-    const currentRows = await supabaseRequest(`/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=body`, {
-      method: "GET"
-    }).catch(() => []);
-    const bodyWithMeta = withMeta(body, data, currentRows?.[0]?.body || "");
+    const currentRows = await supabaseRequest(
+      `/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=body,type`,
+      { method: "GET" }
+    ).catch(() => []);
+
+    const current = currentRows?.[0] || {};
+    const contentType = String(current.type || data?.type || "article");
+
+    const nextBody = ["article", "case"].includes(contentType)
+      ? withMeta(body, data, current.body || "")
+      : cleanBody(body);
+
     const nextIntro = String(intro || data?.subtitle || "").trim();
 
-    const updatedRows = await supabaseRequest(`/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=id,title,slug,intro,body,type,topic,created_at`, {
-      method: "PATCH",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify({
-        title,
-        intro: nextIntro,
-        topic: topic || "未分类",
-        body: bodyWithMeta
-      })
-    });
+    const updatedRows = await supabaseRequest(
+      `/rest/v1/contents?id=eq.${encodeURIComponent(id)}&select=id,title,slug,intro,body,type,topic,created_at`,
+      {
+        method: "PATCH",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify({
+          title,
+          intro: nextIntro,
+          topic: topic || "未分类",
+          body: nextBody
+        })
+      }
+    );
 
     if (!updatedRows || updatedRows.length === 0) {
       return res.status(404).json({
