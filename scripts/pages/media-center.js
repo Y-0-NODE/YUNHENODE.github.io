@@ -21,6 +21,20 @@ function previewLink(x) {
 }
 function ensureMediaViewer() {
   if (document.getElementById("media-viewer")) return;
+  if (!document.getElementById("media-viewer-styles")) {
+    const styles = document.createElement("style");
+    styles.id = "media-viewer-styles";
+    styles.textContent = `
+      .media-viewer{position:fixed;inset:0;z-index:1000;display:none;padding:clamp(14px,4vw,48px);background:rgba(0,0,0,.94);overflow:auto}
+      .media-viewer.is-open{display:grid;place-items:center}
+      .media-viewer-inner{width:min(1600px,100%)}
+      .media-viewer-bar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px;color:#eee}
+      .media-viewer-bar strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .media-viewer-bar button{border:1px solid #444;background:#111;color:#eee;padding:10px 15px;cursor:pointer}
+      .media-viewer-image{display:block;width:100%;max-height:calc(100vh - 120px);object-fit:contain;background:#050505}
+    `;
+    document.head.appendChild(styles);
+  }
   document.body.insertAdjacentHTML(
     "beforeend",
     `<div id="media-viewer" class="media-viewer" aria-hidden="true" role="dialog" aria-modal="true" aria-label="作品大图">
