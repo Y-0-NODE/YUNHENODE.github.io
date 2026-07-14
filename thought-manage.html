@@ -492,6 +492,25 @@ async function uploadThroughServer(file, options){
   });
   const result = await uploadRes.json().catch(() => ({}));
   if(!uploadRes.ok) throw new Error(result.error || "图片上传失败。");
+  await fetch("./api/media-record", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      adminName:ADMIN_NAME,
+      password:ADMIN_PASSWORD,
+      kind:options.kind || "photo",
+      title:options.title || file.name,
+      description:options.description || "随笔引用媒体",
+      fileName:file.name,
+      path:result.path,
+      url:result.publicUrl
+    })
+  }).then(async response => {
+    if(!response.ok){
+      const detail = await response.json().catch(() => ({}));
+      throw new Error(detail.error || "图片已上传，但没有登记进 Media Center。");
+    }
+  });
   return result.publicUrl;
 }
 

@@ -277,7 +277,7 @@ Promise.all([
   loadJson("./data/local-gallery.json", [])
 ])
   .then(([remoteResult, localResult]) => {
-    const remoteList = Array.isArray(remoteResult.data) ? remoteResult.data : [];
+    const remoteList = Array.isArray(remoteResult.data) ? remoteResult.data.filter(item => ["photo", "video"].includes(item.kind)) : [];
     const localList = Array.isArray(localResult) ? localResult : [];
     const list = [...remoteList, ...localList].sort((a, b) =>
       String(b.created_at || "").localeCompare(String(a.created_at || ""))

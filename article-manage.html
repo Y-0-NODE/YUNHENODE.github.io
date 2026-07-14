@@ -335,12 +335,9 @@
         <label for="media-url">已有图片 / 视频地址</label>
         <input id="media-url" placeholder="https://...">
 
-        <label for="media-file">从电脑上传</label>
-        <input id="media-file" type="file" accept="image/*,video/*">
-
         <div class="media-actions">
-          <button type="button" onclick="uploadAndInsertMedia()">上传并插入正文</button>
           <button type="button" onclick="insertMediaUrl()">插入已有地址</button>
+          <a class="button" href="media-center.html" target="_blank">打开 Media Center</a>
         </div>
         <div id="media-status" class="status"></div>
       </div>
@@ -356,25 +353,25 @@
   </section>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 let DATA = [];
 let ADMIN_NAME = "";
 let ADMIN_PASSWORD = "";
 let EDITING_ID = "";
 const PAGE_PARAMS = new URLSearchParams(location.search);
-const CONTENT_TYPE = PAGE_PARAMS.get("type") === "case" ? "case" : "article";
-const TYPE_LABEL = CONTENT_TYPE === "case" ? "案例" : "文章";
+const REQUESTED_TYPE = PAGE_PARAMS.get("type");
+const CONTENT_TYPE = ["case", "video"].includes(REQUESTED_TYPE) ? REQUESTED_TYPE : "article";
+const TYPE_LABEL = CONTENT_TYPE === "case" ? "案例" : (CONTENT_TYPE === "video" ? "视频" : "文章");
 const TARGET_ID = PAGE_PARAMS.get("id") || "";
 const TARGET_SLUG = PAGE_PARAMS.get("slug") || "";
 const TARGET_TITLE = PAGE_PARAMS.get("title") || "";
 
 function applyPageMode(){
   document.title = `${TYPE_LABEL}管理｜云鹤系统`;
-  document.getElementById("page-eyebrow").textContent = CONTENT_TYPE === "case" ? "CASE MANAGEMENT" : "ARTICLE MANAGEMENT";
+  document.getElementById("page-eyebrow").textContent = CONTENT_TYPE === "case" ? "CASE MANAGEMENT" : (CONTENT_TYPE === "video" ? "VIDEO MANAGEMENT" : "ARTICLE MANAGEMENT");
   document.getElementById("page-title").textContent = `${TYPE_LABEL}管理`;
   document.getElementById("page-intro").textContent = `先登录数据管理员账户，再管理和删除${TYPE_LABEL}。`;
-  document.getElementById("editor-eyebrow").textContent = CONTENT_TYPE === "case" ? "EDIT CASE" : "EDIT ARTICLE";
+  document.getElementById("editor-eyebrow").textContent = CONTENT_TYPE === "case" ? "EDIT CASE" : (CONTENT_TYPE === "video" ? "EDIT VIDEO" : "EDIT ARTICLE");
 }
 
 function articleUrl(item){
@@ -548,7 +545,6 @@ function openEditor(id){
   document.getElementById("edit-body").value = cleanBody(item.body || "");
   document.getElementById("media-caption").value = "";
   document.getElementById("media-url").value = "";
-  document.getElementById("media-file").value = "";
   document.getElementById("media-status").textContent = "";
   document.getElementById("editor-panel").classList.remove("hidden");
   document.getElementById("editor-panel").scrollIntoView({ behavior:"smooth", block:"start" });
@@ -620,79 +616,6 @@ function insertMediaUrl(){
 
   insertIntoEditBody(getMediaLine(kind, caption, url));
   status.textContent = "已经插入正文，记得点击“保存修改”。";
-}
-
-async function uploadAndInsertMedia(){
-  const status = document.getElementById("media-status");
-  const file = document.getElementById("media-file").files[0];
-  const kind = document.getElementById("media-kind").value === "video" ? "video" : "photo";
-  const caption = document.getElementById("media-caption").value.trim();
-
-  if(!EDITING_ID){
-    status.textContent = `请先打开要编辑的${TYPE_LABEL}。`;
-    return;
-  }
-
-  if(!file){
-    status.textContent = "请先选择要上传的图片或视频。";
-    return;
-  }
-
-  if(!window.supabase){
-    status.textContent = "上传组件还没加载好，请刷新页面后再试。";
-    return;
-  }
-
-  status.textContent = "正在申请上传通道...";
-
-  const signRes = await fetch("./api/media-sign-upload", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD,
-      kind,
-      fileName:file.name,
-      contentType:file.type
-    })
-  });
-
-  const sign = await signRes.json().catch(() => ({}));
-
-  if(!signRes.ok){
-    status.textContent = sign.error || "申请上传通道失败。";
-    return;
-  }
-
-  status.textContent = "正在上传文件...";
-  const client = window.supabase.createClient("https://ndraugyrdnecqqcyfzjt.supabase.co", "sb_publishable_QWJ-UAB2M1a9OwKcCJAA_w_WdbRHYyM");
-  const uploadResult = await client.storage
-    .from(sign.bucket)
-    .uploadToSignedUrl(sign.path, sign.token, file);
-
-  if(uploadResult.error){
-    status.textContent = uploadResult.error.message || "上传失败。";
-    return;
-  }
-
-  await fetch("./api/media-record", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      adminName:ADMIN_NAME,
-      password:ADMIN_PASSWORD,
-      kind,
-      title:caption || file.name,
-      description:`从${TYPE_LABEL}管理页插入`,
-      fileName:file.name,
-      path:sign.path,
-      url:sign.publicUrl
-    })
-  }).catch(() => null);
-
-  document.getElementById("media-url").value = sign.publicUrl;
-  insertIntoEditBody(getMediaLine(kind === "video" ? "video" : "image", caption || file.name, sign.publicUrl));
-  status.textContent = "上传成功，已经插入正文，记得点击“保存修改”。";
 }
 
 async function saveEdit(){
@@ -779,5 +702,6 @@ async function deleteArticle(id, encodedSlug, encodedTitle){
 applyPageMode();
 </script>
 
+<script src="knowledge-client.js"></script>
 </body>
 </html>

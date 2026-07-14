@@ -14,6 +14,11 @@ const ALLOWED_MIME_TYPES = [
   "video/mp4",
   "video/quicktime",
   "video/webm"
+  ,"audio/mpeg"
+  ,"audio/mp4"
+  ,"audio/wav"
+  ,"audio/x-m4a"
+  ,"application/pdf"
 ];
 
 function safeFileName(name) {
@@ -21,6 +26,10 @@ function safeFileName(name) {
     .replace(/[/\\?%*:|"<>]/g, "-")
     .replace(/\s+/g, "-")
     .slice(0, 120);
+}
+
+function normalizeKind(value) {
+  return ["photo", "video", "audio", "document", "asset"].includes(value) ? value : "asset";
 }
 
 function getSupabaseEnv() {
@@ -159,7 +168,7 @@ module.exports = async function handler(req, res) {
     const env = requireSupabaseEnv();
     if (!env.ok) return res.status(env.status).json({ success: false, error: env.error });
 
-    const kind = body?.kind === "video" ? "video" : "photo";
+    const kind = normalizeKind(body?.kind);
     const safeName = safeFileName(body?.fileName);
     const path = `${kind}/${Date.now()}-${safeName}`;
 

@@ -13,6 +13,8 @@ const DEFAULT_CONFIG = {
   topics: ["个人成长与自我观察", "情感关系与人际处理", "系统组织与规则设计", "创作表达与内容方法", "技术工具与数字实践", "社会观察与公共议题"],
   levels: ["Observation", "Analysis", "Decision", "Validation", "Method"],
   archives: ["案例档案", "方法档案", "研究档案", "项目档案", "媒体档案", "未分类档案"],
+  categories: ["人与关系", "组织与系统", "社会与现实", "创作与内在", "项目与方法", "未分类"],
+  tags: ["观察", "分析", "案例", "方法", "研究", "复盘"],
   relationRules: ["共享主题时建立关联", "共享两个以上关键词时建立关联", "后续文章引用前文时建立关联"]
 };
 
@@ -63,6 +65,8 @@ async function saveConfig(input) {
     topics: Array.isArray(input?.topics) ? input.topics : DEFAULT_CONFIG.topics,
     levels: Array.isArray(input?.levels) ? input.levels : DEFAULT_CONFIG.levels,
     archives: Array.isArray(input?.archives) ? input.archives : DEFAULT_CONFIG.archives,
+    categories: Array.isArray(input?.categories) ? input.categories : DEFAULT_CONFIG.categories,
+    tags: Array.isArray(input?.tags) ? input.tags : DEFAULT_CONFIG.tags,
     relationRules: Array.isArray(input?.relationRules) ? input.relationRules : DEFAULT_CONFIG.relationRules
   };
 
@@ -95,6 +99,16 @@ module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
   if (req.method === "GET") {
+    if (req.query?.view === "knowledge-config") {
+      const env = requireSupabaseEnv();
+      if (!env.ok) return res.status(env.status).json({ success:false, error:env.error });
+      try {
+        const row = await getConfigRow();
+        return res.status(200).json({ success:true, data:parseConfig(row) });
+      } catch (error) {
+        return res.status(500).json({ success:false, error:error.message });
+      }
+    }
     return res.status(200).json({ success: true, version: "admin-list-rest-2026-07-15-v2", message: "管理列表、搜索索引和知识配置共用一个接口。" });
   }
   if (req.method !== "POST") return res.status(405).json({ success: false, error: "Only POST allowed" });
@@ -117,7 +131,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true, data: await saveConfig(data?.config) });
     }
 
-    const allowedTypes = ["article", "case", "thought", "thought_profile"];
+    const allowedTypes = ["article", "case", "video", "thought", "thought_profile"];
     const requestedType = allowedTypes.includes(data?.type) ? data.type : "article";
     const contents = await supabaseRequest(`/rest/v1/contents?select=id,title,slug,intro,body,type,topic,created_at&type=eq.${requestedType}&order=created_at.desc`);
     return res.status(200).json({ success: true, data: Array.isArray(contents) ? contents : [] });

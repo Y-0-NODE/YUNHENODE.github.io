@@ -47,6 +47,10 @@ async function insertMediaRecord(supabase, payload) {
   return { data: null, error: lastError };
 }
 
+function normalizeKind(value) {
+  return ["photo", "video", "audio", "document", "asset"].includes(value) ? value : "asset";
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -70,7 +74,7 @@ module.exports = async function handler(req, res) {
     const payload = {
       title: body?.title || body?.fileName || "未命名作品",
       description: body?.description || "",
-      kind: body?.kind === "video" ? "video" : "photo",
+      kind: normalizeKind(body?.kind),
       url: body.url,
       path: body.path,
       shot_at: body?.shot_at || null

@@ -65,9 +65,17 @@
 }
 
 .preview img,
-.preview video{
+.preview video,
+.preview audio{
   width:100%;
   display:block;
+}
+
+.preview .document-link{
+  display:block;
+  padding:32px;
+  color:#f2f2f2;
+  text-align:center;
 }
 
 .readonly{
@@ -88,7 +96,7 @@
 <header class="topbar">
   <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
   <nav>
-    <a href="gallery-manage.html">作品管理</a>
+    <a href="media-center.html">媒体中心</a>
     <a href="media-manage.html">上传作品</a>
     <a href="admin.html">后台首页</a>
   </nav>
@@ -122,7 +130,7 @@
 
     <button id="save-work" class="primary" type="button" onclick="saveWork()">保存修改</button>
     <button class="danger" type="button" onclick="deleteWork()">删除作品</button>
-    <a href="gallery-manage.html">返回作品管理</a>
+    <a href="media-center.html">返回媒体中心</a>
     <div id="status" class="status">正在读取作品...</div>
   </section>
 </main>
@@ -174,9 +182,15 @@ async function loadWork(){
   }
 
   const preview = document.getElementById("preview");
-  preview.innerHTML = CURRENT.kind === "video"
-    ? `<video src="${escapeHtml(CURRENT.url)}" controls playsinline></video>`
-    : `<img src="${escapeHtml(CURRENT.url)}" alt="${escapeHtml(CURRENT.title || "作品")}">`;
+  if(CURRENT.kind === "video"){
+    preview.innerHTML = `<video src="${escapeHtml(CURRENT.url)}" controls playsinline></video>`;
+  }else if(CURRENT.kind === "audio"){
+    preview.innerHTML = `<audio src="${escapeHtml(CURRENT.url)}" controls></audio>`;
+  }else if(CURRENT.kind === "document"){
+    preview.innerHTML = `<a class="document-link" href="${escapeHtml(CURRENT.url)}" target="_blank" rel="noopener">打开 PDF / 文档</a>`;
+  }else{
+    preview.innerHTML = `<img src="${escapeHtml(CURRENT.url)}" alt="${escapeHtml(CURRENT.title || "媒体")}">`;
+  }
 
   document.getElementById("title").value = CURRENT.title || "";
   document.getElementById("description").value = CURRENT.description || "";
@@ -264,7 +278,7 @@ async function deleteWork(){
     ? `作品记录已删除。提醒：${result.storageWarning}`
     : "作品已删除，正在返回作品页。";
   setTimeout(() => {
-    location.href = `gallery-manage.html?v=${Date.now()}`;
+    location.href = `media-center.html?v=${Date.now()}`;
   }, 600);
 }
 

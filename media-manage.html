@@ -63,7 +63,7 @@
   <a class="logo logo-back" href="admin.html" onclick="if(window.history.length > 1){event.preventDefault();window.history.back();}" aria-label="返回上一页">YUNHENODE CMS</a>
   <nav>
     <a href="admin.html">后台首页</a>
-    <a href="gallery-manage.html">作品管理</a>
+    <a href="media-center.html">媒体中心</a>
     <a href="index.html">网站首页</a>
   </nav>
 </header>
@@ -82,8 +82,11 @@
 
     <label for="kind">类型</label>
     <select id="kind">
-      <option value="photo">摄影</option>
-      <option value="video">影像</option>
+      <option value="photo">摄影 / 图片</option>
+      <option value="video">视频 / 影像</option>
+      <option value="audio">音频 / 录音 / 音乐</option>
+      <option value="document">PDF / 文档</option>
+      <option value="asset">封面 / 通用素材</option>
     </select>
 
     <label for="title">标题</label>
@@ -96,13 +99,13 @@
     <input id="shot-at" type="date">
 
     <label for="file">文件</label>
-    <input id="file" type="file" accept="image/*,video/*">
+    <input id="file" type="file" accept="image/*,video/*,audio/*,application/pdf">
 
     <label for="external-url">已有作品地址</label>
     <input id="external-url" type="url" placeholder="视频或图片已经在其他平台时，粘贴 https://...">
 
     <button type="button" onclick="uploadMedia()">上传作品</button>
-    <div id="status" class="status">图片会先自动压缩再上传；大视频建议粘贴已有地址。</div>
+    <div id="status" class="status">所有文件只进入 Media Center；内容页使用资源地址引用，不重复上传。</div>
     <div class="hint">Supabase 免费版单文件上限固定为 50MB。4K 视频建议放在视频平台或网盘，网站保存链接；摄影作品可上传压缩后的展示图。</div>
   </section>
 </main>
@@ -410,7 +413,7 @@ async function uploadMedia(){
     return;
   }
 
-  status.textContent = "上传成功，作品已经进入艺术摄影页面。";
+  status.textContent = "上传成功，资源已进入 Media Center，可在内容中通过地址引用。";
 }
 </script>
 
