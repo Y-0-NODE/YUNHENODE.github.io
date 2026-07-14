@@ -52,8 +52,16 @@ document.addEventListener("keydown", event => {
   if (event.key === "Escape") closeDetail();
 });
 
-Promise.all([loadJson("./api/media-list", { data: [] }), loadJson("./data/local-gallery.json", [])])
-  .then(([remoteResult, localResult]) => {
+async function loadGallery() {
+  const status = document.getElementById("status");
+  const gallery = document.getElementById("gallery");
+  status.textContent = "正在加载作品...";
+  try {
+    const cacheKey = Date.now();
+    const [remoteResult, localResult] = await Promise.all([
+      loadJson(`./api/media-list?refresh=${cacheKey}`, { data: [] }),
+      loadJson(`./data/local-gallery.json?refresh=${cacheKey}`, [])
+    ]);
     const remoteList = Array.isArray(remoteResult.data)
       ? remoteResult.data.filter(item => ["photo", "video"].includes(item.kind))
       : [];
@@ -64,11 +72,9 @@ Promise.all([loadJson("./api/media-list", { data: [] }), loadJson("./data/local-
     const list = [...remoteList, ...localList].sort((a, b) =>
       String(b.created_at || "").localeCompare(String(a.created_at || ""))
     );
-    const status = document.getElementById("status");
-    const gallery = document.getElementById("gallery");
-
     if (!list.length) {
       status.textContent = "暂时没有作品。";
+      gallery.innerHTML = "";
       return;
     }
 
@@ -91,7 +97,12 @@ Promise.all([loadJson("./api/media-list", { data: [] }), loadJson("./data/local-
     `
       )
       .join("");
-  })
-  .catch(() => {
-    document.getElementById("status").textContent = "作品加载失败。";
-  });
+  } catch (error) {
+    status.textContent = "作品加载失败。";
+  }
+}
+
+window.addEventListener("pageshow", loadGallery);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) loadGallery();
+});
