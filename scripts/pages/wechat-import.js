@@ -1,7 +1,7 @@
 const TOPIC_RULES = [
   ["亲密关系与家庭", ["亲密关系", "婚姻", "伴侣", "夫妻", "家庭", "父母", "亲子", "婆媳"]],
   ["沟通与冲突", ["沟通", "冲突", "争吵", "表达", "协商", "误解", "冷战", "和解"]],
-  ["情感与关系", ["情感", "感情", "关系", "恋爱", "分手", "依恋", "信任", "边界"]],
+  ["情感与关系", ["情感", "感情", "人际关系", "恋爱", "分手", "依恋", "信任", "关系边界"]],
   ["个体成长", ["成长", "自我", "选择", "焦虑", "情绪", "心理", "疗愈", "反思"]],
   ["组织结构", ["组织结构", "权责", "岗位", "层级", "部门", "架构调整", "职能"]],
   ["系统机制", ["系统机制", "运行机制", "失效", "闭环", "规则", "权限", "治理", "退出机制"]],
@@ -24,7 +24,10 @@ const TOPIC_RULES = [
   ],
   ["社会观察", ["社会观察", "社会现象", "群体", "公共议题", "政策", "舆论", "时代", "现实"]],
   ["城市与空间", ["城市", "街区", "社区", "空间", "建筑", "场地", "室内", "公共空间"]],
-  ["消费与生活", ["消费", "购买", "服务", "体验", "生活方式", "日常", "用户体验"]],
+  [
+    "消费与生活",
+    ["消费", "购买", "服务", "体验", "生活方式", "日常", "用户体验", "饮食", "食物", "调味", "胡椒"]
+  ],
   ["商业与品牌", ["品牌", "商业", "市场", "营销", "logo", "包装", "定位", "传播"]],
   ["艺术与创作", ["艺术", "摄影", "影像", "展览", "作品", "图像", "创作", "设计"]],
   [
@@ -32,17 +35,32 @@ const TOPIC_RULES = [
     ["方法", "方法论", "框架", "模型", "判断模型", "判断方法", "分析方法", "研究方法"]
   ],
   ["梦境与潜意识", ["梦境", "潜意识", "象征", "梦中", "做梦"]],
-  ["文化", ["文化", "传统", "习俗", "审美", "历史", "叙事"]],
-  ["平台", ["apple", "账号", "微信", "公众号", "小程序", "平台", "后台"]],
-  ["技术", ["网站", "架构", "模块", "技术", "系统开发"]],
-  ["组织", ["组织", "公司", "机构"]],
-  ["品牌", ["品牌"]],
-  ["城市", ["城市", "地方"]],
-  ["消费", ["消费", "产品"]],
-  ["艺术", ["艺术", "作品"]],
-  ["空间", ["空间", "建筑"]],
-  ["梦境", ["梦"]]
+  ["社会观察", ["文化", "传统", "习俗", "历史", "公共叙事"]]
 ];
+
+const LEGACY_TOPIC_MAP = {
+  情感关系与人际处理: "情感与关系",
+  个人成长与自我观察: "个体成长",
+  系统组织与规则设计: "系统机制",
+  社会观察与公共议题: "社会观察",
+  技术工具与数字实践: "平台与技术",
+  平台: "平台与技术",
+  技术: "平台与技术",
+  组织: "组织结构",
+  城市: "城市与空间",
+  空间: "城市与空间",
+  消费: "消费与生活",
+  品牌: "商业与品牌",
+  艺术: "艺术与创作",
+  梦境: "梦境与潜意识",
+  文化: "社会观察",
+  社会: "社会观察"
+};
+
+function canonicalTopic(value) {
+  const topic = String(value || "未分类").trim() || "未分类";
+  return LEGACY_TOPIC_MAP[topic] || topic;
+}
 
 function cleanLines(text) {
   return String(text || "")
@@ -67,12 +85,12 @@ function detectTopic(text) {
 
 function detectType(text) {
   const lower = String(text || "").toLowerCase();
+  const firstLine = cleanLines(text)[0] || "";
+  const caseMarkers = ["problem", "analysis", "decision", "validation"].filter(marker =>
+    new RegExp(`(^|\\n)${marker}\\s*[:：]`, "i").test(lower)
+  ).length;
 
-  if (
-    /case\s*\d+|problem|analysis|decision|validation|案例|问题|分析|决策|验证|排查流程|沟通策略/.test(
-      lower
-    )
-  ) {
+  if (/case\s*\d+|案例档案|案例分析/.test(firstLine.toLowerCase()) || caseMarkers >= 2) {
     return "case";
   }
 
@@ -131,7 +149,7 @@ function getResolved() {
   const selectedType = document.getElementById("type").value;
   const selectedTopic = document.getElementById("topic").value;
   const type = selectedType === "auto" ? detectType(rawText) : selectedType;
-  const topic = selectedTopic === "auto" ? detectTopic(rawText) : selectedTopic;
+  const topic = canonicalTopic(selectedTopic === "auto" ? detectTopic(rawText) : selectedTopic);
   const title = document.getElementById("title").value.trim() || lines[0] || "未命名公众号内容";
   const intro =
     document.getElementById("intro").value.trim() ||
@@ -153,7 +171,6 @@ function autoFill(force) {
 
   const rawText = lines.join("\n");
   const type = detectType(rawText);
-  const topic = detectTopic(rawText);
 
   if (force || !document.getElementById("title").value.trim()) {
     document.getElementById("title").value = lines[0] || "";
@@ -163,12 +180,9 @@ function autoFill(force) {
     document.getElementById("intro").value = firstSentence(lines.slice(1).join("\n")) || "";
   }
 
-  if (force || document.getElementById("type").value === "auto") {
-    document.getElementById("type").value = type;
-  }
-
-  if (force || document.getElementById("topic").value === "auto") {
-    document.getElementById("topic").value = topic;
+  if (force) {
+    document.getElementById("type").value = "auto";
+    document.getElementById("topic").value = "auto";
   }
 
   if (force || !document.getElementById("body").value.trim()) {

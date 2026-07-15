@@ -4,29 +4,35 @@ const API = `${SUPABASE_URL}/rest/v1/contents?select=id,title,slug,intro,type,to
 
 let DATA = [];
 
+const LEGACY_TOPIC_MAP = {
+  情感关系与人际处理: "情感与关系",
+  个人成长与自我观察: "个体成长",
+  系统组织与规则设计: "系统机制",
+  社会观察与公共议题: "社会观察",
+  技术工具与数字实践: "平台与技术",
+  平台: "平台与技术",
+  技术: "平台与技术",
+  组织: "组织结构",
+  城市: "城市与空间",
+  空间: "城市与空间",
+  消费: "消费与生活",
+  品牌: "商业与品牌",
+  艺术: "艺术与创作",
+  梦境: "梦境与潜意识",
+  文化: "社会观察",
+  社会: "社会观察"
+};
+
+function canonicalTopic(value) {
+  const topic = String(value || "未分类").trim() || "未分类";
+  return LEGACY_TOPIC_MAP[topic] || topic;
+}
+
 const DIMENSIONS = {
-  人与关系: [
-    "情感与关系",
-    "情感",
-    "关系",
-    "亲密关系与家庭",
-    "亲密关系",
-    "家庭",
-    "沟通与冲突",
-    "个体成长"
-  ],
-  组织与系统: ["组织结构", "组织", "系统机制", "管理与协作", "平台与技术", "平台", "技术"],
-  社会与现实: [
-    "社会观察",
-    "城市与空间",
-    "城市",
-    "空间",
-    "消费与生活",
-    "消费",
-    "商业与品牌",
-    "品牌"
-  ],
-  创作与内在: ["艺术与创作", "艺术", "方法与思考", "梦境与潜意识", "梦境", "未分类"]
+  人与关系: ["情感与关系", "亲密关系与家庭", "沟通与冲突", "个体成长"],
+  组织与系统: ["组织结构", "系统机制", "管理与协作", "平台与技术"],
+  社会与现实: ["社会观察", "城市与空间", "消费与生活", "商业与品牌"],
+  创作与内在: ["艺术与创作", "方法与思考", "梦境与潜意识", "未分类"]
 };
 
 function articleUrl(item) {
@@ -63,7 +69,7 @@ function render(list) {
     a.href = articleUrl(item);
 
     a.innerHTML = `
-      <div class="topic">${item.topic || "ARTICLE"}<br>${String(item.created_at || "").slice(0, 10)}</div>
+      <div class="topic">${canonicalTopic(item.topic)}<br>${String(item.created_at || "").slice(0, 10)}</div>
       <div>
         <h2>${titleParts.title || "未命名文章"}</h2>
         <p class="subtitle">${titleParts.subtitle || item.intro || ""}</p>
@@ -81,12 +87,12 @@ function filterType(type) {
 }
 
 function filterTopic(topic) {
-  render(DATA.filter(i => i.topic === topic));
+  render(DATA.filter(item => canonicalTopic(item.topic) === canonicalTopic(topic)));
 }
 
 function filterDimension(name) {
   const topics = DIMENSIONS[name] || [];
-  render(DATA.filter(item => topics.includes(String(item.topic || "未分类"))));
+  render(DATA.filter(item => topics.includes(canonicalTopic(item.topic))));
 }
 
 fetch(API, {
