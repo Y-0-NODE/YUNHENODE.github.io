@@ -47,7 +47,7 @@ function renderList() {
   document.getElementById("list").innerHTML = ITEMS.length
     ? ITEMS.map(
         x =>
-          `<button onclick="selectItem('${x.id}')"><b>${esc(x.title)}</b><br><small>${esc(x.lifecycle || "published")} · ${esc(x.topic)}</small></button>`
+          `<button onclick="selectItem('${x.id}')"><b>${esc(x.title)}</b><br><small>${esc(x.lifecycle || "published")} · ${esc(window.YunheTaxonomy.classifyContent(x))}</small></button>`
       ).join("")
     : "暂无内容。";
 }
@@ -57,8 +57,13 @@ function selectItem(id) {
   const m = meta(CURRENT.body);
   document.getElementById("selected-title").textContent = CURRENT.title;
   document.getElementById("title").value = CURRENT.title || "";
-  document.getElementById("topic").value = CURRENT.topic || "";
+  document.getElementById("subtitle").value = m.subtitle || "";
+  window.YunheTaxonomy.populateTopicSelect(document.getElementById("topic"), {
+    selected: window.YunheTaxonomy.classifyContent(CURRENT)
+  });
   document.getElementById("intro").value = CURRENT.intro || "";
+  document.getElementById("original-date").value = m.originalDate || "";
+  document.getElementById("source").value = m.source || "本站撰写";
   document.getElementById("body").value = clean(CURRENT.body);
   document.getElementById("template").value = m.template || "";
   document.getElementById("level").value = m.knowledge_level || "Observation";
@@ -71,14 +76,27 @@ function selectItem(id) {
       ? "thought-manage.html"
       : `article-manage.html?type=${TYPE}&id=${CURRENT.id}`;
 }
+function resetTopic() {
+  if (!CURRENT) return alert("请先选择内容");
+  const topic = window.YunheTaxonomy.detectTopic(
+    [v("title"), v("intro"), v("body")].join("\n"),
+    v("topic")
+  );
+  document.getElementById("topic").value = topic;
+  document.getElementById("status").textContent =
+    `分类已重新判断为“${topic}”，点击“保存全部修改”后生效。`;
+}
 async function saveItem() {
   if (!CURRENT) return alert("请先选择内容");
   try {
     await call("./api/update", {
       id: CURRENT.id,
       title: v("title"),
-      topic: v("topic"),
+      subtitle: v("subtitle"),
+      topic: window.YunheTaxonomy.canonicalTopic(v("topic")),
       intro: v("intro"),
+      originalDate: v("original-date"),
+      source: v("source"),
       body: v("body"),
       template: v("template"),
       knowledgeLevel: v("level"),
@@ -108,12 +126,15 @@ async function duplicateItem() {
   try {
     await call("./api/publish", {
       title: `${CURRENT.title}（副本）`,
+      subtitle: m.subtitle,
       intro: CURRENT.intro,
       topic: CURRENT.topic,
       body: clean(CURRENT.body),
       type: TYPE,
       template: m.template,
       knowledgeLevel: m.knowledge_level,
+      originalDate: m.originalDate,
+      source: m.source,
       collections: m.collections,
       relatedDocuments: m.related_documents,
       mediaFiles: m.media_files

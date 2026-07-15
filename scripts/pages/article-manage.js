@@ -9,29 +9,6 @@ const TYPE_LABEL = CONTENT_TYPE === "case" ? "案例" : CONTENT_TYPE === "video"
 const TARGET_ID = PAGE_PARAMS.get("id") || "";
 const TARGET_SLUG = PAGE_PARAMS.get("slug") || "";
 const TARGET_TITLE = PAGE_PARAMS.get("title") || "";
-const LEGACY_TOPIC_MAP = {
-  情感关系与人际处理: "情感与关系",
-  个人成长与自我观察: "个体成长",
-  系统组织与规则设计: "系统机制",
-  社会观察与公共议题: "社会观察",
-  技术工具与数字实践: "平台与技术",
-  平台: "平台与技术",
-  技术: "平台与技术",
-  组织: "组织结构",
-  城市: "城市与空间",
-  空间: "城市与空间",
-  消费: "消费与生活",
-  品牌: "商业与品牌",
-  艺术: "艺术与创作",
-  梦境: "梦境与潜意识",
-  文化: "社会观察",
-  社会: "社会观察"
-};
-
-function canonicalTopic(value) {
-  const topic = String(value || "未分类").trim() || "未分类";
-  return LEGACY_TOPIC_MAP[topic] || topic;
-}
 
 function applyPageMode() {
   document.title = `${TYPE_LABEL}管理｜云鹤系统`;
@@ -50,6 +27,7 @@ function applyPageMode() {
       : CONTENT_TYPE === "video"
         ? "EDIT VIDEO"
         : "EDIT ARTICLE";
+  document.getElementById("insert-project-modules").hidden = CONTENT_TYPE !== "case";
 }
 
 function articleUrl(item) {
@@ -65,6 +43,13 @@ function splitTitle(title) {
     title: match[1].trim() || text,
     subtitle: match[3].trim()
   };
+}
+
+function editableTitle(title) {
+  if (/case\s*001.*bo\s*h5\s*modular\s*upgrade/i.test(String(title || ""))) {
+    return "BO H5模块化升级：从结构判断到验证";
+  }
+  return title;
 }
 
 function readMeta(body) {
@@ -93,12 +78,13 @@ function render(list) {
       const level = protocol.knowledge_level || "Observation";
       return `
       <div class="manage-item">
-        <div class="meta">${canonicalTopic(item.topic)} / Template ${template} / ${level} / ID ${item.id}</div>
+        <div class="meta">${window.YunheTaxonomy.classifyContent(item)} / Template ${template} / ${level} / ID ${item.id}</div>
         <h2>${splitTitle(item.title).title || `未命名${TYPE_LABEL}`}</h2>
         <p>${splitTitle(item.title).subtitle || item.intro || ""}</p>
         <div class="actions">
           <a href="${articleUrl(item)}">打开${TYPE_LABEL}</a>
           <button type="button" onclick="openEditor('${item.id}')">编辑${TYPE_LABEL}</button>
+          <button type="button" onclick="openEditorAndReset('${item.id}')">重新判断分类</button>
           <button class="danger" type="button" onclick="deleteArticle('${item.id}', '${encodeURIComponent(item.slug || "")}', '${encodeURIComponent(item.title || "")}')">删除${TYPE_LABEL}</button>
         </div>
       </div>
@@ -205,7 +191,7 @@ function openEditor(id) {
   }
 
   EDITING_ID = String(item.id);
-  const titleParts = splitTitle(item.title);
+  const titleParts = splitTitle(editableTitle(item.title));
   const meta = readMeta(item.body);
   document.getElementById("editor-heading").textContent =
     `编辑${TYPE_LABEL}：${titleParts.title || `未命名${TYPE_LABEL}`}`;
@@ -217,13 +203,54 @@ function openEditor(id) {
   document.getElementById("edit-template").value =
     meta.template || (CONTENT_TYPE === "case" ? "A" : "X");
   document.getElementById("edit-knowledge-level").value = meta.knowledge_level || "Observation";
-  document.getElementById("edit-topic").value = canonicalTopic(item.topic);
+  window.YunheTaxonomy.populateTopicSelect(document.getElementById("edit-topic"), {
+    selected: window.YunheTaxonomy.classifyContent(item)
+  });
   document.getElementById("edit-body").value = cleanBody(item.body || "");
   document.getElementById("media-caption").value = "";
   document.getElementById("media-url").value = "";
   document.getElementById("media-status").textContent = "";
+  document.getElementById("classification-status").textContent = "";
   document.getElementById("editor-panel").classList.remove("hidden");
   document.getElementById("editor-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetEditorTopic() {
+  if (!EDITING_ID) {
+    alert(`请先打开要编辑的${TYPE_LABEL}。`);
+    return;
+  }
+
+  const text = [
+    document.getElementById("edit-title").value,
+    document.getElementById("edit-subtitle").value,
+    document.getElementById("edit-intro").value,
+    document.getElementById("edit-body").value
+  ].join("\n");
+  const topic = window.YunheTaxonomy.detectTopic(text, document.getElementById("edit-topic").value);
+  document.getElementById("edit-topic").value = topic;
+  document.getElementById("classification-status").textContent =
+    `已重新判断为“${topic}”。确认后点击“保存修改”才会写入数据库。`;
+}
+
+function openEditorAndReset(id) {
+  openEditor(id);
+  resetEditorTopic();
+}
+
+function insertProjectModules() {
+  if (CONTENT_TYPE !== "case") return;
+  const body = document.getElementById("edit-body");
+  const modules = ["项目背景", "修改前后对比", "最终结果"];
+  const missing = modules.filter(name => !body.value.includes(name));
+  if (!missing.length) {
+    document.getElementById("classification-status").textContent = "三个项目模块已经存在。";
+    return;
+  }
+  const addition = missing.map(name => `${name}\n待填写`).join("\n\n");
+  body.value = `${body.value.trim()}${body.value.trim() ? "\n\n" : ""}${addition}`;
+  document.getElementById("classification-status").textContent =
+    "已插入项目背景、修改前后对比和最终结果，填写后点击保存修改。";
 }
 
 function openTargetFromUrl() {

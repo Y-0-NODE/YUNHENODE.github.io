@@ -117,9 +117,206 @@ body::before {
   font-size: 13px;
 }
 
+.visitor-categories {
+  margin-top: 86px;
+  border-top: 1px solid #d8d8d8;
+  padding-top: 54px;
+}
+
+.visitor-category-heading {
+  max-width: 760px;
+  margin-bottom: 44px;
+}
+
+.visitor-category-heading h2 {
+  margin: 10px 0 14px;
+  color: #111;
+  font-size: clamp(36px, 5vw, 62px);
+  line-height: 1.05;
+}
+
+.visitor-category-heading > p:last-child,
+.visitor-category-group-head p {
+  color: #555;
+  line-height: 1.8;
+}
+
+.visitor-category-list {
+  display: grid;
+  gap: 50px;
+}
+
+.visitor-category-group {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 34px;
+  border-top: 1px solid #ddd;
+  padding-top: 26px;
+}
+
+.visitor-category-group-head h3 {
+  margin: 0 0 10px;
+  color: #111;
+  font-size: 21px;
+}
+
+.visitor-category-group-head p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.visitor-topic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.visitor-topic {
+  min-height: 124px;
+  display: grid;
+  align-content: space-between;
+  border: 1px solid #d8d8d8;
+  background: #fff;
+  color: #111;
+  padding: 17px;
+  text-decoration: none;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.visitor-topic:hover,
+.visitor-topic:focus-visible {
+  transform: translateY(-2px);
+  border-color: #777;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  outline: none;
+}
+
+.visitor-topic span,
+.visitor-topic small {
+  color: #777;
+  font-size: 11px;
+}
+
+.visitor-topic strong {
+  margin: 16px 0 6px;
+  font-size: 18px;
+}
+
+.featured-section {
+  margin-top: 86px;
+  border-top: 1px solid #d8d8d8;
+  padding-top: 54px;
+}
+
+.featured-heading {
+  max-width: 760px;
+  margin-bottom: 52px;
+}
+
+.featured-heading h2 {
+  margin: 10px 0 14px;
+  color: #111;
+  font-size: clamp(36px, 5vw, 62px);
+  line-height: 1.05;
+}
+
+.featured-heading > p:last-child {
+  color: #555;
+  line-height: 1.8;
+}
+
+.featured-group {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 34px;
+  border-top: 1px solid #ddd;
+  padding: 30px 0 44px;
+}
+
+.featured-group-title span {
+  color: #777;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.featured-group-title h3 {
+  margin: 10px 0 0;
+  color: #111;
+  font-size: 19px;
+}
+
+.featured-list {
+  display: grid;
+  gap: 12px;
+}
+
+.featured-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  border: 1px solid #d8d8d8;
+  background: #fff;
+  color: #111;
+  padding: 22px;
+  text-decoration: none;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.featured-card:hover,
+.featured-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: #777;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.07);
+  outline: none;
+}
+
+.featured-meta {
+  color: #777;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+}
+
+.featured-card h4 {
+  margin: 12px 0 10px;
+  color: #111;
+  font-size: clamp(19px, 2vw, 27px);
+  line-height: 1.28;
+}
+
+.featured-card p,
+.featured-loading {
+  margin: 0;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.featured-date {
+  color: #777;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
 @media (max-width: 900px) {
   .visitor-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .featured-group {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .visitor-category-group {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 }
 
@@ -162,5 +359,42 @@ body::before {
   .visitor-card h2 {
     margin-top: 24px;
     font-size: 23px;
+  }
+
+  .featured-section {
+    margin-top: 58px;
+    padding-top: 38px;
+  }
+
+  .visitor-categories {
+    margin-top: 58px;
+    padding-top: 38px;
+  }
+
+  .visitor-category-heading {
+    margin-bottom: 34px;
+  }
+
+  .visitor-topic-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .visitor-topic {
+    min-height: 116px;
+    padding: 14px;
+  }
+
+  .featured-heading {
+    margin-bottom: 34px;
+  }
+
+  .featured-card {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .featured-date {
+    white-space: normal;
   }
 }

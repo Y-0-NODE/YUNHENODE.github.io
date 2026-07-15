@@ -2,7 +2,7 @@ async function publishToSite() {
   const adminName = document.getElementById("admin-name").value.trim();
   const password = document.getElementById("password").value.trim();
   const type = document.getElementById("type").value;
-  const topic = document.getElementById("topic").value;
+  const topic = window.YunheTaxonomy.canonicalTopic(document.getElementById("topic").value);
   const template = document.getElementById("template").value;
   const knowledgeLevel = document.getElementById("knowledge-level").value;
   const title = document.getElementById("title").value.trim();
@@ -66,3 +66,17 @@ async function publishToSite() {
     output.textContent = "请求失败：\n" + err.message;
   }
 }
+
+function resetPublishTopic() {
+  const text = [
+    document.getElementById("title").value,
+    document.getElementById("subtitle").value,
+    document.getElementById("intro").value,
+    document.getElementById("body").value
+  ].join("\n");
+  const topic = window.YunheTaxonomy.detectTopic(text, document.getElementById("topic").value);
+  document.getElementById("topic").value = topic;
+  document.getElementById("output").textContent = `分类已重新判断为：${topic}`;
+}
+
+window.YunheTaxonomy.populateTopicSelect(document.getElementById("topic"));

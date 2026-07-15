@@ -9,7 +9,7 @@
     />
     <title>访客入口｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260715-2" />
+    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260716-3" />
   </head>
 
   <body>
@@ -70,8 +70,59 @@
         </a>
       </section>
 
+      <section class="visitor-categories" aria-labelledby="visitor-category-title">
+        <div class="visitor-category-heading">
+          <p class="eyebrow">ARTICLE CATEGORIES</p>
+          <h2 id="visitor-category-title">文章分类</h2>
+          <p>与网站首页文章分类使用同一套结构，点击具体类目即可浏览相关文章。</p>
+        </div>
+        <div id="visitor-category-list" class="visitor-category-list">
+          <p class="featured-loading">正在读取文章分类…</p>
+        </div>
+      </section>
+
+      <section class="featured-section" aria-labelledby="featured-title">
+        <div class="featured-heading">
+          <p class="eyebrow">SELECTED READING</p>
+          <h2 id="featured-title">精选阅读</h2>
+          <p>按“最能说明云鹤系统如何观察、判断和验证现实”整理。</p>
+        </div>
+
+        <section class="featured-group">
+          <div class="featured-group-title">
+            <span>01</span>
+            <h3>首屏重点文章</h3>
+          </div>
+          <div id="featured-primary" class="featured-list">
+            <p class="featured-loading">正在读取文章…</p>
+          </div>
+        </section>
+
+        <section class="featured-group">
+          <div class="featured-group-title">
+            <span>02</span>
+            <h3>现实观察与案例</h3>
+          </div>
+          <div id="featured-observation" class="featured-list">
+            <p class="featured-loading">正在读取内容…</p>
+          </div>
+        </section>
+
+        <section class="featured-group">
+          <div class="featured-group-title">
+            <span>03</span>
+            <h3>延伸阅读</h3>
+          </div>
+          <div id="featured-extended" class="featured-list">
+            <p class="featured-loading">正在读取文章…</p>
+          </div>
+        </section>
+      </section>
+
       <p class="visitor-note">访客入口仅供浏览。</p>
     </main>
-    <script src="scripts/pages/visitor.js?v=20260715-2"></script>
+    <script src="scripts/core/config.js"></script>
+    <script src="scripts/core/utils.js?v=20260716-3"></script>
+    <script src="scripts/pages/visitor.js?v=20260716-3"></script>
   </body>
 </html>

@@ -3,37 +3,11 @@ const SUPABASE_KEY = window.YUNHE_CONFIG.supabaseKey;
 const API = `${SUPABASE_URL}/rest/v1/contents?select=id,title,slug,intro,type,topic,created_at&type=eq.article&order=created_at.desc`;
 
 let DATA = [];
+const VISITOR_MODE = new URLSearchParams(location.search).get("visitor") === "1";
 
-const LEGACY_TOPIC_MAP = {
-  情感关系与人际处理: "情感与关系",
-  个人成长与自我观察: "个体成长",
-  系统组织与规则设计: "系统机制",
-  社会观察与公共议题: "社会观察",
-  技术工具与数字实践: "平台与技术",
-  平台: "平台与技术",
-  技术: "平台与技术",
-  组织: "组织结构",
-  城市: "城市与空间",
-  空间: "城市与空间",
-  消费: "消费与生活",
-  品牌: "商业与品牌",
-  艺术: "艺术与创作",
-  梦境: "梦境与潜意识",
-  文化: "社会观察",
-  社会: "社会观察"
-};
-
-function canonicalTopic(value) {
-  const topic = String(value || "未分类").trim() || "未分类";
-  return LEGACY_TOPIC_MAP[topic] || topic;
-}
-
-const DIMENSIONS = {
-  人与关系: ["情感与关系", "亲密关系与家庭", "沟通与冲突", "个体成长"],
-  组织与系统: ["组织结构", "系统机制", "管理与协作", "平台与技术"],
-  社会与现实: ["社会观察", "城市与空间", "消费与生活", "商业与品牌"],
-  创作与内在: ["艺术与创作", "方法与思考", "梦境与潜意识", "未分类"]
-};
+const DIMENSIONS = Object.fromEntries(
+  window.YunheTaxonomy.groups.map(group => [group.name, group.items.map(item => item.name)])
+);
 
 function articleUrl(item) {
   if (item.slug) return `content.html?slug=${encodeURIComponent(item.slug)}`;
@@ -69,7 +43,7 @@ function render(list) {
     a.href = articleUrl(item);
 
     a.innerHTML = `
-      <div class="topic">${canonicalTopic(item.topic)}<br>${String(item.created_at || "").slice(0, 10)}</div>
+      <div class="topic">${window.YunheTaxonomy.classifyContent(item)}<br>${String(item.created_at || "").slice(0, 10)}</div>
       <div>
         <h2>${titleParts.title || "未命名文章"}</h2>
         <p class="subtitle">${titleParts.subtitle || item.intro || ""}</p>
@@ -87,12 +61,26 @@ function filterType(type) {
 }
 
 function filterTopic(topic) {
-  render(DATA.filter(item => canonicalTopic(item.topic) === canonicalTopic(topic)));
+  const canonical = window.YunheTaxonomy.canonicalTopic(topic);
+  render(DATA.filter(item => window.YunheTaxonomy.classifyContent(item) === canonical));
 }
 
 function filterDimension(name) {
   const topics = DIMENSIONS[name] || [];
-  render(DATA.filter(item => topics.includes(canonicalTopic(item.topic))));
+  render(DATA.filter(item => topics.includes(window.YunheTaxonomy.classifyContent(item))));
+}
+
+function dedupeVisitorArticles(items) {
+  if (!VISITOR_MODE) return items;
+  const seen = new Set();
+  return items.filter(item => {
+    const key = String(item.title || "")
+      .toLowerCase()
+      .replace(/[《》“”"'：:，,。.!！?？/\s—_-]/g, "");
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 fetch(API, {
@@ -106,7 +94,7 @@ fetch(API, {
     return r.json();
   })
   .then(data => {
-    DATA = Array.isArray(data) ? data : [];
+    DATA = dedupeVisitorArticles(Array.isArray(data) ? data : []);
     render(DATA);
   })
   .catch(() => {

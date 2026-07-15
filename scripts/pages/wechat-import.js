@@ -1,67 +1,3 @@
-const TOPIC_RULES = [
-  ["亲密关系与家庭", ["亲密关系", "婚姻", "伴侣", "夫妻", "家庭", "父母", "亲子", "婆媳"]],
-  ["沟通与冲突", ["沟通", "冲突", "争吵", "表达", "协商", "误解", "冷战", "和解"]],
-  ["情感与关系", ["情感", "感情", "人际关系", "恋爱", "分手", "依恋", "信任", "关系边界"]],
-  ["个体成长", ["成长", "自我", "选择", "焦虑", "情绪", "心理", "疗愈", "反思"]],
-  ["组织结构", ["组织结构", "权责", "岗位", "层级", "部门", "架构调整", "职能"]],
-  ["系统机制", ["系统机制", "运行机制", "失效", "闭环", "规则", "权限", "治理", "退出机制"]],
-  ["管理与协作", ["管理", "协作", "团队", "流程", "执行", "决策", "项目管理", "分工"]],
-  [
-    "平台与技术",
-    [
-      "github",
-      "supabase",
-      "vercel",
-      "codex",
-      "api",
-      "h5",
-      "数据库",
-      "部署",
-      "算法",
-      "软件",
-      "人工智能"
-    ]
-  ],
-  ["社会观察", ["社会观察", "社会现象", "群体", "公共议题", "政策", "舆论", "时代", "现实"]],
-  ["城市与空间", ["城市", "街区", "社区", "空间", "建筑", "场地", "室内", "公共空间"]],
-  [
-    "消费与生活",
-    ["消费", "购买", "服务", "体验", "生活方式", "日常", "用户体验", "饮食", "食物", "调味", "胡椒"]
-  ],
-  ["商业与品牌", ["品牌", "商业", "市场", "营销", "logo", "包装", "定位", "传播"]],
-  ["艺术与创作", ["艺术", "摄影", "影像", "展览", "作品", "图像", "创作", "设计"]],
-  [
-    "方法与思考",
-    ["方法", "方法论", "框架", "模型", "判断模型", "判断方法", "分析方法", "研究方法"]
-  ],
-  ["梦境与潜意识", ["梦境", "潜意识", "象征", "梦中", "做梦"]],
-  ["社会观察", ["文化", "传统", "习俗", "历史", "公共叙事"]]
-];
-
-const LEGACY_TOPIC_MAP = {
-  情感关系与人际处理: "情感与关系",
-  个人成长与自我观察: "个体成长",
-  系统组织与规则设计: "系统机制",
-  社会观察与公共议题: "社会观察",
-  技术工具与数字实践: "平台与技术",
-  平台: "平台与技术",
-  技术: "平台与技术",
-  组织: "组织结构",
-  城市: "城市与空间",
-  空间: "城市与空间",
-  消费: "消费与生活",
-  品牌: "商业与品牌",
-  艺术: "艺术与创作",
-  梦境: "梦境与潜意识",
-  文化: "社会观察",
-  社会: "社会观察"
-};
-
-function canonicalTopic(value) {
-  const topic = String(value || "未分类").trim() || "未分类";
-  return LEGACY_TOPIC_MAP[topic] || topic;
-}
-
 function cleanLines(text) {
   return String(text || "")
     .replace(/\r\n/g, "\n")
@@ -69,18 +5,6 @@ function cleanLines(text) {
     .map(line => line.trim())
     .filter(Boolean)
     .filter(line => !/^阅读原文$|^微信扫一扫$|^长按识别/.test(line));
-}
-
-function detectTopic(text) {
-  const lower = String(text || "").toLowerCase();
-  const ranked = TOPIC_RULES.map(([topic, words], priority) => {
-    const matches = words.filter(word => lower.includes(String(word).toLowerCase()));
-    const score = matches.reduce((total, word) => total + Math.max(1, String(word).length), 0);
-    return { topic, score, matchCount: matches.length, priority };
-  })
-    .filter(item => item.matchCount > 0)
-    .sort((a, b) => b.score - a.score || b.matchCount - a.matchCount || a.priority - b.priority);
-  return ranked[0]?.topic || "未分类";
 }
 
 function detectType(text) {
@@ -93,11 +17,7 @@ function detectType(text) {
   if (/case\s*\d+|案例档案|案例分析/.test(firstLine.toLowerCase()) || caseMarkers >= 2) {
     return "case";
   }
-
-  if (/视频|视频号|影像|片段|短片|纪录|vlog|movie|film/.test(lower)) {
-    return "video";
-  }
-
+  if (/视频号|影像记录|纪录片|vlog|movie|film/.test(lower)) return "video";
   return "article";
 }
 
@@ -106,59 +26,75 @@ function firstSentence(text) {
   return line.replace(/[。！？].*$/, "。").slice(0, 90);
 }
 
-function normalizeBody(lines, sourceUrl, mediaUrl, type) {
+function publicSourceUrl(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    if (url.hostname === "mp.weixin.qq.com" && !/^\/s(?:\/|$)/.test(url.pathname)) return "";
+    return url.href;
+  } catch (error) {
+    return "";
+  }
+}
+
+function comparable(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[《》“”"'：:，,。.!！?？/\s—_-]/g, "");
+}
+
+function normalizeBody(lines, sourceUrl, mediaUrl, type, intro) {
   const bodyLines = [...lines];
   const title = bodyLines.shift() || "";
-  const intro = bodyLines[0] || "";
-  const body = [];
-
-  body.push(title);
-  body.push("");
-  if (intro && intro !== title) body.push(intro, "");
-
-  bodyLines.forEach(line => {
-    if (
-      /^(\d+[.、]|Problem|Analysis|Decision|Validation|系统分析|排查流程|沟通策略|GitHub|Supabase|Vercel|Codex)/i.test(
-        line
-      )
-    ) {
-      body.push(line);
-    } else {
-      body.push(line);
-    }
-  });
+  if (bodyLines[0] && comparable(bodyLines[0]) === comparable(intro)) bodyLines.shift();
+  const body = bodyLines.filter(line => !/^(图片|插图|image|图片\d+|此处插入图片)$/i.test(line));
 
   if (mediaUrl) {
     const label = type === "video" ? "视频" : "图片";
     body.push("", `[${label}: ${title || "公众号素材"}](${mediaUrl})`);
   }
-
-  if (sourceUrl) {
-    body.push("", `原文链接：${sourceUrl}`);
-  }
-
+  if (sourceUrl) body.push("", `原文链接：${sourceUrl}`);
   return body.join("\n").trim();
 }
 
 function getResolved() {
   const raw = document.getElementById("raw").value;
-  const sourceUrl = document.getElementById("source-url").value.trim();
+  const enteredSourceUrl = document.getElementById("source-url").value.trim();
+  const sourceUrl = publicSourceUrl(enteredSourceUrl);
   const mediaUrl = document.getElementById("media-url").value.trim();
   const lines = cleanLines(raw);
   const rawText = lines.join("\n");
   const selectedType = document.getElementById("type").value;
   const selectedTopic = document.getElementById("topic").value;
   const type = selectedType === "auto" ? detectType(rawText) : selectedType;
-  const topic = canonicalTopic(selectedTopic === "auto" ? detectTopic(rawText) : selectedTopic);
+  const topic =
+    selectedTopic === "auto"
+      ? window.YunheTaxonomy.detectTopic(rawText)
+      : window.YunheTaxonomy.canonicalTopic(selectedTopic);
   const title = document.getElementById("title").value.trim() || lines[0] || "未命名公众号内容";
   const intro =
     document.getElementById("intro").value.trim() ||
     firstSentence(lines.slice(1).join("\n")) ||
     "公众号内容导入。";
   const body =
-    document.getElementById("body").value.trim() || normalizeBody(lines, sourceUrl, mediaUrl, type);
+    document.getElementById("body").value.trim() ||
+    normalizeBody(lines, sourceUrl, mediaUrl, type, intro);
 
-  return { type, topic, title, intro, body, sourceUrl, mediaUrl };
+  return {
+    type,
+    topic,
+    title,
+    intro,
+    body,
+    sourceUrl,
+    enteredSourceUrl,
+    mediaUrl,
+    template: document.getElementById("template").value,
+    knowledgeLevel: document.getElementById("knowledge-level").value,
+    originalDate: document.getElementById("original-date").value,
+    source: document.getElementById("source").value
+  };
 }
 
 function autoFill(force) {
@@ -171,42 +107,45 @@ function autoFill(force) {
 
   const rawText = lines.join("\n");
   const type = detectType(rawText);
-
   if (force || !document.getElementById("title").value.trim()) {
     document.getElementById("title").value = lines[0] || "";
   }
-
   if (force || !document.getElementById("intro").value.trim()) {
     document.getElementById("intro").value = firstSentence(lines.slice(1).join("\n")) || "";
   }
-
   if (force) {
     document.getElementById("type").value = "auto";
     document.getElementById("topic").value = "auto";
   }
-
   if (force || !document.getElementById("body").value.trim()) {
     document.getElementById("body").value = normalizeBody(
       lines,
-      document.getElementById("source-url").value.trim(),
+      publicSourceUrl(document.getElementById("source-url").value),
       document.getElementById("media-url").value.trim(),
-      type
+      type,
+      document.getElementById("intro").value.trim()
     );
   }
-
   renderPreview();
 }
 
 function renderPreview() {
   const data = getResolved();
+  const ignoredLink = data.enteredSourceUrl && !data.sourceUrl;
   document.getElementById("preview").textContent = [
     `板块：${data.type}`,
     `主题：${data.topic}`,
+    `模板：${data.template}`,
+    `知识层级：${data.knowledgeLevel}`,
+    `来源：${data.source}`,
     `标题：${data.title}`,
     `简介：${data.intro}`,
+    ignoredLink ? "原文链接：已忽略公众号后台管理地址" : "",
     "",
     data.body
-  ].join("\n");
+  ]
+    .filter((line, index) => line || index === 8)
+    .join("\n");
 }
 
 async function copyPreview() {
@@ -224,14 +163,12 @@ async function publishImport() {
     status.textContent = "请填写管理员名称和密码。";
     return;
   }
-
-  if (!data.title || !data.body) {
-    status.textContent = "请先粘贴公众号内容，或填写标题和正文。";
+  if (!data.title || !data.body || !data.template || !data.knowledgeLevel) {
+    status.textContent = "请补齐标题、正文、模板和知识层级。";
     return;
   }
 
   status.textContent = "正在保存到网站数据库...";
-
   const res = await fetch("/api/publish", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -243,18 +180,24 @@ async function publishImport() {
       body: data.body,
       type: data.type,
       topic: data.topic,
+      template: data.template,
+      knowledgeLevel: data.knowledgeLevel,
+      originalDate: data.originalDate,
+      source: data.source,
       video: data.type === "video" ? data.mediaUrl || data.sourceUrl : ""
     })
   });
 
   const result = await res.json().catch(() => ({}));
-
   if (!res.ok) {
     status.textContent = result.error || "保存失败，请检查管理员密码或 Vercel 环境变量。";
     return;
   }
-
   status.innerHTML = `保存成功。<a href="${result.url}">打开内容</a>`;
 }
 
+window.YunheTaxonomy.populateTopicSelect(document.getElementById("topic"), {
+  includeAuto: true,
+  selected: "auto"
+});
 renderPreview();

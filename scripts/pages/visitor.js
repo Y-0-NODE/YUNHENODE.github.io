@@ -151,5 +151,153 @@ async function loadVisitorBackground() {
   }
 }
 
+const FEATURED_CONTENT = {
+  primary: [
+    {
+      title: "谁掌握了节点定义权，谁就更接近定义现实",
+      summary: "从真实事件进入核心概念、结构模型与判断总结。"
+    },
+    {
+      title: "从12345反馈到“个人问题”：一次公共系统责任下沉机制的结构分析",
+      summary: "持续跟踪现实系统、部门边界和责任如何被转译。"
+    },
+    {
+      title: "如何识别虚假的结构内容",
+      summary: "辨认结构语言、真实判断与表面包装之间的区别。"
+    }
+  ],
+  observation: [
+    {
+      title: "新人不要在小区门口做，这里是存量区。",
+      summary: "从具体事件提炼“存量区／开放区”的可复用判断模型。"
+    },
+    {
+      title: "Case 001 / BO H5 Modular Upgrade",
+      displayTitle: "BO H5模块化升级：从结构判断到验证",
+      aliases: ["BO H5模块化升级：从结构判断到验证"],
+      summary: "项目背景、结构调整、修改前后对比、验证过程与最终结果。"
+    }
+  ],
+  extended: [
+    {
+      title: "艺术系统 vs 商业系统",
+      summary: "从艺术与商业的不同运行逻辑理解价值和判断。"
+    },
+    {
+      title: "为什么商业不生产“真正需要的东西”？",
+      summary: "继续进入商业、消费与需求结构的关系。"
+    }
+  ]
+};
+
+function normalizeFeaturedTitle(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[《》“”"'：:，,。.!！?？/\s-]/g, "");
+}
+
+function featuredUrl(item) {
+  const target = item.slug
+    ? `content.html?slug=${encodeURIComponent(item.slug)}`
+    : `content.html?id=${encodeURIComponent(item.id)}`;
+  return `${target}&visitor=1&curated=1`;
+}
+
+function renderVisitorCategories(items) {
+  const box = document.getElementById("visitor-category-list");
+  if (!box || !window.YunheTaxonomy) return;
+  const escape = window.YunheUtils?.escapeHtml || (value => String(value || ""));
+  const articles = items.filter(item => item.type === "article");
+
+  box.innerHTML = window.YunheTaxonomy.groups
+    .map(
+      group => `
+        <section class="visitor-category-group">
+          <div class="visitor-category-group-head">
+            <h3>${escape(group.name)}</h3>
+            <p>${escape(group.description)}</p>
+          </div>
+          <div class="visitor-topic-grid">
+            ${group.items
+              .map(item => {
+                const count = articles.filter(
+                  article => window.YunheTaxonomy.classifyContent(article) === item.name
+                ).length;
+                return `
+                  <a class="visitor-topic" href="article-topic.html?topic=${encodeURIComponent(item.name)}&visitor=1">
+                    <span>${count} 篇</span>
+                    <strong>${escape(item.name)}</strong>
+                    <small>${escape(item.description)}</small>
+                  </a>
+                `;
+              })
+              .join("")}
+          </div>
+        </section>
+      `
+    )
+    .join("");
+}
+
+function renderFeaturedGroup(groupName, items) {
+  const box = document.getElementById(`featured-${groupName}`);
+  if (!box) return;
+  const escape = window.YunheUtils?.escapeHtml || (value => String(value || ""));
+  const definitions = FEATURED_CONTENT[groupName] || [];
+  box.innerHTML = definitions
+    .map(definition => {
+      const keys = [definition.title, ...(definition.aliases || [])].map(normalizeFeaturedTitle);
+      const item = items.find(row => keys.includes(normalizeFeaturedTitle(row.title)));
+      if (!item) return "";
+      const title = definition.displayTitle || item.title;
+      const topic = window.YunheTaxonomy?.classifyContent(item) || item.topic || "未分类";
+      const type = item.type === "case" ? "CASE" : "ARTICLE";
+      return `
+        <a class="featured-card" href="${featuredUrl(item)}">
+          <div>
+            <div class="featured-meta">${type} / ${escape(topic)} / 访客整理版</div>
+            <h4>${escape(title)}</h4>
+            <p>${escape(definition.summary || item.intro || "")}</p>
+          </div>
+          <time class="featured-date">${escape(String(item.created_at || "").slice(0, 10))}</time>
+        </a>
+      `;
+    })
+    .filter(Boolean)
+    .join("");
+  if (!box.innerHTML.trim()) box.innerHTML = '<p class="featured-loading">内容整理中。</p>';
+}
+
+async function loadFeaturedContent() {
+  if (!document.getElementById("featured-primary") || !window.YUNHE_CONFIG) return;
+  const { supabaseUrl, supabaseKey } = window.YUNHE_CONFIG;
+  try {
+    const query =
+      "select=id,title,slug,intro,type,topic,created_at&type=in.(article,case)&order=created_at.desc";
+    const response = await fetch(`${supabaseUrl}/rest/v1/contents?${query}`, {
+      cache: "no-store",
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` }
+    });
+    if (!response.ok) throw new Error("featured load failed");
+    const result = await response.json();
+    const items = Array.isArray(result) ? result : [];
+    renderVisitorCategories(items);
+    renderFeaturedGroup("primary", items);
+    renderFeaturedGroup("observation", items);
+    renderFeaturedGroup("extended", items);
+  } catch (error) {
+    const categoryBox = document.getElementById("visitor-category-list");
+    if (categoryBox) {
+      categoryBox.innerHTML = '<p class="featured-loading">文章分类暂时无法读取。</p>';
+    }
+    document.querySelectorAll(".featured-list").forEach(box => {
+      box.innerHTML = '<p class="featured-loading">精选内容暂时无法读取。</p>';
+    });
+  }
+}
+
 enableVisitorBrowseMode();
-if (document.querySelector(".visitor-shell")) loadVisitorBackground();
+if (document.querySelector(".visitor-shell")) {
+  loadVisitorBackground();
+  loadFeaturedContent();
+}

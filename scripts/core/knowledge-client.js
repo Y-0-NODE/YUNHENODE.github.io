@@ -48,12 +48,20 @@
         item => ({ value: item, label: item }),
         () => false
       );
-      replaceShared(
-        topic,
-        config.topics,
-        item => ({ value: item, label: item }),
-        value => value === "auto"
-      );
+      if (window.YunheTaxonomy) {
+        window.YunheTaxonomy.populateTopicSelect(topic, {
+          extras: config.topics,
+          includeAuto: topic?.value === "auto",
+          selected: topic?.value
+        });
+      } else {
+        replaceShared(
+          topic,
+          config.topics,
+          item => ({ value: item, label: item }),
+          value => value === "auto"
+        );
+      }
 
       window.dispatchEvent(new CustomEvent("yunhe:knowledge-ready", { detail: config }));
     } catch (error) {
