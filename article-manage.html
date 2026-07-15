@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>文章管理｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/article-manage.css" />
+    <link rel="stylesheet" href="assets/styles/pages/article-manage.css?v=20260716-1" />
   </head>
 
   <body>
@@ -164,6 +164,14 @@
             </optgroup>
           </select>
 
+          <div class="classification-actions">
+            <button type="button" onclick="resetEditorTopic()">根据标题和正文重新判断分类</button>
+            <button id="insert-project-modules" type="button" onclick="insertProjectModules()">
+              插入项目背景 / 修改前后对比 / 最终结果
+            </button>
+          </div>
+          <div id="classification-status" class="status"></div>
+
           <label for="edit-body">正文</label>
           <textarea id="edit-body"></textarea>
 
@@ -214,9 +222,10 @@
       </section>
     </main>
 
+    <script src="scripts/core/utils.js?v=20260716-1"></script>
     <script src="shared/metadata.js"></script>
-    <script src="scripts/pages/article-manage.js"></script>
+    <script src="scripts/pages/article-manage.js?v=20260716-1"></script>
 
-    <script src="scripts/core/knowledge-client.js"></script>
+    <script src="scripts/core/knowledge-client.js?v=20260716-1"></script>
   </body>
 </html>
