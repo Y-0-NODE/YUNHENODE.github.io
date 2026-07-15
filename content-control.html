@@ -1,4 +1,123 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>内容管理｜YUNHENODE CMS</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="assets/styles/pages/content-control.css"></head><body><header class="topbar"><a class="logo" href="admin.html">YUNHENODE CMS</a><nav><a href="admin.html">后台首页</a><a href="index.html">网站首页</a></nav></header><main class="home"><p class="eyebrow">CONTENT MANAGEMENT</p><h1 id="page-title">内容管理</h1><p class="intro">文章、案例、视频与随笔使用同一组管理能力；媒体文件只保存引用地址，不重复上传。</p>
-<section class="panel login"><h2>管理员验证</h2><input id="admin" value="YUNHE" aria-label="管理员名称"><input id="password" type="password" placeholder="管理员密码"><button onclick="loadItems()">进入管理</button><span id="status" class="status"></span></section>
-<div class="layout"><aside class="panel"><h2>内容列表</h2><div id="list" class="list muted">验证后读取内容。</div></aside><section class="panel"><h2 id="selected-title">选择一条内容</h2><div class="actions"><a id="edit" href="#">Edit｜编辑</a><button onclick="removeItem()" class="danger">Delete｜删除</button><button onclick="duplicateItem()">Duplicate｜复制</button><button onclick="setLifecycle('archived')">Archive｜归档</button><button onclick="showHistory()">Version History｜历史版本</button></div>
-<div class="fields"><label>Publish Settings｜发布设置<select id="lifecycle" onchange="setLifecycle(this.value)"><option value="published">公开发布</option><option value="private">私人</option><option value="archived">归档</option></select></label><label>Metadata｜标题<input id="title"></label><label>主题<input id="topic"></label><label>简介<input id="intro"></label><label>模板<input id="template"></label><label>知识层级<select id="level"><option>Observation</option><option>Analysis</option><option>Decision</option><option>Validation</option><option>Method</option></select></label><label class="wide">正文<textarea id="body"></textarea></label><label class="wide">Collections｜作品集（每行一个）<textarea id="collections"></textarea></label><label class="wide">Related Content｜关联内容 ID（每行一个）<textarea id="related"></textarea></label><label class="wide">Media Files｜媒体文件地址（每行一个）<textarea id="media"></textarea></label></div><div class="actions"><button onclick="saveItem()">保存全部修改</button></div><div id="history" class="history"></div></section></div></main><script src="shared/metadata.js"></script><script src="scripts/pages/content-control.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>内容管理｜YUNHENODE CMS</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/content-control.css?v=20260716-2" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo" href="admin.html">YUNHENODE CMS</a>
+      <nav>
+        <a href="admin.html">后台首页</a>
+        <a href="index.html">网站首页</a>
+      </nav>
+    </header>
+
+    <main class="home">
+      <p class="eyebrow">CONTENT MANAGEMENT</p>
+      <h1 id="page-title">内容管理</h1>
+      <p class="intro">
+        文章、案例、视频与随笔使用同一组管理能力；媒体文件只保存引用地址，不重复上传。
+      </p>
+
+      <section class="panel login">
+        <h2>管理员验证</h2>
+        <input id="admin" value="YUNHE" aria-label="管理员名称" />
+        <input id="password" type="password" placeholder="管理员密码" />
+        <button onclick="loadItems()">进入管理</button>
+        <span id="status" class="status"></span>
+      </section>
+
+      <div class="layout">
+        <aside class="panel">
+          <h2>内容列表</h2>
+          <div id="list" class="list muted">验证后读取内容。</div>
+        </aside>
+
+        <section class="panel">
+          <h2 id="selected-title">选择一条内容</h2>
+          <div class="actions">
+            <a id="edit" href="#">Edit｜编辑</a>
+            <button onclick="removeItem()" class="danger">Delete｜删除</button>
+            <button onclick="duplicateItem()">Duplicate｜复制</button>
+            <button onclick="setLifecycle('archived')">Archive｜归档</button>
+            <button onclick="showHistory()">Version History｜历史版本</button>
+          </div>
+
+          <div class="fields">
+            <label>
+              Publish Settings｜发布设置
+              <select id="lifecycle" onchange="setLifecycle(this.value)">
+                <option value="published">公开发布</option>
+                <option value="private">私人</option>
+                <option value="archived">归档</option>
+              </select>
+            </label>
+            <label>Metadata｜标题<input id="title" /></label>
+            <label>副标题<input id="subtitle" /></label>
+
+            <section class="homepage-category-panel wide">
+              <p class="category-kicker">ARTICLE CATEGORY</p>
+              <h3>首页文章分类</h3>
+              <p class="category-note">
+                这里决定文章在网站首页“文章分类”中的位置。它和下面的内容模板是两套不同的设置。
+              </p>
+              <label>
+                选择具体类目
+                <select id="topic"></select>
+              </label>
+              <button type="button" onclick="resetTopic()">根据标题和正文重新判断分类</button>
+            </section>
+
+            <label>简介<input id="intro" /></label>
+            <label>原始撰写时间<input id="original-date" type="date" /></label>
+            <label>
+              内容来源
+              <select id="source">
+                <option value="本站撰写">本站撰写</option>
+                <option value="公众号导入">公众号导入</option>
+                <option value="云鹤系统公众号转载">云鹤系统公众号转载</option>
+                <option value="内部日记整理">内部日记整理</option>
+                <option value="外部链接摘录">外部链接摘录</option>
+              </select>
+            </label>
+            <label>Content Template｜内容模板（不是文章分类）<input id="template" /></label>
+            <label>
+              Knowledge Level｜知识层级
+              <select id="level">
+                <option>Observation</option>
+                <option>Analysis</option>
+                <option>Decision</option>
+                <option>Validation</option>
+                <option>Method</option>
+              </select>
+            </label>
+            <label class="wide">正文<textarea id="body"></textarea></label>
+            <label class="wide">
+              Collections｜作品集（每行一个）
+              <textarea id="collections"></textarea>
+            </label>
+            <label class="wide">
+              Related Content｜关联内容 ID（每行一个）
+              <textarea id="related"></textarea>
+            </label>
+            <label class="wide">
+              Media Files｜媒体文件地址（每行一个）
+              <textarea id="media"></textarea>
+            </label>
+          </div>
+
+          <div class="actions"><button onclick="saveItem()">保存全部修改</button></div>
+          <div id="history" class="history"></div>
+        </section>
+      </div>
+    </main>
+
+    <script src="scripts/core/utils.js?v=20260716-1"></script>
+    <script src="shared/metadata.js"></script>
+    <script src="scripts/pages/content-control.js?v=20260716-1"></script>
+  </body>
+</html>

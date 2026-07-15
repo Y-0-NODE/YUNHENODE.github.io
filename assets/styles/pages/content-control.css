@@ -58,6 +58,42 @@
 .wide {
   grid-column: 1/-1;
 }
+.homepage-category-panel {
+  padding: 20px;
+  border: 1px solid #666;
+  background: #181818;
+}
+.homepage-category-panel h3 {
+  margin: 4px 0 8px;
+  color: #f2f2f2;
+  font-size: 22px;
+}
+.homepage-category-panel label {
+  color: #ddd;
+}
+.homepage-category-panel button {
+  margin-top: 12px;
+  border: 1px solid #444;
+  background: #0b0b0b;
+  color: #eee;
+  padding: 10px 13px;
+  cursor: pointer;
+}
+.homepage-category-panel button:hover {
+  background: #e8e8e8;
+  color: #111;
+}
+.category-kicker {
+  margin: 0;
+  color: #888;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+.category-note {
+  margin: 0 0 14px;
+  color: #aaa;
+  line-height: 1.7;
+}
 .actions {
   display: flex;
   flex-wrap: wrap;
