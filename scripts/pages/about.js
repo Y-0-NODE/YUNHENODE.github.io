@@ -80,8 +80,10 @@ function renderContacts(settings) {
 
 async function loadPublicContacts() {
   const cacheKey = Date.now();
-  let items = await fetchMediaItems(`./api/media-list?contacts=${cacheKey}`);
-  if (!items) items = await fetchMediaItems(`${PUBLIC_MEDIA_API}?contacts=${cacheKey}`);
+  let items = await fetchMediaItems(`./api/media-list?includeSettings=1&contacts=${cacheKey}`);
+  if (!items) {
+    items = await fetchMediaItems(`${PUBLIC_MEDIA_API}?includeSettings=1&contacts=${cacheKey}`);
+  }
   const record = items?.find(item => item.title === CONTACT_SETTINGS_TITLE);
   renderContacts(parseContactSettings(record));
 }

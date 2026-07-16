@@ -1,5 +1,6 @@
 const { createClient } = require("@supabase/supabase-js");
 const mediaMetadata = require("../shared/metadata").media;
+const CONTACT_SETTINGS_TITLE = "YUNHE_PUBLIC_CONTACTS";
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -45,9 +46,12 @@ module.exports = async function handler(req, res) {
 
   if (error) return res.status(500).json({ success: false, error: error.message || error });
 
-  const cleaned = (data || []).map(item => ({
-    ...item,
-    description: mediaMetadata.strip(item.description)
-  }));
+  const includeSettings = String(req.query?.includeSettings || "") === "1";
+  const cleaned = (data || [])
+    .filter(item => includeSettings || item.title !== CONTACT_SETTINGS_TITLE)
+    .map(item => ({
+      ...item,
+      description: mediaMetadata.strip(item.description)
+    }));
   return res.status(200).json({ success: true, data: cleaned });
 };

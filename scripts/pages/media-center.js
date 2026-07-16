@@ -144,7 +144,7 @@ async function saveContactSettings() {
     : {
         adminName,
         password,
-        kind: "asset",
+        kind: "photo",
         title: CONTACT_SETTINGS_TITLE,
         description,
         path: "external/settings/public-contacts",
@@ -268,7 +268,7 @@ async function copyUrl(value) {
     prompt("复制这个媒体地址：", url);
   }
 }
-fetch("./api/media-list", { cache: "no-store" })
+fetch("./api/media-list?includeSettings=1", { cache: "no-store" })
   .then(r => r.json())
   .then(o => {
     const allItems = Array.isArray(o.data) ? o.data : [];
