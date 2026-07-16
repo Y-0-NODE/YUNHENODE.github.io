@@ -203,42 +203,6 @@ function featuredUrl(item) {
   return `${target}&visitor=1&curated=1`;
 }
 
-function renderVisitorCategories(items) {
-  const box = document.getElementById("visitor-category-list");
-  if (!box || !window.YunheTaxonomy) return;
-  const escape = window.YunheUtils?.escapeHtml || (value => String(value || ""));
-  const articles = items.filter(item => item.type === "article");
-
-  box.innerHTML = window.YunheTaxonomy.groups
-    .map(
-      group => `
-        <section class="visitor-category-group">
-          <div class="visitor-category-group-head">
-            <h3>${escape(group.name)}</h3>
-            <p>${escape(group.description)}</p>
-          </div>
-          <div class="visitor-topic-grid">
-            ${group.items
-              .map(item => {
-                const count = articles.filter(
-                  article => window.YunheTaxonomy.classifyContent(article) === item.name
-                ).length;
-                return `
-                  <a class="visitor-topic" href="article-topic.html?topic=${encodeURIComponent(item.name)}&visitor=1">
-                    <span>${count} 篇</span>
-                    <strong>${escape(item.name)}</strong>
-                    <small>${escape(item.description)}</small>
-                  </a>
-                `;
-              })
-              .join("")}
-          </div>
-        </section>
-      `
-    )
-    .join("");
-}
-
 function renderFeaturedGroup(groupName, items) {
   const box = document.getElementById(`featured-${groupName}`);
   if (!box) return;
@@ -281,15 +245,10 @@ async function loadFeaturedContent() {
     if (!response.ok) throw new Error("featured load failed");
     const result = await response.json();
     const items = Array.isArray(result) ? result : [];
-    renderVisitorCategories(items);
     renderFeaturedGroup("primary", items);
     renderFeaturedGroup("observation", items);
     renderFeaturedGroup("extended", items);
   } catch (error) {
-    const categoryBox = document.getElementById("visitor-category-list");
-    if (categoryBox) {
-      categoryBox.innerHTML = '<p class="featured-loading">文章分类暂时无法读取。</p>';
-    }
     document.querySelectorAll(".featured-list").forEach(box => {
       box.innerHTML = '<p class="featured-loading">精选内容暂时无法读取。</p>';
     });

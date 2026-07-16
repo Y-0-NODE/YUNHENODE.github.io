@@ -28,26 +28,84 @@ body {
 }
 
 .about-layout {
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 52px;
   max-width: 1180px;
   margin: 0 auto;
 }
 
-.section-nav {
-  position: sticky;
-  top: 100px;
-  align-self: start;
+.about-layout > div {
   display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  column-gap: 56px;
+  align-items: start;
+}
+
+.section-nav {
+  position: fixed;
+  z-index: 40;
+  top: 50%;
+  left: 0;
+  width: min(270px, calc(100vw - 44px));
+  max-height: min(720px, calc(100vh - 120px));
+  overflow-y: auto;
+  border: 1px solid #292929;
+  border-left: 0;
+  background: rgba(13, 13, 13, 0.97);
+  padding: 18px 46px 18px 18px;
+  transform: translate(calc(-100% + 36px), -50%);
+  box-shadow: 12px 0 32px rgba(0, 0, 0, 0);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+  backdrop-filter: blur(14px);
+}
+
+.section-nav:hover,
+.section-nav:focus-within,
+.section-nav.open {
+  transform: translate(0, -50%);
+  box-shadow: 12px 0 32px rgba(0, 0, 0, 0.2);
+}
+
+.section-nav-links {
+  display: grid;
+  gap: 2px;
+}
+
+.section-nav-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding-top: 6px;
+  border: 0;
+  border-left: 1px solid #292929;
+  background: transparent;
+  color: #bdbdbd;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+}
+
+.section-nav-handle strong {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+.section-nav-handle span {
+  color: #666;
+  font-size: 9px;
+  letter-spacing: 1.4px;
 }
 
 .section-nav a {
   color: #858585;
   text-decoration: none;
-  padding: 12px 0;
+  padding: 10px 0;
   border-bottom: 1px solid #222;
 }
 
@@ -56,14 +114,14 @@ body {
   color: #fff;
 }
 
-.section-nav strong {
+.section-nav a strong {
   display: block;
   font-size: 14px;
   line-height: 1.3;
   letter-spacing: 0;
 }
 
-.section-nav span {
+.section-nav a span {
   display: block;
   margin-top: 4px;
   color: #666;
@@ -78,55 +136,65 @@ body {
 }
 
 .roadmap {
-  margin-bottom: 64px;
+  grid-column: 1;
+  grid-row: 1 / span 9;
+  position: sticky;
+  top: 104px;
+  margin: 0;
   border-top: 1px solid #222;
   border-bottom: 1px solid #222;
-  padding: 28px 0 30px;
+  padding: 24px 0 26px;
 }
 
 .roadmap-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
+  display: grid;
+  gap: 14px;
   color: #888;
-  font-size: 12px;
-  letter-spacing: 1.6px;
-  margin-bottom: 24px;
+  font-size: 11px;
+  line-height: 1.7;
+  letter-spacing: 0.4px;
+  margin-bottom: 26px;
 }
 
 .roadmap-head strong {
   display: block;
   color: #d6d6d6;
-  font-size: 13px;
+  font-size: 17px;
   letter-spacing: 0;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .roadmap-head span {
   display: block;
 }
 
+.roadmap-title small {
+  color: #777;
+  font-size: 10px;
+  letter-spacing: 1.6px;
+}
+
 .route {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 0;
 }
 
 .route::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 12px;
-  height: 1px;
+  left: 6px;
+  top: 10px;
+  bottom: 12px;
+  width: 1px;
   background: #2a2a2a;
 }
 
 .route-step {
   position: relative;
-  padding-top: 40px;
-  min-height: 116px;
+  min-height: 74px;
+  padding: 0 0 22px 30px;
   color: #aaa;
 }
 
@@ -135,8 +203,8 @@ body {
   position: absolute;
   top: 5px;
   left: 0;
-  width: 13px;
-  height: 13px;
+  width: 11px;
+  height: 11px;
   border: 1px solid #555;
   background: #0b0b0b;
   border-radius: 50%;
@@ -150,17 +218,18 @@ body {
 .route-step strong {
   display: block;
   color: #f2f2f2;
-  font-size: 16px;
-  margin-bottom: 8px;
+  font-size: 15px;
+  margin-bottom: 6px;
 }
 
 .route-step span {
   display: block;
   line-height: 1.65;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .about-section {
+  grid-column: 2;
   scroll-margin-top: 96px;
   padding: 56px 0;
   border-top: 1px solid #222;
@@ -340,50 +409,63 @@ body.visitor-browse-mode .contact-line span {
   min-width: 0;
 }
 
+body.visitor-browse-mode .section-nav {
+  border-color: #d8d8d8;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 12px 0 32px rgba(0, 0, 0, 0.06);
+}
+
+body.visitor-browse-mode .section-nav-handle {
+  border-left-color: #d8d8d8;
+  color: #222;
+}
+
+body.visitor-browse-mode .section-nav a {
+  border-bottom-color: #e5e5e5 !important;
+  background: transparent !important;
+  color: #666 !important;
+}
+
+body.visitor-browse-mode .section-nav a:hover,
+body.visitor-browse-mode .section-nav a.active {
+  color: #111 !important;
+}
+
+body.visitor-browse-mode .route-step::before {
+  background: #fff;
+}
+
+body.visitor-browse-mode .route-step.active::before {
+  background: #111;
+  border-color: #111;
+}
+
 @media (max-width: 980px) {
   .about-shell {
     padding: 48px 18px 70px;
   }
 
-  .about-layout {
+  .about-layout > div {
     grid-template-columns: 1fr;
     gap: 36px;
   }
 
-  .section-nav {
+  .roadmap {
+    grid-column: 1;
+    grid-row: auto;
     position: relative;
     top: auto;
-    display: flex;
-    overflow-x: auto;
-    gap: 18px;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
   }
 
-  .section-nav a {
-    white-space: nowrap;
-    border-bottom: 0;
+  .about-section {
+    grid-column: 1;
   }
 
-  .route,
   .split-grid,
   .field-grid,
   .content-flow {
     grid-template-columns: 1fr;
-  }
-
-  .route::before {
-    display: none;
-  }
-
-  .route-step {
-    min-height: auto;
-    padding: 18px 0 18px 32px;
-    border-top: 1px solid #222;
-  }
-
-  .route-step::before {
-    top: 22px;
-    left: 0;
   }
 
   body.visitor-browse-mode .contact-line {

@@ -117,94 +117,6 @@ body::before {
   font-size: 13px;
 }
 
-.visitor-categories {
-  margin-top: 86px;
-  border-top: 1px solid #d8d8d8;
-  padding-top: 54px;
-}
-
-.visitor-category-heading {
-  max-width: 760px;
-  margin-bottom: 44px;
-}
-
-.visitor-category-heading h2 {
-  margin: 10px 0 14px;
-  color: #111;
-  font-size: clamp(36px, 5vw, 62px);
-  line-height: 1.05;
-}
-
-.visitor-category-heading > p:last-child,
-.visitor-category-group-head p {
-  color: #555;
-  line-height: 1.8;
-}
-
-.visitor-category-list {
-  display: grid;
-  gap: 50px;
-}
-
-.visitor-category-group {
-  display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
-  gap: 34px;
-  border-top: 1px solid #ddd;
-  padding-top: 26px;
-}
-
-.visitor-category-group-head h3 {
-  margin: 0 0 10px;
-  color: #111;
-  font-size: 21px;
-}
-
-.visitor-category-group-head p {
-  margin: 0;
-  font-size: 13px;
-}
-
-.visitor-topic-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.visitor-topic {
-  min-height: 124px;
-  display: grid;
-  align-content: space-between;
-  border: 1px solid #d8d8d8;
-  background: #fff;
-  color: #111;
-  padding: 17px;
-  text-decoration: none;
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.visitor-topic:hover,
-.visitor-topic:focus-visible {
-  transform: translateY(-2px);
-  border-color: #777;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-  outline: none;
-}
-
-.visitor-topic span,
-.visitor-topic small {
-  color: #777;
-  font-size: 11px;
-}
-
-.visitor-topic strong {
-  margin: 16px 0 6px;
-  font-size: 18px;
-}
-
 .featured-section {
   margin-top: 86px;
   border-top: 1px solid #d8d8d8;
@@ -313,11 +225,6 @@ body::before {
     grid-template-columns: 1fr;
     gap: 18px;
   }
-
-  .visitor-category-group {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
 }
 
 @media (max-width: 560px) {
@@ -364,24 +271,6 @@ body::before {
   .featured-section {
     margin-top: 58px;
     padding-top: 38px;
-  }
-
-  .visitor-categories {
-    margin-top: 58px;
-    padding-top: 38px;
-  }
-
-  .visitor-category-heading {
-    margin-bottom: 34px;
-  }
-
-  .visitor-topic-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .visitor-topic {
-    min-height: 116px;
-    padding: 14px;
   }
 
   .featured-heading {

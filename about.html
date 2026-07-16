@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>关于我｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/about.css?v=20260715-4" />
+    <link rel="stylesheet" href="assets/styles/pages/about.css?v=20260716-4" />
   </head>
 
   <body>
@@ -44,22 +44,35 @@
       </section>
 
       <section class="about-layout">
-        <nav class="section-nav" id="section-nav">
-          <a href="#identity"><strong>我是谁</strong><span>Identity</span></a>
-          <a href="#method"><strong>我的方法</strong><span>Method</span></a>
-          <a href="#fields"><strong>研究方向</strong><span>Research</span></a>
-          <a href="#structure"><strong>内容组成</strong><span>Structure</span></a>
-          <a href="#guide"><strong>如何阅读</strong><span>Guide</span></a>
-          <a href="#collaboration"><strong>合作方式</strong><span>Collaboration</span></a>
-          <a href="#boundary"><strong>内容边界</strong><span>Boundary</span></a>
-          <a href="#update"><strong>更新方式</strong><span>Update</span></a>
-          <a href="#contact"><strong>联系方式</strong><span>Contact</span></a>
+        <nav class="section-nav" id="section-nav" aria-label="关于我页面目录">
+          <button
+            class="section-nav-handle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="section-nav-links"
+            onclick="toggleSectionNav()"
+          >
+            <strong>目录</strong><span>MENU</span>
+          </button>
+          <div class="section-nav-links" id="section-nav-links">
+            <a href="#identity"><strong>我是谁</strong><span>Identity</span></a>
+            <a href="#method"><strong>我的方法</strong><span>Method</span></a>
+            <a href="#fields"><strong>研究方向</strong><span>Research</span></a>
+            <a href="#structure"><strong>内容组成</strong><span>Structure</span></a>
+            <a href="#guide"><strong>如何阅读</strong><span>Guide</span></a>
+            <a href="#collaboration"><strong>合作方式</strong><span>Collaboration</span></a>
+            <a href="#boundary"><strong>内容边界</strong><span>Boundary</span></a>
+            <a href="#update"><strong>更新方式</strong><span>Update</span></a>
+            <a href="#contact"><strong>联系方式</strong><span>Contact</span></a>
+          </div>
         </nav>
 
         <div>
           <section class="roadmap" aria-label="阅读路线图">
             <div class="roadmap-head">
-              <span><strong>阅读路线</strong>READING ROUTE</span>
+              <span class="roadmap-title"
+                ><strong>阅读路线</strong><small>READING ROUTE</small></span
+              >
               <span>首页 → 研究主题 → 文章 → 案例 → 视频 → 关于我</span>
             </div>
             <div class="route" id="route">
@@ -258,7 +271,7 @@
       </section>
     </main>
 
-    <script src="scripts/pages/visitor.js"></script>
-    <script src="scripts/pages/about.js"></script>
+    <script src="scripts/pages/visitor.js?v=20260716-4"></script>
+    <script src="scripts/pages/about.js?v=20260716-4"></script>
   </body>
 </html>
