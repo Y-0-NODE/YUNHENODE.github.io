@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>关于我｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/about.css?v=20260716-4" />
+    <link rel="stylesheet" href="assets/styles/components/edge-drawer.css?v=20260716-5" />
+    <link rel="stylesheet" href="assets/styles/pages/about.css?v=20260716-5" />
   </head>
 
   <body>
@@ -44,17 +45,17 @@
       </section>
 
       <section class="about-layout">
-        <nav class="section-nav" id="section-nav" aria-label="关于我页面目录">
+        <nav class="section-nav edge-drawer" id="section-nav" aria-label="关于我页面目录">
           <button
-            class="section-nav-handle"
+            class="section-nav-handle edge-drawer-handle"
             type="button"
             aria-expanded="false"
             aria-controls="section-nav-links"
-            onclick="toggleSectionNav()"
+            onclick="toggleEdgeDrawer('section-nav')"
           >
             <strong>目录</strong><span>MENU</span>
           </button>
-          <div class="section-nav-links" id="section-nav-links">
+          <div class="section-nav-links edge-drawer-content" id="section-nav-links">
             <a href="#identity"><strong>我是谁</strong><span>Identity</span></a>
             <a href="#method"><strong>我的方法</strong><span>Method</span></a>
             <a href="#fields"><strong>研究方向</strong><span>Research</span></a>
@@ -68,35 +69,6 @@
         </nav>
 
         <div>
-          <section class="roadmap" aria-label="阅读路线图">
-            <div class="roadmap-head">
-              <span class="roadmap-title"
-                ><strong>阅读路线</strong><small>READING ROUTE</small></span
-              >
-              <span>首页 → 研究主题 → 文章 → 案例 → 视频 → 关于我</span>
-            </div>
-            <div class="route" id="route">
-              <div class="route-step active">
-                <strong>首页</strong><span>理解云鹤系统的整体入口。</span>
-              </div>
-              <div class="route-step">
-                <strong>研究主题</strong><span>从品牌、平台、城市、组织等方向进入。</span>
-              </div>
-              <div class="route-step">
-                <strong>文章</strong><span>阅读方法论、结构分析与系统记录。</span>
-              </div>
-              <div class="route-step">
-                <strong>案例</strong><span>查看问题、分析、判断和验证。</span>
-              </div>
-              <div class="route-step">
-                <strong>视频</strong><span>补充阶段性的表达与观察过程。</span>
-              </div>
-              <div class="route-step">
-                <strong>关于我</strong><span>理解网站边界、合作方式与更新机制。</span>
-              </div>
-            </div>
-          </section>
-
           <section id="identity" class="about-section">
             <div class="section-label">Identity</div>
             <h2>我是谁</h2>
@@ -271,7 +243,8 @@
       </section>
     </main>
 
-    <script src="scripts/pages/visitor.js?v=20260716-4"></script>
-    <script src="scripts/pages/about.js?v=20260716-4"></script>
+    <script src="scripts/pages/visitor.js?v=20260716-5"></script>
+    <script src="scripts/components/edge-drawer.js?v=20260716-5"></script>
+    <script src="scripts/pages/about.js?v=20260716-5"></script>
   </body>
 </html>

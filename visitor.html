@@ -9,7 +9,8 @@
     />
     <title>访客入口｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260716-4" />
+    <link rel="stylesheet" href="assets/styles/components/edge-drawer.css?v=20260716-5" />
+    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260716-5" />
   </head>
 
   <body>
@@ -34,6 +35,49 @@
         <a href="about.html">关于</a>
       </nav>
     </header>
+
+    <aside
+      class="reading-route-drawer edge-drawer"
+      id="reading-route-drawer"
+      aria-label="访客阅读路线"
+    >
+      <button
+        class="edge-drawer-handle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="reading-route-content"
+        onclick="toggleEdgeDrawer('reading-route-drawer')"
+      >
+        <strong>阅读路线</strong><span>ROUTE</span>
+      </button>
+      <div class="edge-drawer-content" id="reading-route-content">
+        <div class="edge-drawer-heading">
+          <p>READING ROUTE</p>
+          <h2>阅读路线</h2>
+          <span>从公开入口进入云鹤系统的文章、案例、作品和说明。</span>
+        </div>
+        <nav class="edge-route" aria-label="阅读顺序">
+          <a class="active" href="visitor.html">
+            <span>01</span><strong>访客入口</strong><small>了解公开内容范围。</small>
+          </a>
+          <a href="#featured-title">
+            <span>02</span><strong>重点阅读</strong><small>先阅读精选文章与案例。</small>
+          </a>
+          <a href="article-list.html?visitor=1">
+            <span>03</span><strong>文章</strong><small>阅读结构分析与现实观察。</small>
+          </a>
+          <a href="case-list.html?visitor=1">
+            <span>04</span><strong>案例</strong><small>查看问题、判断与验证。</small>
+          </a>
+          <a href="gallery.html?visitor=1">
+            <span>05</span><strong>作品</strong><small>浏览摄影与视觉记录。</small>
+          </a>
+          <a href="about.html?visitor=1">
+            <span>06</span><strong>关于我</strong><small>理解方法、边界与合作方式。</small>
+          </a>
+        </nav>
+      </div>
+    </aside>
 
     <main class="visitor-shell">
       <section class="visitor-hero">
@@ -111,7 +155,8 @@
       <p class="visitor-note">访客入口仅供浏览。</p>
     </main>
     <script src="scripts/core/config.js"></script>
-    <script src="scripts/core/utils.js?v=20260716-4"></script>
-    <script src="scripts/pages/visitor.js?v=20260716-4"></script>
+    <script src="scripts/core/utils.js?v=20260716-5"></script>
+    <script src="scripts/components/edge-drawer.js?v=20260716-5"></script>
+    <script src="scripts/pages/visitor.js?v=20260716-5"></script>
   </body>
 </html>
