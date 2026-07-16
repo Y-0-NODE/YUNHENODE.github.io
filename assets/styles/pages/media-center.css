@@ -40,6 +40,7 @@
 }
 input,
 select,
+textarea,
 button,
 .button {
   border: 1px solid #303030;
@@ -48,6 +49,10 @@ button,
   padding: 10px 13px;
   text-decoration: none;
   cursor: pointer;
+}
+textarea {
+  min-height: 92px;
+  resize: vertical;
 }
 .filters {
   display: flex;
@@ -134,6 +139,89 @@ button,
 .panel-links {
   margin-top: 17px;
 }
+.contact-settings {
+  margin-top: 52px;
+}
+.contact-settings-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.contact-settings-head h2 {
+  margin: 5px 0 10px;
+}
+.contact-settings-head p {
+  min-height: 0;
+  margin: 0;
+}
+.contact-auth,
+.contact-copy-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 26px;
+}
+.contact-settings label {
+  display: grid;
+  gap: 8px;
+  color: #aaa;
+  font-size: 13px;
+}
+.contact-settings input,
+.contact-settings textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+.contact-table-head,
+.contact-row {
+  display: grid;
+  grid-template-columns: 0.72fr 1fr 1.35fr 70px 74px;
+  gap: 10px;
+  align-items: center;
+}
+.contact-table-head {
+  margin-top: 30px;
+  border-bottom: 1px solid #292929;
+  padding: 0 0 10px;
+  color: #777;
+  font-size: 11px;
+}
+.contact-rows {
+  display: grid;
+}
+.contact-row {
+  border-bottom: 1px solid #242424;
+  padding: 12px 0;
+}
+.contact-row input {
+  min-width: 0;
+}
+.contact-visible {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.contact-visible input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+}
+.contact-remove {
+  color: #ffaaa2;
+}
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.contact-actions .primary {
+  background: #eee;
+  color: #111;
+  font-weight: 700;
+}
 .hidden {
   display: none;
 }
@@ -185,8 +273,28 @@ button,
   .tools {
     grid-template-columns: 1fr;
   }
+  .contact-settings-head {
+    display: grid;
+  }
+  .contact-auth,
+  .contact-copy-fields {
+    grid-template-columns: 1fr;
+  }
+  .contact-table-head {
+    display: none;
+  }
+  .contact-row {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    padding: 18px 0;
+  }
+  .contact-row input::placeholder {
+    color: #777;
+  }
+  .contact-visible {
+    justify-content: flex-start;
+  }
   .preview {
     aspect-ratio: 16/10;
   }
 }
-

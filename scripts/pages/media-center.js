@@ -1,4 +1,23 @@
 let ITEMS = [];
+let CONTACT_RECORD = null;
+let CONTACT_ROWS = [];
+const CONTACT_SETTINGS_TITLE = "YUNHE_PUBLIC_CONTACTS";
+const DEFAULT_CONTACT_SETTINGS = {
+  title: "联系方式",
+  intro: "如需合作，可通过以下方式联系。",
+  contacts: [
+    {
+      label: "Email",
+      value: "YUNHE-ZK@outlook.com",
+      url: "mailto:YUNHE-ZK@outlook.com",
+      visible: true
+    },
+    { label: "Behance", value: "云鹤系统", url: "", visible: true },
+    { label: "GitHub", value: "YUNHENODE", url: "", visible: true },
+    { label: "公众号", value: "云鹤系统", url: "", visible: true },
+    { label: "小红书", value: "云鹤系统", url: "", visible: true }
+  ]
+};
 const esc = s =>
   String(s || "")
     .replaceAll("&", "&amp;")
@@ -6,6 +25,153 @@ const esc = s =>
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
 const encoded = s => encodeURIComponent(String(s || "")).replaceAll("'", "%27");
+const contactId = () =>
+  globalThis.crypto?.randomUUID?.() ||
+  `contact-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+function contactDefaults() {
+  return JSON.parse(JSON.stringify(DEFAULT_CONTACT_SETTINGS));
+}
+
+function parseContactSettings(record) {
+  if (!record?.description) return contactDefaults();
+  try {
+    const parsed = JSON.parse(record.description);
+    return {
+      title: String(parsed.title || DEFAULT_CONTACT_SETTINGS.title),
+      intro: String(parsed.intro || DEFAULT_CONTACT_SETTINGS.intro),
+      contacts: Array.isArray(parsed.contacts)
+        ? parsed.contacts.map(item => ({
+            id: item.id || contactId(),
+            label: String(item.label || ""),
+            value: String(item.value || ""),
+            url: String(item.url || ""),
+            visible: item.visible !== false
+          }))
+        : contactDefaults().contacts
+    };
+  } catch (error) {
+    return contactDefaults();
+  }
+}
+
+function collectContactRows() {
+  return Array.from(document.querySelectorAll(".contact-row")).map(row => ({
+    id: row.dataset.id || contactId(),
+    label: row.querySelector('[data-field="label"]').value.trim(),
+    value: row.querySelector('[data-field="value"]').value.trim(),
+    url: row.querySelector('[data-field="url"]').value.trim(),
+    visible: row.querySelector('[data-field="visible"]').checked
+  }));
+}
+
+function renderContactRows() {
+  const box = document.getElementById("contact-rows");
+  if (!box) return;
+  box.innerHTML = CONTACT_ROWS.map(
+    (item, index) => `
+      <div class="contact-row" data-id="${esc(item.id || contactId())}">
+        <input data-field="label" value="${esc(item.label)}" placeholder="名称，例如 Email" aria-label="联系方式名称">
+        <input data-field="value" value="${esc(item.value)}" placeholder="公开显示的内容" aria-label="联系方式显示内容">
+        <input data-field="url" value="${esc(item.url)}" placeholder="链接，可留空" aria-label="联系方式链接">
+        <label class="contact-visible" title="是否公开">
+          <input data-field="visible" type="checkbox" ${item.visible !== false ? "checked" : ""} aria-label="公开这个联系方式">
+        </label>
+        <button class="contact-remove" type="button" onclick="removeContactRow(${index})">删除</button>
+      </div>
+    `
+  ).join("");
+}
+
+function loadContactSettings(record) {
+  CONTACT_RECORD = record || null;
+  const settings = parseContactSettings(record);
+  CONTACT_ROWS = settings.contacts.map(item => ({ id: item.id || contactId(), ...item }));
+  document.getElementById("contact-section-title").value = settings.title;
+  document.getElementById("contact-section-intro").value = settings.intro;
+  renderContactRows();
+  document.getElementById("contact-status").textContent = record
+    ? "已读取当前公开联系方式设置。"
+    : "还没有保存自定义设置，目前显示默认联系方式。";
+}
+
+function addContactRow() {
+  CONTACT_ROWS = collectContactRows();
+  CONTACT_ROWS.push({ id: contactId(), label: "", value: "", url: "", visible: true });
+  renderContactRows();
+}
+
+function removeContactRow(index) {
+  CONTACT_ROWS = collectContactRows();
+  CONTACT_ROWS.splice(index, 1);
+  renderContactRows();
+}
+
+function resetContactDefaults() {
+  if (!confirm("恢复默认联系方式项目？点击保存后才会同步到公开页面。")) return;
+  const defaults = contactDefaults();
+  CONTACT_ROWS = defaults.contacts.map(item => ({ id: contactId(), ...item }));
+  document.getElementById("contact-section-title").value = defaults.title;
+  document.getElementById("contact-section-intro").value = defaults.intro;
+  renderContactRows();
+  document.getElementById("contact-status").textContent = "已恢复默认内容，请点击保存。";
+}
+
+async function saveContactSettings() {
+  const status = document.getElementById("contact-status");
+  const adminName = document.getElementById("contact-admin-name").value.trim();
+  const password = document.getElementById("contact-admin-password").value.trim();
+  const title = document.getElementById("contact-section-title").value.trim() || "联系方式";
+  const intro = document.getElementById("contact-section-intro").value.trim();
+  const contacts = collectContactRows().filter(item => item.label || item.value || item.url);
+
+  if (!adminName || !password) {
+    status.textContent = "请填写管理员名称和密码。";
+    return;
+  }
+
+  const description = JSON.stringify({ version: 1, title, intro, contacts });
+  const isUpdate = Boolean(CONTACT_RECORD?.id);
+  const endpoint = isUpdate ? "./api/media-update" : "./api/media-record";
+  const payload = isUpdate
+    ? {
+        id: CONTACT_RECORD.id,
+        adminName,
+        password,
+        title: CONTACT_SETTINGS_TITLE,
+        description
+      }
+    : {
+        adminName,
+        password,
+        kind: "asset",
+        title: CONTACT_SETTINGS_TITLE,
+        description,
+        path: "external/settings/public-contacts",
+        url: new URL("about.html#contact", location.href).href
+      };
+
+  status.textContent = "正在保存并同步到公开页面…";
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      status.textContent = result.error || "联系方式保存失败。";
+      return;
+    }
+    CONTACT_RECORD = result.data || CONTACT_RECORD;
+    CONTACT_ROWS = contacts;
+    renderContactRows();
+    status.innerHTML = `已保存。<a href="about.html?visitor=1&refresh=${Date.now()}#contact" target="_blank">查看公开联系方式</a>`;
+  } catch (error) {
+    status.textContent = error.message || "联系方式保存失败。";
+  }
+}
+
 function preview(x) {
   if (x.kind === "video") return `<video src="${esc(x.url)}" controls playsinline></video>`;
   if (x.kind === "audio") return `<audio src="${esc(x.url)}" controls></audio>`;
@@ -105,13 +271,21 @@ async function copyUrl(value) {
 fetch("./api/media-list", { cache: "no-store" })
   .then(r => r.json())
   .then(o => {
-    ITEMS = Array.isArray(o.data) ? o.data : [];
+    const allItems = Array.isArray(o.data) ? o.data : [];
+    const contactRecord = allItems.find(item => item.title === CONTACT_SETTINGS_TITLE);
+    ITEMS = allItems.filter(item => item.title !== CONTACT_SETTINGS_TITLE);
+    loadContactSettings(contactRecord);
     const map = { photography: "photo", video: "video", audio: "audio", assets: "asset" };
     if (map[location.hash.slice(1)])
       document.getElementById("kind").value = map[location.hash.slice(1)];
     render();
   })
-  .catch(() => (document.getElementById("status").textContent = "媒体库读取失败。"));
+  .catch(() => {
+    document.getElementById("status").textContent = "媒体库读取失败。";
+    loadContactSettings(null);
+    document.getElementById("contact-status").textContent =
+      "联系方式设置读取失败，目前显示默认项目。";
+  });
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") closeMediaViewer();

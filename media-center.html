@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>媒体中心｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/media-center.css" />
+    <link rel="stylesheet" href="assets/styles/pages/media-center.css?v=20260716-6" />
   </head>
   <body>
     <header class="topbar cms-topbar">
@@ -55,6 +55,51 @@
         </div>
         <div id="status" class="status">正在读取媒体库…</div>
         <div id="grid" class="media-grid"></div>
+      </section>
+      <section id="public-contact-settings" class="panel contact-settings">
+        <div class="contact-settings-head">
+          <div>
+            <p class="eyebrow">PUBLIC CONTACT SETTINGS</p>
+            <h2>公开联系方式</h2>
+            <p>自定义“关于我”页面最下方显示的联系方式。只有勾选“公开”的项目才会显示给访客。</p>
+          </div>
+          <a class="button" href="about.html?visitor=1#contact" target="_blank">查看公开页面</a>
+        </div>
+
+        <div class="contact-auth">
+          <label for="contact-admin-name"
+            >管理员名称<input id="contact-admin-name" value="YUNHE" autocomplete="username"
+          /></label>
+          <label for="contact-admin-password"
+            >管理员密码<input
+              id="contact-admin-password"
+              type="password"
+              autocomplete="current-password"
+          /></label>
+        </div>
+
+        <div class="contact-copy-fields">
+          <label for="contact-section-title"
+            >板块标题<input id="contact-section-title" value="联系方式"
+          /></label>
+          <label for="contact-section-intro"
+            >板块说明<textarea id="contact-section-intro">如需合作，可通过以下方式联系。</textarea>
+          </label>
+        </div>
+
+        <div class="contact-table-head" aria-hidden="true">
+          <span>名称</span><span>显示内容</span><span>链接</span><span>公开</span><span>操作</span>
+        </div>
+        <div id="contact-rows" class="contact-rows"></div>
+
+        <div class="contact-actions">
+          <button type="button" onclick="addContactRow()">增加联系方式</button>
+          <button class="primary" type="button" onclick="saveContactSettings()">
+            保存并同步到“关于我”
+          </button>
+          <button type="button" onclick="resetContactDefaults()">恢复默认项目</button>
+        </div>
+        <div id="contact-status" class="status">正在读取公开联系方式设置…</div>
       </section>
       <section class="info-panels">
         <article id="photography" class="panel">
@@ -129,6 +174,6 @@
         </article>
       </section>
     </main>
-    <script src="scripts/pages/media-center.js"></script>
+    <script src="scripts/pages/media-center.js?v=20260716-6"></script>
   </body>
 </html>
