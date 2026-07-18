@@ -4,6 +4,7 @@
   const SWIPE_DISTANCE = 46;
   const SWIPE_EDGE = 54;
   let touchState = null;
+  let pointerState = null;
 
   function setEdgeDrawer(drawer, open) {
     if (!drawer) return;
@@ -62,6 +63,27 @@
     touchState = null;
   }
 
+  function handlePointerStart(event) {
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
+    const drawer = event.target.closest(".edge-drawer");
+    if (!drawer?.classList.contains("open")) return;
+    pointerState = {
+      drawer,
+      startX: event.clientX,
+      startY: event.clientY
+    };
+  }
+
+  function handlePointerEnd(event) {
+    if (!pointerState?.drawer) return;
+    const dx = event.clientX - pointerState.startX;
+    const dy = event.clientY - pointerState.startY;
+    if (dx < -SWIPE_DISTANCE && Math.abs(dx) > Math.abs(dy) * 1.25) {
+      setEdgeDrawer(pointerState.drawer, false);
+    }
+    pointerState = null;
+  }
+
   document.querySelectorAll(".edge-drawer a").forEach(link => {
     link.addEventListener("click", () => setEdgeDrawer(link.closest(".edge-drawer"), false));
   });
@@ -78,6 +100,14 @@
     }
   });
 
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    document.querySelectorAll(".edge-drawer").forEach(drawer => {
+      drawer.addEventListener("mouseleave", () => {
+        if (drawer.classList.contains("open")) setEdgeDrawer(drawer, false);
+      });
+    });
+  }
+
   window.addEventListener("keydown", event => {
     if (event.key !== "Escape") return;
     document.querySelectorAll(".edge-drawer.open").forEach(drawer => setEdgeDrawer(drawer, false));
@@ -85,6 +115,8 @@
 
   window.addEventListener("touchstart", handleTouchStart, { passive: true });
   window.addEventListener("touchend", handleTouchEnd, { passive: true });
+  window.addEventListener("pointerdown", handlePointerStart, { passive: true });
+  window.addEventListener("pointerup", handlePointerEnd, { passive: true });
 
   global.toggleEdgeDrawer = toggleEdgeDrawer;
 })(window);

@@ -192,6 +192,24 @@ body.visitor-browse-mode .edge-drawer,
   backdrop-filter: none;
 }
 
+.edge-drawer-close-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -13px 0 28px;
+  color: var(--drawer-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.edge-drawer-close-hint::before {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: var(--drawer-muted);
+}
+
 .reading-route-drawer .edge-drawer-switch {
   display: grid;
   place-items: center;

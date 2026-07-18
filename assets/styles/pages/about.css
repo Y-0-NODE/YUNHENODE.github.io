@@ -227,6 +227,14 @@ body {
   letter-spacing: 0;
 }
 
+.contact-line a[href^="mailto:"] {
+  min-width: 258px;
+}
+
+.contact-line a[href^="mailto:"] em {
+  white-space: nowrap;
+}
+
 body.visitor-browse-mode .field,
 body.visitor-browse-mode .contact-line a,
 body.visitor-browse-mode .contact-line span {
@@ -253,6 +261,10 @@ body.visitor-browse-mode .contact-line {
 body.visitor-browse-mode .contact-line a,
 body.visitor-browse-mode .contact-line span {
   min-width: 0;
+}
+
+body.visitor-browse-mode .contact-line a[href^="mailto:"] {
+  grid-column: span 2;
 }
 
 body.visitor-browse-mode .section-nav {
@@ -294,5 +306,9 @@ body.visitor-browse-mode .section-nav a.active {
 
   body.visitor-browse-mode .contact-line {
     grid-template-columns: 1fr;
+  }
+
+  body.visitor-browse-mode .contact-line a[href^="mailto:"] {
+    grid-column: 1;
   }
 }
