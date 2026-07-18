@@ -264,6 +264,53 @@ body.visitor-browse-mode .edge-drawer,
   transform: translate(-50%, -50%) scaleY(0.45);
 }
 
+.section-nav .edge-drawer-switch {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 18px;
+  height: 26px;
+  margin: 11px 0 0;
+}
+
+.section-nav .edge-drawer-switch::before,
+.section-nav .edge-drawer-switch::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
+.section-nav .edge-drawer-switch::before {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--drawer-muted);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.section-nav .edge-drawer-switch::after {
+  width: 1.5px;
+  height: 22px;
+  background: var(--drawer-muted);
+  opacity: 0;
+  transform: translate(-50%, -50%) scaleY(0.45);
+}
+
+.section-nav.open .edge-drawer-switch::before {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.45);
+}
+
+.section-nav.open .edge-drawer-switch::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scaleY(1);
+}
+
 .reading-route-drawer.open .edge-drawer-switch::before {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.45);
@@ -275,11 +322,13 @@ body.visitor-browse-mode .edge-drawer,
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .section-nav:hover .edge-drawer-switch::before,
   .reading-route-drawer:hover .edge-drawer-switch::before {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.45);
   }
 
+  .section-nav:hover .edge-drawer-switch::after,
   .reading-route-drawer:hover .edge-drawer-switch::after {
     opacity: 1;
     transform: translate(-50%, -50%) scaleY(1);

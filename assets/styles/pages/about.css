@@ -56,12 +56,12 @@ body {
 }
 
 .section-nav-handle .section-nav-mark {
-  margin-top: 11px;
+  margin-top: 10px;
   color: inherit;
-  font-size: 18px;
-  font-weight: 650;
+  font-size: 15px;
+  font-weight: 400;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.04em;
 }
 
 .section-nav a {

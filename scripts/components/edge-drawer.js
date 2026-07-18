@@ -118,5 +118,11 @@
   window.addEventListener("pointerdown", handlePointerStart, { passive: true });
   window.addEventListener("pointerup", handlePointerEnd, { passive: true });
 
+  document.addEventListener("click", event => {
+    document.querySelectorAll(".edge-drawer.open").forEach(drawer => {
+      if (!drawer.contains(event.target)) setEdgeDrawer(drawer, false);
+    });
+  });
+
   global.toggleEdgeDrawer = toggleEdgeDrawer;
 })(window);
