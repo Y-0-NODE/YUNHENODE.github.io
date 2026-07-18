@@ -197,9 +197,13 @@ body.visitor-browse-mode .edge-drawer,
   align-items: center;
   gap: 8px;
   margin: -13px 0 28px;
+  border: 0;
+  background: transparent;
   color: var(--drawer-muted);
   font-size: 10px;
   letter-spacing: 0.08em;
+  padding: 0;
+  cursor: pointer;
 }
 
 .edge-drawer-close-hint::before {
@@ -208,6 +212,18 @@ body.visitor-browse-mode .edge-drawer,
   width: 22px;
   height: 1px;
   background: var(--drawer-muted);
+}
+
+.edge-drawer-close-hint:hover,
+.edge-drawer-close-hint:focus-visible {
+  color: var(--drawer-text);
+  outline: none;
+}
+
+.edge-drawer-close-hint:hover::before,
+.edge-drawer-close-hint:focus-visible::before {
+  width: 30px;
+  background: var(--drawer-text);
 }
 
 .reading-route-drawer .edge-drawer-switch {

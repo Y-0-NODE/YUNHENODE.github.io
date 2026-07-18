@@ -42,6 +42,28 @@ body {
   gap: 2px;
 }
 
+.section-nav-handle .section-nav-title {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.section-nav-handle .section-nav-title span {
+  color: inherit;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.section-nav-handle .section-nav-mark {
+  margin-top: 11px;
+  color: inherit;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 .section-nav a {
   color: #858585;
   text-decoration: none;
@@ -255,16 +277,12 @@ body.visitor-browse-mode .contact-line em {
 
 body.visitor-browse-mode .contact-line {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: minmax(258px, 1.55fr) repeat(3, minmax(140px, 1fr));
 }
 
 body.visitor-browse-mode .contact-line a,
 body.visitor-browse-mode .contact-line span {
   min-width: 0;
-}
-
-body.visitor-browse-mode .contact-line a[href^="mailto:"] {
-  grid-column: span 2;
 }
 
 body.visitor-browse-mode .section-nav {
@@ -308,7 +326,4 @@ body.visitor-browse-mode .section-nav a.active {
     grid-template-columns: 1fr;
   }
 
-  body.visitor-browse-mode .contact-line a[href^="mailto:"] {
-    grid-column: 1;
-  }
 }
