@@ -16,7 +16,7 @@ function injectVisitorBrowseStyles() {
     body.visitor-browse-mode::before{display:none!important}
     body.visitor-browse-mode .topbar{background:rgba(244,243,238,.9)!important;border-bottom-color:rgba(38,48,42,.1)!important;backdrop-filter:blur(16px)}
     body.visitor-browse-mode .topbar a,body.visitor-browse-mode .logo,body.visitor-browse-mode a{color:#111}
-    body.visitor-browse-mode nav a{background:rgba(248,247,242,.76)!important;color:#111!important;border-color:rgba(38,48,42,.12)!important;border-radius:999px}
+    body.visitor-browse-mode .topbar nav a{background:rgba(248,247,242,.76)!important;color:#111!important;border-color:rgba(38,48,42,.12)!important;border-radius:999px}
     body.visitor-browse-mode .intro,body.visitor-browse-mode .status,body.visitor-browse-mode .eyebrow,body.visitor-browse-mode p{color:#465049}
     body.visitor-browse-mode .card,
     body.visitor-browse-mode .article-row,
@@ -54,7 +54,7 @@ function injectVisitorBrowseStyles() {
     body.visitor-browse-mode .article-row h2{font-size:clamp(20px,2.2vw,32px)!important;line-height:1.25!important}
     body.visitor-browse-mode .reading-shell>h1{font-size:clamp(32px,4.2vw,60px)!important;line-height:1.12!important}
     body.visitor-browse-mode .article-row:visited,body.visitor-browse-mode .article-row:active{color:#111!important}
-    body.visitor-browse-mode button,body.visitor-browse-mode input,body.visitor-browse-mode select,body.visitor-browse-mode textarea{background:rgba(248,247,242,.84)!important;color:#111!important;border-color:rgba(38,48,42,.18)!important;border-radius:999px}
+    body.visitor-browse-mode input,body.visitor-browse-mode select,body.visitor-browse-mode textarea{background:rgba(248,247,242,.84)!important;color:#111!important;border-color:rgba(38,48,42,.18)!important}
     body.visitor-browse-mode .toolbar button{transition:transform .18s ease,background .18s ease}
     body.visitor-browse-mode .toolbar button:hover{transform:translateY(-2px);background:rgba(126,152,136,.13)!important}
     body.visitor-browse-mode .work img,body.visitor-browse-mode .work video{border-radius:22px 22px 0 0}
@@ -65,25 +65,25 @@ function injectVisitorBrowseStyles() {
     body.visitor-browse-mode .detail-meta p,body.visitor-browse-mode .detail-side{color:#333!important}
     body.visitor-browse-mode .reading-shell{
       --bg:#fbfaf6;--surface:#fff;--line:rgba(38,48,42,.12);--text:#111;--muted:#667068;--soft:#333;--accent:#111;
-      width:min(1180px,calc(100% - 48px));
-      margin:24px auto 56px;
-      border:1px solid rgba(38,48,42,.1);
-      border-radius:32px;
-      background:rgba(255,255,255,.72)!important;
+      width:100%;
+      margin:0;
+      border:0;
+      border-radius:0;
+      background:transparent!important;
       color:#111!important;
-      box-shadow:0 24px 70px rgba(42,53,47,.08);
-      backdrop-filter:blur(10px)
+      box-shadow:none;
+      backdrop-filter:none
     }
     body.visitor-browse-mode .article-body,body.visitor-browse-mode .article-body p{color:#222!important}
     body.visitor-browse-mode .media-block img,body.visitor-browse-mode .media-block video{border-radius:22px}
-    body.visitor-browse-mode .article-tools{position:sticky;top:12px;z-index:20;width:max-content;min-height:auto;margin-bottom:72px;padding:0;border:0}
-    body.visitor-browse-mode .article-tools #back-link{min-height:40px;border:1px solid rgba(38,48,42,.14);border-radius:999px;background:rgba(248,247,242,.9);padding:0 17px;color:#18201b!important;font-weight:700;letter-spacing:1.6px;box-shadow:0 10px 28px rgba(42,53,47,.08);backdrop-filter:blur(12px)}
+    body.visitor-browse-mode .article-tools{position:static;width:100%;min-height:48px;margin-bottom:86px;padding:0 0 14px;border-bottom:1px solid rgba(38,48,42,.12)}
+    body.visitor-browse-mode .article-tools #back-link{min-height:34px;border:0;border-radius:0;background:transparent;padding:0 2px;color:#18201b!important;font-weight:750;letter-spacing:1.8px;box-shadow:none;backdrop-filter:none}
     body.visitor-browse-mode .topbar nav a[href*="video.html"],body.visitor-browse-mode .topbar nav a[href*="thought.html"]{display:none}
     @media(max-width:760px){
-      body.visitor-browse-mode nav a{border-radius:12px}
+      body.visitor-browse-mode .topbar nav a{border-radius:12px}
       body.visitor-browse-mode .article-row{padding:18px!important}
       body.visitor-browse-mode .about-section{padding:22px!important;border-radius:20px!important}
-      body.visitor-browse-mode .reading-shell{width:auto;margin:10px;border-radius:24px;padding:24px 18px 56px}
+      body.visitor-browse-mode .reading-shell{width:100%;margin:0;border-radius:0;padding:24px 18px 56px}
       body.visitor-browse-mode .detail{padding:8px}
       body.visitor-browse-mode .detail-inner{border-radius:24px;padding:14px}
     }

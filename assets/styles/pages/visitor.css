@@ -832,9 +832,28 @@ body {
 }
 
 .visitor-log-form button[type="submit"] {
-  border: 0;
-  border-radius: 999px;
-  background: #26332c;
+  min-height: 48px;
+  border: 1px solid #26332c !important;
+  border-radius: 12px !important;
+  background: #26332c !important;
+  color: #fff !important;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+}
+
+.visitor-log-form select {
+  appearance: none;
+  border-radius: 10px !important;
+  background-color: #f7f6f1 !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #687169 50%),
+    linear-gradient(135deg, #687169 50%, transparent 50%) !important;
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50% !important;
+  background-repeat: no-repeat !important;
+  background-size: 5px 5px !important;
+  padding-right: 38px;
 }
 
 .visitor-assistant-card {
