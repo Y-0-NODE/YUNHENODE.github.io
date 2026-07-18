@@ -68,7 +68,13 @@
 
   document.querySelectorAll(".edge-drawer-handle").forEach(handle => {
     if (!handle.querySelector(".edge-drawer-switch")) {
-      handle.insertAdjacentHTML("afterbegin", '<span class="edge-drawer-switch" aria-hidden="true"></span>');
+      const title = handle.querySelector("strong");
+      const switchMarkup = '<span class="edge-drawer-switch" aria-hidden="true"></span>';
+      if (title) {
+        title.insertAdjacentHTML("afterend", switchMarkup);
+      } else {
+        handle.insertAdjacentHTML("afterbegin", switchMarkup);
+      }
     }
   });
 

@@ -1,7 +1,17 @@
 const { checkAdmin, requireSupabaseEnv } = require("../lib/_auth");
+const { supabaseRequest } = require("../lib/_supabase-rest");
 const { buildSearchIndex } = require("../lib/services/search-index-service");
 const { listContent } = require("../lib/services/content-query-service");
 const knowledgeConfig = require("../lib/services/knowledge-config-service");
+
+async function listVisitorLogs() {
+  return supabaseRequest(
+    "/rest/v1/visitor_logs?select=id,created_at,display_name,source,purpose,message,page_url&order=created_at.desc&limit=200",
+    {
+      method: "GET"
+    }
+  );
+}
 
 module.exports = async function adminQueryRouter(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -38,6 +48,9 @@ module.exports = async function adminQueryRouter(req, res) {
       return res
         .status(200)
         .json({ success: true, data: await knowledgeConfig.saveConfig(input.config) });
+    }
+    if (input.action === "visitor-log-list") {
+      return res.status(200).json({ success: true, data: await listVisitorLogs() });
     }
     return res.status(200).json({ success: true, data: await listContent(input.type) });
   } catch (error) {

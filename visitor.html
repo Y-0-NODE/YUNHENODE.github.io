@@ -30,8 +30,8 @@
     />
     <title>访客入口｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/components/edge-drawer.css?v=20260718-2" />
-    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260718-2" />
+    <link rel="stylesheet" href="assets/styles/components/edge-drawer.css?v=20260718-4" />
+    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260718-4" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -85,11 +85,11 @@
         aria-controls="reading-route-content"
         onclick="toggleEdgeDrawer('reading-route-drawer')"
       >
-        <strong>阅读路线</strong><span>ROUTE</span>
+        <strong>阅读路线</strong>
       </button>
       <div class="edge-drawer-content" id="reading-route-content">
         <div class="edge-drawer-heading">
-          <p>READING ROUTE</p>
+          <p>READING GUIDE</p>
           <h2>阅读路线</h2>
           <span>从公开入口进入云鹤系统的文章、案例、作品和说明。</span>
         </div>
@@ -191,9 +191,85 @@
 
       <p class="visitor-note">访客入口仅供浏览。</p>
     </main>
+
+    <button
+      class="visitor-log-trigger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="visitor-log-panel"
+      onclick="openVisitorLog()"
+    >
+      <span>访客登记</span>
+      <small>VISITOR LOG</small>
+    </button>
+
+    <section
+      class="visitor-log-modal"
+      id="visitor-log-panel"
+      aria-label="访客登记"
+      aria-hidden="true"
+      hidden
+    >
+      <div
+        class="visitor-log-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="visitor-log-title"
+      >
+        <button
+          class="visitor-log-close"
+          type="button"
+          onclick="closeVisitorLog()"
+          aria-label="关闭登记框"
+        >
+          ×
+        </button>
+        <p class="eyebrow">VISITOR LOG</p>
+        <h2 id="visitor-log-title">访客登记</h2>
+        <form id="visitor-log-form" class="visitor-log-form">
+          <label>
+            怎么称呼你？<span>可选</span>
+            <input id="visitor-log-name" name="display_name" autocomplete="name" />
+          </label>
+
+          <label>
+            你从哪里来？
+            <select id="visitor-log-source" name="source" required>
+              <option value="">请选择</option>
+              <option value="公众号">公众号</option>
+              <option value="视频">视频</option>
+              <option value="朋友推荐">朋友推荐</option>
+              <option value="搜索">搜索</option>
+              <option value="其他">其他</option>
+            </select>
+          </label>
+
+          <label>
+            你为什么进入云鹤系统？
+            <select id="visitor-log-purpose" name="purpose" required>
+              <option value="">请选择</option>
+              <option value="看文章">看文章</option>
+              <option value="看案例">看案例</option>
+              <option value="看作品">看作品</option>
+              <option value="了解云鹤系统">了解云鹤系统</option>
+              <option value="其他">其他</option>
+            </select>
+          </label>
+
+          <label>
+            你想留下什么？<span>可选</span>
+            <textarea id="visitor-log-message" name="message" rows="4"></textarea>
+          </label>
+
+          <button type="submit">提交</button>
+          <p id="visitor-log-status" class="visitor-log-status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
     <script src="scripts/core/config.js"></script>
     <script src="scripts/core/utils.js?v=20260718-1"></script>
-    <script src="scripts/components/edge-drawer.js?v=20260718-2"></script>
-    <script src="scripts/pages/visitor.js?v=20260718-1"></script>
+    <script src="scripts/components/edge-drawer.js?v=20260718-4"></script>
+    <script src="scripts/pages/visitor.js?v=20260718-4"></script>
   </body>
 </html>

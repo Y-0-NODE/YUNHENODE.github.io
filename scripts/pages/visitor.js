@@ -255,8 +255,91 @@ async function loadFeaturedContent() {
   }
 }
 
+function visitorLogElements() {
+  return {
+    panel: document.getElementById("visitor-log-panel"),
+    trigger: document.querySelector(".visitor-log-trigger"),
+    form: document.getElementById("visitor-log-form"),
+    status: document.getElementById("visitor-log-status")
+  };
+}
+
+function openVisitorLog() {
+  const { panel, trigger } = visitorLogElements();
+  if (!panel) return;
+  panel.hidden = false;
+  panel.setAttribute("aria-hidden", "false");
+  trigger?.setAttribute("aria-expanded", "true");
+  window.setTimeout(() => document.getElementById("visitor-log-source")?.focus(), 20);
+}
+
+function closeVisitorLog() {
+  const { panel, trigger } = visitorLogElements();
+  if (!panel) return;
+  panel.hidden = true;
+  panel.setAttribute("aria-hidden", "true");
+  trigger?.setAttribute("aria-expanded", "false");
+}
+
+async function submitVisitorLog(event) {
+  event.preventDefault();
+  const { form, status } = visitorLogElements();
+  if (!form || !window.YUNHE_CONFIG) return;
+
+  const formData = new FormData(form);
+  const payload = {
+    display_name: String(formData.get("display_name") || "").trim() || null,
+    source: String(formData.get("source") || "").trim(),
+    purpose: String(formData.get("purpose") || "").trim(),
+    message: String(formData.get("message") || "").trim() || null,
+    page_url: location.href,
+    user_agent: navigator.userAgent
+  };
+
+  if (!payload.source || !payload.purpose) {
+    if (status) status.textContent = "请选择来源和进入目的。";
+    return;
+  }
+
+  if (status) status.textContent = "正在提交…";
+  const { supabaseUrl, supabaseKey } = window.YUNHE_CONFIG;
+  try {
+    const response = await fetch(`${supabaseUrl}/rest/v1/visitor_logs`, {
+      method: "POST",
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error("登记失败");
+    form.reset();
+    if (status) status.textContent = "已提交，谢谢。";
+    window.setTimeout(closeVisitorLog, 900);
+  } catch (error) {
+    if (status) status.textContent = "暂时提交失败，请稍后再试。";
+  }
+}
+
+function initVisitorLog() {
+  const { form, panel } = visitorLogElements();
+  form?.addEventListener("submit", submitVisitorLog);
+  panel?.addEventListener("click", event => {
+    if (event.target === panel) closeVisitorLog();
+  });
+  window.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeVisitorLog();
+  });
+}
+
 enableVisitorBrowseMode();
+initVisitorLog();
 if (document.querySelector(".visitor-shell")) {
   loadVisitorBackground();
   loadFeaturedContent();
 }
+
+window.openVisitorLog = openVisitorLog;
+window.closeVisitorLog = closeVisitorLog;

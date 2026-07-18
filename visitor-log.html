@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>访客记录｜云鹤系统</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/admin.css" />
+    <link rel="stylesheet" href="assets/styles/pages/visitor-log.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <a
+        class="logo logo-back"
+        href="admin.html"
+        onclick="
+          if (window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+          }
+        "
+        aria-label="返回上一页"
+        >YUNHENODE CMS</a
+      >
+      <nav>
+        <a href="admin.html">后台首页</a>
+        <a href="visitor.html">访客入口</a>
+      </nav>
+    </header>
+
+    <main class="home">
+      <p class="eyebrow">VISITOR LOG</p>
+      <h1>访客记录</h1>
+      <p class="intro">查看访客在公开入口提交的来源、进入目的与留言。</p>
+
+      <section id="login-panel" class="visitor-log-admin-card">
+        <label>
+          管理员名称
+          <input id="admin-name" value="YUNHE" autocomplete="username" />
+        </label>
+        <label>
+          管理员密码
+          <input id="admin-password" type="password" autocomplete="current-password" />
+        </label>
+        <button type="button" onclick="loadVisitorLogs()">查看访客记录</button>
+        <p id="visitor-log-status" class="status">填写后台管理员密码后读取。</p>
+      </section>
+
+      <section id="visitor-log-panel" class="visitor-log-admin-card hidden">
+        <div class="visitor-log-toolbar">
+          <p id="visitor-log-count" class="status"></p>
+          <button type="button" onclick="loadVisitorLogs()">刷新</button>
+        </div>
+        <div class="visitor-log-table-wrap">
+          <table class="visitor-log-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>来源</th>
+                <th>进入目的</th>
+                <th>留言</th>
+              </tr>
+            </thead>
+            <tbody id="visitor-log-list"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="scripts/core/utils.js"></script>
+    <script src="scripts/pages/visitor-log.js"></script>
+  </body>
+</html>
