@@ -3,6 +3,7 @@
   --drawer-line: #303030;
   --drawer-text: #f2f2f2;
   --drawer-muted: #858585;
+  --drawer-peek: 38px;
   position: fixed;
   z-index: 80;
   top: 0;
@@ -14,7 +15,7 @@
   border-right: 1px solid var(--drawer-line);
   background: var(--drawer-bg);
   color: var(--drawer-text);
-  transform: translateX(calc(-100% + 38px));
+  transform: translateX(calc(-100% + var(--drawer-peek)));
   box-shadow: 16px 0 38px rgba(0, 0, 0, 0);
   transition:
     transform 0.22s ease,
@@ -47,7 +48,7 @@
   z-index: 2;
   top: 0;
   right: 0;
-  width: 38px;
+  width: var(--drawer-peek);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -72,6 +73,10 @@
   color: var(--drawer-muted);
   font-size: 9px;
   letter-spacing: 1.5px;
+}
+
+.edge-drawer-switch {
+  display: none;
 }
 
 .edge-drawer-heading {
@@ -169,25 +174,56 @@ body.visitor-browse-mode .edge-drawer,
 
 @media (max-width: 640px) {
   .edge-drawer {
+    --drawer-peek: 44px;
     width: min(88vw, 336px);
-    transform: translateX(calc(-100% + 24px));
+    touch-action: pan-y;
   }
 
   .edge-drawer-content {
-    padding: 76px 38px max(28px, env(safe-area-inset-bottom)) 16px;
+    padding: 76px 50px max(28px, env(safe-area-inset-bottom)) 18px;
   }
 
   .edge-drawer-handle {
-    width: 24px;
+    width: var(--drawer-peek);
+    touch-action: none;
   }
 
   .edge-drawer-handle strong {
-    font-size: 10px;
-    letter-spacing: 1px;
+    color: var(--drawer-muted);
+    font-size: 11px;
+    letter-spacing: 1.2px;
   }
 
   .edge-drawer-handle span {
-    display: none;
+    display: block;
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .edge-drawer-switch {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 42px;
+    margin: 10px 0;
+    border: 1px solid var(--drawer-line);
+    border-radius: 999px;
+  }
+
+  .edge-drawer-switch::before {
+    content: "";
+    display: block;
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--drawer-muted);
+    border-radius: 50%;
+  }
+
+  .edge-drawer.open .edge-drawer-switch::before {
+    width: 2px;
+    height: 18px;
+    border-radius: 0;
+    background: var(--drawer-muted);
   }
 
   .edge-route a {
