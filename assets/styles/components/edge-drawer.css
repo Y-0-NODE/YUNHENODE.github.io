@@ -170,15 +170,24 @@ body.visitor-browse-mode .edge-drawer,
 @media (max-width: 640px) {
   .edge-drawer {
     width: min(88vw, 336px);
-    transform: translateX(calc(-100% + 36px));
+    transform: translateX(calc(-100% + 24px));
   }
 
   .edge-drawer-content {
-    padding: 84px 50px max(28px, env(safe-area-inset-bottom)) 18px;
+    padding: 76px 38px max(28px, env(safe-area-inset-bottom)) 16px;
   }
 
   .edge-drawer-handle {
-    width: 36px;
+    width: 24px;
+  }
+
+  .edge-drawer-handle strong {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .edge-drawer-handle span {
+    display: none;
   }
 
   .edge-route a {

@@ -70,6 +70,7 @@ for (const file of listFiles(root, file => file.endsWith(".html"))) {
   if (/<script>([\s\S]*?)<\/script>/i.test(html))
     failures.push(`${relative}: inline <script> block`);
   for (const match of html.matchAll(/href=["']([^"'#?]+\.html)(?:[?#][^"']*)?["']/g)) {
+    if (/^(?:https?:|\/\/)/.test(match[1])) continue;
     if (!fs.existsSync(path.join(root, match[1]))) {
       failures.push(`${relative} -> missing ${match[1]}`);
     }
