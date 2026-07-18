@@ -225,6 +225,18 @@ body.visitor-browse-mode .edge-drawer,
   transform: translate(-50%, -50%) scaleY(1);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .reading-route-drawer:hover .edge-drawer-switch::before {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.45);
+  }
+
+  .reading-route-drawer:hover .edge-drawer-switch::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scaleY(1);
+  }
+}
+
 @media (max-width: 640px) {
   .edge-drawer {
     --drawer-peek: 44px;

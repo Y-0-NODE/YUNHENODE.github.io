@@ -251,13 +251,17 @@ fetch(
 
 function renderArticleTools(post) {
   const tools = document.getElementById("manage-tools");
+  const backLink = document.getElementById("back-link");
+  const visitorMode = new URLSearchParams(location.search).get("visitor") === "1";
   const listUrl =
     post.type === "case"
       ? "case-list.html"
       : post.type === "video"
         ? "video-list.html"
         : "article-list.html";
-  document.getElementById("back-link").href = listUrl;
+  backLink.href = visitorMode ? "visitor.html?visitor=1" : listUrl;
+  backLink.textContent = visitorMode ? "YUNHENODE" : "返回列表";
+  backLink.setAttribute("aria-label", visitorMode ? "返回访客入口" : "返回列表");
   tools.hidden = true;
   tools.innerHTML = "";
 }

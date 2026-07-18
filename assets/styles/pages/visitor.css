@@ -634,13 +634,13 @@ body::before {
 /* 2026-07: softer public reading experience */
 body {
   background:
-    radial-gradient(circle at 82% 18%, rgba(201, 216, 202, 0.42), transparent 27rem),
-    radial-gradient(circle at 18% 72%, rgba(226, 204, 190, 0.34), transparent 32rem),
-    #f8f7f2;
+    radial-gradient(circle at 82% 18%, rgba(201, 216, 202, 0.28), transparent 27rem),
+    radial-gradient(circle at 18% 72%, rgba(226, 204, 190, 0.22), transparent 32rem),
+    #f4f3ee;
 }
 
 .topbar {
-  background: rgba(248, 247, 242, 0.78);
+  background: rgba(244, 243, 238, 0.84);
   border-bottom-color: rgba(38, 44, 40, 0.09);
 }
 
@@ -652,7 +652,7 @@ body {
 .featured-card {
   border-color: rgba(40, 48, 43, 0.1);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(248, 247, 242, 0.76);
   box-shadow: 0 12px 36px rgba(42, 53, 47, 0.04);
   backdrop-filter: blur(10px);
 }
@@ -686,7 +686,7 @@ body {
 .featured-card:focus-visible {
   transform: translateY(-5px) rotate(-0.25deg);
   border-color: rgba(55, 69, 61, 0.2);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(250, 249, 245, 0.92);
   box-shadow: 0 22px 48px rgba(42, 53, 47, 0.1);
 }
 
@@ -743,6 +743,7 @@ body {
   border-radius: 24px;
   background: rgba(251, 250, 246, 0.94);
   box-shadow: 0 28px 72px rgba(46, 57, 50, 0.16);
+  text-align: center;
 }
 
 .visitor-tools-panel::before {
@@ -750,17 +751,19 @@ body {
 }
 
 .visitor-tools-panel button {
+  justify-items: center;
   border-top-color: rgba(38, 48, 42, 0.08);
   border-radius: 12px;
+  text-align: center;
   transition:
     background 0.18s ease,
-    padding-left 0.18s ease;
+    transform 0.18s ease;
 }
 
 .visitor-tools-panel button:hover,
 .visitor-tools-panel button:focus-visible {
   background: rgba(126, 152, 136, 0.1);
-  padding-left: 12px;
+  transform: translateY(-1px);
 }
 
 .visitor-log-modal,
@@ -945,6 +948,8 @@ body.visitor-browse-mode .assistant-message--user p {
 
 .visitor-assistant-prompts {
   display: flex;
+  flex: 0 0 auto;
+  align-items: center;
   gap: 8px;
   margin: 0 0 12px;
   overflow-x: auto;
@@ -952,13 +957,20 @@ body.visitor-browse-mode .assistant-message--user p {
 }
 
 .visitor-assistant-prompts button {
+  display: inline-flex;
+  min-height: 36px;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   border-color: rgba(49, 65, 56, 0.13);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.58);
-  padding: 8px 12px;
+  padding: 0 13px;
   color: #46534c;
   font-size: 11px;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .visitor-assistant-prompts button:hover,
@@ -968,6 +980,7 @@ body.visitor-browse-mode .assistant-message--user p {
 }
 
 .visitor-assistant-form {
+  flex: 0 0 auto;
   align-items: center;
   gap: 8px;
   margin: 0;
@@ -1014,6 +1027,7 @@ body.visitor-browse-mode .assistant-message--user p {
 }
 
 .visitor-assistant-note {
+  flex: 0 0 auto;
   margin: 8px 0 0;
   color: #919792;
   text-align: center;
@@ -1028,7 +1042,7 @@ body.visitor-browse-mode .assistant-message--user p {
 
   .visitor-log-modal,
   .visitor-assistant-modal {
-    place-items: end center;
+    place-items: center;
     padding: 8px;
   }
 
@@ -1048,6 +1062,16 @@ body.visitor-browse-mode .assistant-message--user p {
 
   .visitor-assistant-prompts {
     display: flex;
+    width: 100%;
+    justify-content: center;
+    overflow-x: visible;
+    padding: 2px 0 4px;
+  }
+
+  .visitor-assistant-prompts button {
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 10px;
   }
 
   .visitor-assistant-form {
