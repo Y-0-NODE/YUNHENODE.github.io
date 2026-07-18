@@ -30,6 +30,68 @@
       <p class="eyebrow">SYSTEM CENTER / OPERATIONS</p>
       <h1>系统中心</h1>
       <p class="intro">网站运行、权限、API 环境变量、设计、日志和部署统一从这里进入。</p>
+      <section id="visitor-data" class="visitor-data panel">
+        <div class="visitor-data-heading">
+          <div>
+            <p class="panel-kicker">VISITOR DATA / LIVE</p>
+            <h2>Visitor Registry｜访客登记数据</h2>
+            <p>查看和修改访客提交内容；可标记重点颜色，并写下仅后台可见的解释。</p>
+          </div>
+          <span id="visitor-data-count" class="visitor-data-count">尚未读取</span>
+        </div>
+
+        <div id="visitor-data-login" class="visitor-data-login">
+          <label>
+            管理员名称
+            <input id="visitor-admin-name" value="YUNHE" autocomplete="username" />
+          </label>
+          <label>
+            管理员密码
+            <input
+              id="visitor-admin-password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="输入后台密码"
+            />
+          </label>
+          <button type="button" onclick="loadVisitorData()">读取访客数据</button>
+        </div>
+
+        <div id="visitor-data-toolbar" class="visitor-data-toolbar hidden">
+          <input
+            id="visitor-data-search"
+            type="search"
+            placeholder="搜索称呼、来源、留言或后台解释"
+            oninput="filterVisitorData()"
+          />
+          <select id="visitor-data-filter" onchange="filterVisitorData()" aria-label="筛选重点颜色">
+            <option value="all">全部记录</option>
+            <option value="important">仅重点</option>
+            <option value="red">红色重点</option>
+            <option value="amber">琥珀重点</option>
+            <option value="green">绿色重点</option>
+            <option value="blue">蓝色重点</option>
+          </select>
+          <button type="button" onclick="loadVisitorData()">刷新</button>
+        </div>
+        <p id="visitor-data-status" class="status">输入管理员密码后读取 Supabase 数据。</p>
+        <div id="visitor-data-table-wrap" class="visitor-data-table-wrap hidden">
+          <table class="visitor-data-table">
+            <thead>
+              <tr>
+                <th>重点</th>
+                <th>访客与时间</th>
+                <th>来源 / 目的</th>
+                <th>访客留言</th>
+                <th>后台解释</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="visitor-data-list"></tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="system-grid">
         <article id="security" class="panel">
           <h2>Security Center｜安全中心</h2>
@@ -96,6 +158,7 @@
         </article>
       </section>
     </main>
-    <script src="scripts/pages/system-center.js"></script>
+    <script src="scripts/core/utils.js"></script>
+    <script src="scripts/pages/system-center.js?v=20260718-2"></script>
   </body>
 </html>

@@ -51,6 +51,10 @@ create table if not exists visitor_logs (
   message text,
   page_url text,
   user_agent text,
+  is_important boolean not null default false,
+  highlight_color text not null default 'none',
+  admin_note text,
+  updated_at timestamptz,
   created_at timestamptz default now()
 );
 

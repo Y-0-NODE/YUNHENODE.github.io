@@ -85,12 +85,18 @@
         aria-controls="reading-route-content"
         onclick="toggleEdgeDrawer('reading-route-drawer')"
       >
-        <strong>阅读路线</strong>
+        <strong class="edge-drawer-title" aria-label="阅读路径">
+          <span aria-hidden="true">阅</span>
+          <span aria-hidden="true">读</span>
+          <span aria-hidden="true">路</span>
+          <span aria-hidden="true">径</span>
+        </strong>
+        <span class="edge-drawer-switch" aria-hidden="true"></span>
       </button>
       <div class="edge-drawer-content" id="reading-route-content">
         <div class="edge-drawer-heading">
           <p>READING GUIDE</p>
-          <h2>阅读路线</h2>
+          <h2>阅读路径</h2>
           <span>从公开入口进入云鹤系统的文章、案例、作品和说明。</span>
         </div>
         <nav class="edge-route" aria-label="阅读顺序">
@@ -306,39 +312,53 @@
         >
           ×
         </button>
-        <p class="eyebrow">YUNHE READING ASSISTANT</p>
-        <h2 id="visitor-assistant-title">云鹤系统阅读助手</h2>
-        <p class="visitor-assistant-boundary">
-          只回答访客入口当前可阅读内容相关问题：文章、案例、作品、云鹤系统说明、课程目录与购买咨询。
-        </p>
+        <header class="visitor-assistant-heading">
+          <span class="visitor-assistant-orb" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">YUNHE READING ASSISTANT</p>
+            <h2 id="visitor-assistant-title">云鹤阅读助手</h2>
+            <p class="visitor-assistant-boundary">
+              在线 · 回答站内文章、案例、作品与系统说明
+            </p>
+          </div>
+        </header>
+        <div
+          id="visitor-assistant-conversation"
+          class="visitor-assistant-conversation"
+          role="log"
+          aria-live="polite"
+          aria-label="阅读助手对话"
+        >
+          <div class="assistant-message assistant-message--bot">
+            <span>鹤</span>
+            <p>你好，我在。你可以问我这里有什么、从哪里开始读，或者直接告诉我你想找的主题。</p>
+          </div>
+        </div>
         <div class="visitor-assistant-prompts" aria-label="常用问题">
-          <button type="button" data-assistant-question="current">这篇内容在讨论什么？</button>
-          <button type="button" data-assistant-question="cases">有哪些相关案例？</button>
-          <button type="button" data-assistant-question="start">我应该从哪里开始阅读？</button>
-          <button type="button" data-assistant-question="system">云鹤系统是什么？</button>
-          <button type="button" data-assistant-question="course">地理课程包含什么？</button>
+          <button type="button" data-assistant-question="start">从哪里开始读？</button>
+          <button type="button" data-assistant-question="cases">找相关案例</button>
+          <button type="button" data-assistant-question="system">了解云鹤系统</button>
         </div>
         <form id="visitor-assistant-form" class="visitor-assistant-form">
-          <label>
-            输入一个站内问题
+          <label aria-label="输入一个站内问题">
             <input
               id="visitor-assistant-input"
               name="question"
               autocomplete="off"
-              placeholder="例如：我想看案例，从哪里开始？"
+              placeholder="和阅读助手说点什么…"
             />
           </label>
-          <button type="submit">询问</button>
+          <button type="submit" aria-label="发送问题">
+            <span>发送</span><i aria-hidden="true">↗</i>
+          </button>
         </form>
-        <div id="visitor-assistant-answer" class="visitor-assistant-answer" aria-live="polite">
-          你可以直接点上面的常用问题。这个助手不会回答与云鹤系统公开内容无关的问题。
-        </div>
+        <p class="visitor-assistant-note">回答范围仅限本站公开内容。</p>
       </div>
     </section>
 
     <script src="scripts/core/config.js"></script>
     <script src="scripts/core/utils.js?v=20260718-1"></script>
-    <script src="scripts/components/edge-drawer.js?v=20260718-7"></script>
-    <script src="scripts/pages/visitor.js?v=20260718-7"></script>
+    <script src="scripts/components/edge-drawer.js?v=20260718-8"></script>
+    <script src="scripts/pages/visitor.js?v=20260718-8"></script>
   </body>
 </html>
