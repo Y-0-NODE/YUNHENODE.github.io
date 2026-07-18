@@ -258,10 +258,36 @@ async function loadFeaturedContent() {
 function visitorLogElements() {
   return {
     panel: document.getElementById("visitor-log-panel"),
-    trigger: document.querySelector(".visitor-log-trigger"),
+    trigger: null,
     form: document.getElementById("visitor-log-form"),
     status: document.getElementById("visitor-log-status")
   };
+}
+
+function visitorToolsElements() {
+  return {
+    panel: document.getElementById("visitor-tools-panel"),
+    trigger: document.querySelector(".visitor-tools-trigger")
+  };
+}
+
+function setVisitorTools(open) {
+  const { panel, trigger } = visitorToolsElements();
+  if (!panel) return;
+  panel.hidden = !open;
+  panel.setAttribute("aria-hidden", String(!open));
+  trigger?.setAttribute("aria-expanded", String(open));
+}
+
+function toggleVisitorTools() {
+  const { panel } = visitorToolsElements();
+  setVisitorTools(Boolean(panel?.hidden));
+}
+
+function chooseVisitorTool(type) {
+  setVisitorTools(false);
+  if (type === "log") openVisitorLog();
+  if (type === "assistant") openVisitorAssistant();
 }
 
 function openVisitorLog() {
@@ -350,7 +376,7 @@ const VISITOR_ASSISTANT_ANSWERS = {
 function visitorAssistantElements() {
   return {
     panel: document.getElementById("visitor-assistant-panel"),
-    trigger: document.querySelector(".visitor-assistant-trigger"),
+    trigger: null,
     form: document.getElementById("visitor-assistant-form"),
     input: document.getElementById("visitor-assistant-input"),
     answer: document.getElementById("visitor-assistant-answer")
@@ -416,7 +442,20 @@ function initVisitorAssistant() {
   });
 }
 
+function initVisitorTools() {
+  document.addEventListener("click", event => {
+    const { panel, trigger } = visitorToolsElements();
+    if (!panel || panel.hidden) return;
+    if (panel.contains(event.target) || trigger?.contains(event.target)) return;
+    setVisitorTools(false);
+  });
+  window.addEventListener("keydown", event => {
+    if (event.key === "Escape") setVisitorTools(false);
+  });
+}
+
 enableVisitorBrowseMode();
+initVisitorTools();
 initVisitorLog();
 initVisitorAssistant();
 if (document.querySelector(".visitor-shell")) {
@@ -428,3 +467,5 @@ window.openVisitorLog = openVisitorLog;
 window.closeVisitorLog = closeVisitorLog;
 window.openVisitorAssistant = openVisitorAssistant;
 window.closeVisitorAssistant = closeVisitorAssistant;
+window.toggleVisitorTools = toggleVisitorTools;
+window.chooseVisitorTool = chooseVisitorTool;

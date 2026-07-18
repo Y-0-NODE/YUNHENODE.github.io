@@ -177,10 +177,8 @@ body.visitor-browse-mode .edge-drawer,
   place-items: center;
   position: relative;
   width: 18px;
-  height: 42px;
-  margin: 10px 0;
-  border: 1px solid var(--drawer-line);
-  border-radius: 999px;
+  height: 26px;
+  margin: 12px 0 0;
 }
 
 .reading-route-drawer .edge-drawer-switch::before,
@@ -258,10 +256,8 @@ body.visitor-browse-mode .edge-drawer,
     place-items: center;
     position: relative;
     width: 18px;
-    height: 42px;
-    margin: 10px 0;
-    border: 1px solid var(--drawer-line);
-    border-radius: 999px;
+    height: 26px;
+    margin: 12px 0 0;
   }
 
   .edge-drawer-switch::before,
