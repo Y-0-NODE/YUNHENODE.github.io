@@ -354,8 +354,20 @@ function toggleVisitorTools() {
 
 function chooseVisitorTool(type) {
   setVisitorTools(false);
+  if (type === "route") {
+    const drawer = document.getElementById("reading-route-drawer");
+    if (drawer && !drawer.classList.contains("open")) {
+      window.toggleEdgeDrawer?.("reading-route-drawer");
+    }
+  }
   if (type === "log") openVisitorLog();
   if (type === "assistant") openVisitorAssistant();
+  if (type === "recent") {
+    document.getElementById("featured-title")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
 }
 
 function openVisitorLog() {
@@ -429,10 +441,14 @@ function initVisitorLog() {
 }
 
 const VISITOR_ASSISTANT_ANSWERS = {
+  articles:
+    "文章按重点阅读、现实观察与延伸阅读整理。可以输入一个主题关键词，我会帮你缩小查找范围。",
   current:
     "访客入口当前在做一件事：把云鹤系统公开内容整理成一条可阅读路径。\n\n你可以先看重点文章，理解“节点定义权”“公共系统责任下沉”“虚假结构内容识别”这些核心判断；再看现实观察与案例；最后延伸到艺术、商业和消费结构。",
   cases:
     "当前推荐从这两个方向进入案例：\n\n1.《新人不要在小区门口做，这里是存量区。》：适合理解存量区 / 开放区的现实判断。\n2.《BO H5模块化升级：从结构判断到验证》：适合看项目如何从判断进入修改、对比和验证。\n\n你可以点击访客入口里的“现实观察与案例”继续阅读。",
+  photo:
+    "摄影与视觉记录集中在“作品”。你可以输入地点、项目或主题关键词，我会帮助你定位相关作品。",
   start:
     "建议阅读顺序：\n\n1. 先读“重点文章”，理解云鹤系统的判断方式。\n2. 再读“现实观察与案例”，看概念如何落到具体事件。\n3. 然后看“作品”，理解视觉记录和内容系统的关系。\n4. 最后看“关于”，确认方法、边界和合作方式。",
   system:
@@ -447,7 +463,7 @@ function visitorAssistantElements() {
     trigger: null,
     form: document.getElementById("visitor-assistant-form"),
     input: document.getElementById("visitor-assistant-input"),
-    conversation: document.getElementById("visitor-assistant-conversation")
+    resultText: document.getElementById("visitor-assistant-result-text")
   };
 }
 
@@ -474,21 +490,15 @@ function classifyVisitorQuestion(question) {
   if (/^(你好|您好|嗨|哈喽|hello|hi|在吗)[！!。.，,\s]*$/i.test(text)) return "greeting";
   if (/谢谢|多谢|感谢/.test(text)) return "thanks";
   if (/这篇|当前|讨论|讲什么|内容/.test(text)) return "current";
+  if (/摄影|照片|影像|视觉|作品/.test(text)) return "photo";
   if (/案例|相关|BO|H5|小区|存量/.test(text)) return "cases";
+  if (/文章|论文|阅读材料/.test(text)) return "articles";
   if (/开始|路线|先看|阅读|入口/.test(text)) return "start";
   if (/云鹤系统|是什么|方法|结构/.test(text)) return "system";
   if (/课程|地理|购买|价格|目录/.test(text)) return "course";
-  if (/文章|作品|摄影|关于|访客/.test(text)) return "start";
+  if (/关于|访客/.test(text)) return "start";
   return "boundary";
 }
-
-const VISITOR_ASSISTANT_PROMPTS = {
-  current: "这篇内容在讨论什么？",
-  cases: "有哪些相关案例？",
-  start: "我应该从哪里开始阅读？",
-  system: "云鹤系统是什么？",
-  course: "地理课程包含什么？"
-};
 
 const VISITOR_ASSISTANT_SMALL_TALK = {
   greeting:
@@ -496,50 +506,41 @@ const VISITOR_ASSISTANT_SMALL_TALK = {
   thanks: "不客气。你还可以继续问我某个主题有什么文章，或者下一步适合读什么。"
 };
 
-function appendAssistantMessage(role, text) {
-  const { conversation } = visitorAssistantElements();
-  if (!conversation) return;
-  const item = document.createElement("div");
-  item.className = `assistant-message assistant-message--${role}`;
-  const content = document.createElement("p");
-  content.textContent = text;
-  if (role === "bot") {
-    const avatar = document.createElement("span");
-    avatar.textContent = "鹤";
-    item.append(avatar);
-  }
-  item.append(content);
-  conversation.append(item);
-  conversation.scrollTo({ top: conversation.scrollHeight, behavior: "smooth" });
-}
-
-function answerVisitorAssistant(questionKeyOrText, options = {}) {
+function answerVisitorAssistant(questionKeyOrText) {
   const raw = String(questionKeyOrText || "").trim();
-  const displayQuestion = VISITOR_ASSISTANT_PROMPTS[raw] || raw;
-  if (options.echo !== false && displayQuestion) appendAssistantMessage("user", displayQuestion);
+  const { resultText } = visitorAssistantElements();
+  if (!resultText) return;
   const key = VISITOR_ASSISTANT_ANSWERS[questionKeyOrText]
     ? questionKeyOrText
     : classifyVisitorQuestion(questionKeyOrText);
   const reply =
     VISITOR_ASSISTANT_ANSWERS[key] ||
     VISITOR_ASSISTANT_SMALL_TALK[key] ||
-    "这个问题超出了当前阅读助手的范围。\n\n我这里只回答云鹤系统公开访客入口相关内容：文章、案例、作品、关于说明、课程目录和购买咨询。外部知识、闲聊、通用问答不会在这里展开。";
-  window.setTimeout(() => appendAssistantMessage("bot", reply), 180);
+    "暂未找到明确对应内容。请换用文章、案例、摄影或更具体的站内关键词。";
+  resultText.textContent = reply;
 }
 
 function initVisitorAssistant() {
   const { form, panel, input } = visitorAssistantElements();
-  document.querySelectorAll("[data-assistant-question]").forEach(button => {
-    button.addEventListener("click", () =>
-      answerVisitorAssistant(button.dataset.assistantQuestion)
-    );
+  document.querySelectorAll("[data-assistant-query]").forEach(button => {
+    button.addEventListener("click", () => {
+      const query = button.dataset.assistantQuery;
+      if (input) input.value = query;
+      answerVisitorAssistant(query);
+    });
+  });
+  document.querySelectorAll("[data-assistant-focus]").forEach(button => {
+    button.addEventListener("click", () => {
+      if (input) input.value = "";
+      input?.focus();
+    });
   });
   form?.addEventListener("submit", event => {
     event.preventDefault();
     const question = input?.value.trim() || "";
     if (!question) return;
     answerVisitorAssistant(question);
-    input.value = "";
+    input?.select();
   });
   panel?.addEventListener("click", event => {
     if (event.target === panel) closeVisitorAssistant();

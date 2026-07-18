@@ -30,8 +30,8 @@
     />
     <title>访客入口｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/components/edge-drawer.css?v=20260718-13" />
-    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260718-13" />
+    <link rel="stylesheet" href="assets/styles/components/edge-drawer.css?v=20260718-15" />
+    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260718-15" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -207,8 +207,8 @@
         onclick="toggleVisitorTools()"
       >
         <span class="visitor-wave" aria-hidden="true"></span>
-        <span>访客工具</span>
-        <small>OPEN</small>
+        <span>Visitor</span>
+        <small>MENU</small>
       </button>
       <section
         class="visitor-tools-panel"
@@ -218,11 +218,17 @@
         hidden
       >
         <p>选择一个入口</p>
+        <button type="button" onclick="chooseVisitorTool('route')">
+          <span>阅读路径</span><small>READING PATH</small>
+        </button>
+        <button type="button" onclick="chooseVisitorTool('assistant')">
+          <span>阅读助手</span><small>LIBRARY DESK</small>
+        </button>
         <button type="button" onclick="chooseVisitorTool('log')">
           <span>访客登记</span><small>VISITOR LOG</small>
         </button>
-        <button type="button" onclick="chooseVisitorTool('assistant')">
-          <span>阅读助手</span><small>ASK</small>
+        <button type="button" onclick="chooseVisitorTool('recent')">
+          <span>最近更新</span><small>RECENT</small>
         </button>
       </section>
     </div>
@@ -315,37 +321,41 @@
         <header class="visitor-assistant-heading">
           <span class="visitor-assistant-orb" aria-hidden="true"></span>
           <div>
-            <p class="eyebrow">YUNHE READING ASSISTANT</p>
-            <h2 id="visitor-assistant-title">云鹤阅读助手</h2>
+            <p class="eyebrow">YUNHE LIBRARY DESK</p>
+            <h2 id="visitor-assistant-title">阅读助手</h2>
             <p class="visitor-assistant-boundary">
-              在线 · 回答站内文章、案例、作品与系统说明
+              站内内容咨询台
             </p>
           </div>
         </header>
-        <div
-          id="visitor-assistant-conversation"
-          class="visitor-assistant-conversation"
-          role="log"
-          aria-live="polite"
-          aria-label="阅读助手对话"
-        >
-          <div class="assistant-message assistant-message--bot">
-            <span>鹤</span>
-            <p>你好，我在。你可以问我这里有什么、从哪里开始读，或者直接告诉我你想找的主题。</p>
+        <section class="assistant-desk-guide" aria-label="咨询台说明">
+          <div class="assistant-desk-section">
+            <p class="assistant-desk-label">请输入：</p>
+            <div class="assistant-desk-types" aria-label="选择咨询类型">
+              <button type="button" data-assistant-query="文章">文章</button>
+              <button type="button" data-assistant-query="案例">案例</button>
+              <button type="button" data-assistant-query="摄影">摄影</button>
+              <button type="button" data-assistant-focus>关键词</button>
+            </div>
           </div>
-        </div>
-        <div class="visitor-assistant-prompts" aria-label="常用问题">
-          <button type="button" data-assistant-question="start">从哪里开始读？</button>
-          <button type="button" data-assistant-question="cases">找相关案例</button>
-          <button type="button" data-assistant-question="system">了解云鹤系统</button>
-        </div>
+          <div class="assistant-desk-divider" aria-hidden="true"></div>
+          <div class="assistant-desk-section">
+            <p class="assistant-desk-label">我可以帮助你：</p>
+            <ul class="assistant-desk-services">
+              <li>寻找相关文章</li>
+              <li>推荐阅读路径</li>
+              <li>解释案例</li>
+              <li>定位摄影作品</li>
+            </ul>
+          </div>
+        </section>
         <form id="visitor-assistant-form" class="visitor-assistant-form">
           <label aria-label="输入一个站内问题">
             <input
               id="visitor-assistant-input"
               name="question"
               autocomplete="off"
-              placeholder="和阅读助手说点什么…"
+              placeholder="输入文章、案例、摄影或关键词"
             />
           </label>
           <button type="submit" aria-label="发送问题">
@@ -360,6 +370,10 @@
             </svg>
           </button>
         </form>
+        <section class="visitor-assistant-result" aria-live="polite">
+          <p class="assistant-result-label">咨询结果</p>
+          <p id="visitor-assistant-result-text">选择类型，或输入一个站内关键词。</p>
+        </section>
         <p class="visitor-assistant-note">回答范围仅限本站公开内容。</p>
       </div>
     </section>
@@ -367,6 +381,6 @@
     <script src="scripts/core/config.js"></script>
     <script src="scripts/core/utils.js?v=20260718-1"></script>
     <script src="scripts/components/edge-drawer.js?v=20260718-8"></script>
-    <script src="scripts/pages/visitor.js?v=20260718-13"></script>
+    <script src="scripts/pages/visitor.js?v=20260718-15"></script>
   </body>
 </html>

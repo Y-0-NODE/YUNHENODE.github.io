@@ -839,11 +839,11 @@ body {
 
 .visitor-assistant-card {
   display: flex;
-  width: min(620px, 100%);
-  height: min(760px, calc(100dvh - 48px));
+  width: min(570px, 100%);
+  max-height: calc(100dvh - 48px);
   flex-direction: column;
-  padding: 28px;
-  overflow: hidden;
+  padding: 30px;
+  overflow-y: auto;
 }
 
 .visitor-assistant-heading {
@@ -889,94 +889,65 @@ body {
   font-size: 11px;
 }
 
-.visitor-assistant-conversation {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 210px;
-  flex-direction: column;
-  gap: 14px;
-  margin: 24px -8px 16px;
-  padding: 2px 8px 14px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+.assistant-desk-guide {
+  margin: 26px 0 18px;
+  border: 1px solid rgba(48, 62, 54, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.46);
+  padding: 22px;
 }
 
-.assistant-message {
-  display: flex;
-  max-width: 86%;
-  align-items: flex-start;
-  gap: 9px;
-}
-
-.assistant-message > span {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 50%;
-  background: #7d9384;
-  color: #fff;
-  font-size: 11px;
-}
-
-.assistant-message p {
-  margin: 0;
-  border-radius: 6px 18px 18px 18px;
-  background: rgba(255, 255, 255, 0.78);
-  color: #26312b;
-  padding: 11px 14px;
-  font-size: 13px;
-  line-height: 1.7;
-  white-space: pre-line;
-  box-shadow: 0 8px 24px rgba(55, 68, 60, 0.06);
-}
-
-.assistant-message--user {
-  align-self: flex-end;
-}
-
-.assistant-message--user p {
-  border-radius: 18px 6px 18px 18px;
-  background: #29372f;
-  color: #fff;
-}
-
-body.visitor-browse-mode .assistant-message--user p {
-  color: #fff !important;
-}
-
-.visitor-assistant-prompts {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 8px;
+.assistant-desk-label {
   margin: 0 0 12px;
-  overflow-x: auto;
-  padding-bottom: 3px;
+  color: #27332d;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
 }
 
-.visitor-assistant-prompts button {
-  display: inline-flex;
-  min-height: 36px;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  border-color: rgba(49, 65, 56, 0.13);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.58);
-  padding: 0 13px;
-  color: #46534c;
-  font-size: 11px;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
+.assistant-desk-types {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.visitor-assistant-prompts button:hover,
-.visitor-assistant-prompts button:focus-visible {
-  border-color: #8ba092;
-  background: rgba(139, 160, 146, 0.12);
+.assistant-desk-types button {
+  min-height: 38px;
+  border: 1px solid rgba(48, 62, 54, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.64);
+  color: #39463f;
+  font-size: 12px;
+}
+
+.assistant-desk-types button:hover,
+.assistant-desk-types button:focus-visible {
+  border-color: #829b8c;
+  background: rgba(130, 155, 140, 0.12);
+  outline: none;
+}
+
+.assistant-desk-divider {
+  height: 1px;
+  margin: 20px 0;
+  background: rgba(48, 62, 54, 0.13);
+}
+
+.assistant-desk-services {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 18px;
+  margin: 0;
+  padding: 0;
+  color: #59635d;
+  font-size: 12px;
+  list-style: none;
+}
+
+.assistant-desk-services li::before {
+  content: "—";
+  margin-right: 7px;
+  color: #91a097;
 }
 
 .visitor-assistant-form {
@@ -1008,6 +979,28 @@ body.visitor-browse-mode .assistant-message--user p {
   border-radius: 999px;
   background: #29372f;
   padding: 10px 14px;
+}
+
+.visitor-assistant-result {
+  margin-top: 14px;
+  border-left: 2px solid #8ba092;
+  background: rgba(255, 255, 255, 0.42);
+  padding: 12px 15px;
+}
+
+.visitor-assistant-result p {
+  margin: 0;
+  color: #46514b;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.visitor-assistant-result .assistant-result-label {
+  margin-bottom: 4px;
+  color: #87928b;
+  font-size: 9px;
+  letter-spacing: 0.13em;
 }
 
 .visitor-assistant-form button i {
@@ -1056,22 +1049,22 @@ body.visitor-browse-mode .assistant-message--user p {
   }
 
   .visitor-assistant-card {
-    height: min(82dvh, 700px);
+    max-height: calc(100dvh - 24px);
     padding: 22px 16px 16px;
   }
 
-  .visitor-assistant-prompts {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    overflow-x: visible;
-    padding: 2px 0 4px;
+  .assistant-desk-guide {
+    margin: 22px 0 14px;
+    padding: 18px 14px;
   }
 
-  .visitor-assistant-prompts button {
-    min-height: 34px;
-    padding: 0 10px;
-    font-size: 10px;
+  .assistant-desk-types {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .assistant-desk-services {
+    grid-template-columns: 1fr;
+    gap: 7px;
   }
 
   .visitor-assistant-form {
