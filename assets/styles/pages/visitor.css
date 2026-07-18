@@ -1002,35 +1002,15 @@ body.visitor-browse-mode .assistant-message--user p {
 }
 
 .visitor-assistant-form .send-arrow {
-  position: relative;
   display: block;
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
   flex: 0 0 auto;
-}
-
-.visitor-assistant-form .send-arrow::before {
-  content: "";
-  position: absolute;
-  left: 1px;
-  bottom: 3px;
-  width: 15px;
-  height: 1.5px;
-  border-radius: 999px;
-  background: currentColor;
-  transform: rotate(-45deg);
-  transform-origin: left center;
-}
-
-.visitor-assistant-form .send-arrow::after {
-  content: "";
-  position: absolute;
-  top: 1px;
-  right: 1px;
-  width: 7px;
-  height: 7px;
-  border-top: 1.5px solid currentColor;
-  border-right: 1.5px solid currentColor;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .visitor-assistant-note {

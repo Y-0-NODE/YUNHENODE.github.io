@@ -53,9 +53,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0;
-  padding-top: clamp(112px, 19vh, 178px);
+  padding-top: 0;
   border: 0;
   border-left: 1px solid var(--drawer-line);
   background: transparent;
