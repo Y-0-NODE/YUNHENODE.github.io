@@ -379,7 +379,7 @@ function visitorAssistantElements() {
     trigger: null,
     form: document.getElementById("visitor-assistant-form"),
     input: document.getElementById("visitor-assistant-input"),
-    answer: document.getElementById("visitor-assistant-answer")
+    conversation: document.getElementById("visitor-assistant-conversation")
   };
 }
 
@@ -403,6 +403,8 @@ function closeVisitorAssistant() {
 function classifyVisitorQuestion(question) {
   const text = String(question || "").trim();
   if (!text) return "start";
+  if (/^(你好|您好|嗨|哈喽|hello|hi|在吗)[！!。.，,\s]*$/i.test(text)) return "greeting";
+  if (/谢谢|多谢|感谢/.test(text)) return "thanks";
   if (/这篇|当前|讨论|讲什么|内容/.test(text)) return "current";
   if (/案例|相关|BO|H5|小区|存量/.test(text)) return "cases";
   if (/开始|路线|先看|阅读|入口/.test(text)) return "start";
@@ -412,15 +414,49 @@ function classifyVisitorQuestion(question) {
   return "boundary";
 }
 
-function answerVisitorAssistant(questionKeyOrText) {
-  const { answer } = visitorAssistantElements();
-  if (!answer) return;
+const VISITOR_ASSISTANT_PROMPTS = {
+  current: "这篇内容在讨论什么？",
+  cases: "有哪些相关案例？",
+  start: "我应该从哪里开始阅读？",
+  system: "云鹤系统是什么？",
+  course: "地理课程包含什么？"
+};
+
+const VISITOR_ASSISTANT_SMALL_TALK = {
+  greeting:
+    "你好，我在。你可以告诉我现在更想看文章、案例还是作品，我会帮你找到合适的阅读入口。",
+  thanks: "不客气。你还可以继续问我某个主题有什么文章，或者下一步适合读什么。"
+};
+
+function appendAssistantMessage(role, text) {
+  const { conversation } = visitorAssistantElements();
+  if (!conversation) return;
+  const item = document.createElement("div");
+  item.className = `assistant-message assistant-message--${role}`;
+  const content = document.createElement("p");
+  content.textContent = text;
+  if (role === "bot") {
+    const avatar = document.createElement("span");
+    avatar.textContent = "鹤";
+    item.append(avatar);
+  }
+  item.append(content);
+  conversation.append(item);
+  conversation.scrollTo({ top: conversation.scrollHeight, behavior: "smooth" });
+}
+
+function answerVisitorAssistant(questionKeyOrText, options = {}) {
+  const raw = String(questionKeyOrText || "").trim();
+  const displayQuestion = VISITOR_ASSISTANT_PROMPTS[raw] || raw;
+  if (options.echo !== false && displayQuestion) appendAssistantMessage("user", displayQuestion);
   const key = VISITOR_ASSISTANT_ANSWERS[questionKeyOrText]
     ? questionKeyOrText
     : classifyVisitorQuestion(questionKeyOrText);
-  answer.textContent =
+  const reply =
     VISITOR_ASSISTANT_ANSWERS[key] ||
+    VISITOR_ASSISTANT_SMALL_TALK[key] ||
     "这个问题超出了当前阅读助手的范围。\n\n我这里只回答云鹤系统公开访客入口相关内容：文章、案例、作品、关于说明、课程目录和购买咨询。外部知识、闲聊、通用问答不会在这里展开。";
+  window.setTimeout(() => appendAssistantMessage("bot", reply), 180);
 }
 
 function initVisitorAssistant() {
@@ -432,7 +468,10 @@ function initVisitorAssistant() {
   });
   form?.addEventListener("submit", event => {
     event.preventDefault();
-    answerVisitorAssistant(input?.value || "");
+    const question = input?.value.trim() || "";
+    if (!question) return;
+    answerVisitorAssistant(question);
+    input.value = "";
   });
   panel?.addEventListener("click", event => {
     if (event.target === panel) closeVisitorAssistant();
