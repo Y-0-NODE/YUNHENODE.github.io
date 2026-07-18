@@ -31,7 +31,7 @@
     <title>访客入口｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="assets/styles/components/edge-drawer.css?v=20260718-4" />
-    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260718-4" />
+    <link rel="stylesheet" href="assets/styles/pages/visitor.css?v=20260718-5" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -192,16 +192,28 @@
       <p class="visitor-note">访客入口仅供浏览。</p>
     </main>
 
-    <button
-      class="visitor-log-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="visitor-log-panel"
-      onclick="openVisitorLog()"
-    >
-      <span>访客登记</span>
-      <small>VISITOR LOG</small>
-    </button>
+    <div class="visitor-floating-actions" aria-label="访客工具">
+      <button
+        class="visitor-log-trigger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="visitor-log-panel"
+        onclick="openVisitorLog()"
+      >
+        <span>访客登记</span>
+        <small>VISITOR LOG</small>
+      </button>
+      <button
+        class="visitor-assistant-trigger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="visitor-assistant-panel"
+        onclick="openVisitorAssistant()"
+      >
+        <span>阅读助手</span>
+        <small>ASK</small>
+      </button>
+    </div>
 
     <section
       class="visitor-log-modal"
@@ -267,9 +279,60 @@
       </div>
     </section>
 
+    <section
+      class="visitor-assistant-modal"
+      id="visitor-assistant-panel"
+      aria-label="云鹤系统阅读助手"
+      aria-hidden="true"
+      hidden
+    >
+      <div
+        class="visitor-assistant-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="visitor-assistant-title"
+      >
+        <button
+          class="visitor-log-close"
+          type="button"
+          onclick="closeVisitorAssistant()"
+          aria-label="关闭阅读助手"
+        >
+          ×
+        </button>
+        <p class="eyebrow">YUNHE READING ASSISTANT</p>
+        <h2 id="visitor-assistant-title">云鹤系统阅读助手</h2>
+        <p class="visitor-assistant-boundary">
+          只回答访客入口当前可阅读内容相关问题：文章、案例、作品、云鹤系统说明、课程目录与购买咨询。
+        </p>
+        <div class="visitor-assistant-prompts" aria-label="常用问题">
+          <button type="button" data-assistant-question="current">这篇内容在讨论什么？</button>
+          <button type="button" data-assistant-question="cases">有哪些相关案例？</button>
+          <button type="button" data-assistant-question="start">我应该从哪里开始阅读？</button>
+          <button type="button" data-assistant-question="system">云鹤系统是什么？</button>
+          <button type="button" data-assistant-question="course">地理课程包含什么？</button>
+        </div>
+        <form id="visitor-assistant-form" class="visitor-assistant-form">
+          <label>
+            输入一个站内问题
+            <input
+              id="visitor-assistant-input"
+              name="question"
+              autocomplete="off"
+              placeholder="例如：我想看案例，从哪里开始？"
+            />
+          </label>
+          <button type="submit">询问</button>
+        </form>
+        <div id="visitor-assistant-answer" class="visitor-assistant-answer" aria-live="polite">
+          你可以直接点上面的常用问题。这个助手不会回答与云鹤系统公开内容无关的问题。
+        </div>
+      </div>
+    </section>
+
     <script src="scripts/core/config.js"></script>
     <script src="scripts/core/utils.js?v=20260718-1"></script>
     <script src="scripts/components/edge-drawer.js?v=20260718-4"></script>
-    <script src="scripts/pages/visitor.js?v=20260718-4"></script>
+    <script src="scripts/pages/visitor.js?v=20260718-5"></script>
   </body>
 </html>

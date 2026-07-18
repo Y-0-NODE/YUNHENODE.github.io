@@ -334,8 +334,91 @@ function initVisitorLog() {
   });
 }
 
+const VISITOR_ASSISTANT_ANSWERS = {
+  current:
+    "访客入口当前在做一件事：把云鹤系统公开内容整理成一条可阅读路径。\n\n你可以先看重点文章，理解“节点定义权”“公共系统责任下沉”“虚假结构内容识别”这些核心判断；再看现实观察与案例；最后延伸到艺术、商业和消费结构。",
+  cases:
+    "当前推荐从这两个方向进入案例：\n\n1.《新人不要在小区门口做，这里是存量区。》：适合理解存量区 / 开放区的现实判断。\n2.《BO H5模块化升级：从结构判断到验证》：适合看项目如何从判断进入修改、对比和验证。\n\n你可以点击访客入口里的“现实观察与案例”继续阅读。",
+  start:
+    "建议阅读顺序：\n\n1. 先读“重点文章”，理解云鹤系统的判断方式。\n2. 再读“现实观察与案例”，看概念如何落到具体事件。\n3. 然后看“作品”，理解视觉记录和内容系统的关系。\n4. 最后看“关于”，确认方法、边界和合作方式。",
+  system:
+    "云鹤系统不是普通博客分类，而是一套观察现实结构的内容系统。\n\n它关心：谁定义问题、责任如何转移、系统如何组织人和资源、内容如何从现象进入判断，再进入案例和验证。",
+  course:
+    "地理课程相关问题目前只做咨询说明，不在这里展开外部闲聊。\n\n现阶段可以回答：课程目录、适合谁、如何购买、如何从公开文章进入课程理解。后续如果你开放课程页面，阅读助手可以只引用课程页面内容回答。"
+};
+
+function visitorAssistantElements() {
+  return {
+    panel: document.getElementById("visitor-assistant-panel"),
+    trigger: document.querySelector(".visitor-assistant-trigger"),
+    form: document.getElementById("visitor-assistant-form"),
+    input: document.getElementById("visitor-assistant-input"),
+    answer: document.getElementById("visitor-assistant-answer")
+  };
+}
+
+function openVisitorAssistant() {
+  const { panel, trigger, input } = visitorAssistantElements();
+  if (!panel) return;
+  panel.hidden = false;
+  panel.setAttribute("aria-hidden", "false");
+  trigger?.setAttribute("aria-expanded", "true");
+  window.setTimeout(() => input?.focus(), 20);
+}
+
+function closeVisitorAssistant() {
+  const { panel, trigger } = visitorAssistantElements();
+  if (!panel) return;
+  panel.hidden = true;
+  panel.setAttribute("aria-hidden", "true");
+  trigger?.setAttribute("aria-expanded", "false");
+}
+
+function classifyVisitorQuestion(question) {
+  const text = String(question || "").trim();
+  if (!text) return "start";
+  if (/这篇|当前|讨论|讲什么|内容/.test(text)) return "current";
+  if (/案例|相关|BO|H5|小区|存量/.test(text)) return "cases";
+  if (/开始|路线|先看|阅读|入口/.test(text)) return "start";
+  if (/云鹤系统|是什么|方法|结构/.test(text)) return "system";
+  if (/课程|地理|购买|价格|目录/.test(text)) return "course";
+  if (/文章|作品|摄影|关于|访客/.test(text)) return "start";
+  return "boundary";
+}
+
+function answerVisitorAssistant(questionKeyOrText) {
+  const { answer } = visitorAssistantElements();
+  if (!answer) return;
+  const key = VISITOR_ASSISTANT_ANSWERS[questionKeyOrText]
+    ? questionKeyOrText
+    : classifyVisitorQuestion(questionKeyOrText);
+  answer.textContent =
+    VISITOR_ASSISTANT_ANSWERS[key] ||
+    "这个问题超出了当前阅读助手的范围。\n\n我这里只回答云鹤系统公开访客入口相关内容：文章、案例、作品、关于说明、课程目录和购买咨询。外部知识、闲聊、通用问答不会在这里展开。";
+}
+
+function initVisitorAssistant() {
+  const { form, panel, input } = visitorAssistantElements();
+  document.querySelectorAll("[data-assistant-question]").forEach(button => {
+    button.addEventListener("click", () =>
+      answerVisitorAssistant(button.dataset.assistantQuestion)
+    );
+  });
+  form?.addEventListener("submit", event => {
+    event.preventDefault();
+    answerVisitorAssistant(input?.value || "");
+  });
+  panel?.addEventListener("click", event => {
+    if (event.target === panel) closeVisitorAssistant();
+  });
+  window.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeVisitorAssistant();
+  });
+}
+
 enableVisitorBrowseMode();
 initVisitorLog();
+initVisitorAssistant();
 if (document.querySelector(".visitor-shell")) {
   loadVisitorBackground();
   loadFeaturedContent();
@@ -343,3 +426,5 @@ if (document.querySelector(".visitor-shell")) {
 
 window.openVisitorLog = openVisitorLog;
 window.closeVisitorLog = closeVisitorLog;
+window.openVisitorAssistant = openVisitorAssistant;
+window.closeVisitorAssistant = closeVisitorAssistant;

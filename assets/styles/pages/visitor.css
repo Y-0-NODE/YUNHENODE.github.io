@@ -117,11 +117,18 @@ body::before {
   font-size: 13px;
 }
 
-.visitor-log-trigger {
+.visitor-floating-actions {
   position: fixed;
   right: 22px;
   bottom: 22px;
   z-index: 70;
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.visitor-log-trigger,
+.visitor-assistant-trigger {
   display: grid;
   gap: 2px;
   border: 1px solid #d6d6d6;
@@ -134,17 +141,20 @@ body::before {
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.06);
 }
 
-.visitor-log-trigger span {
+.visitor-log-trigger span,
+.visitor-assistant-trigger span {
   font-size: 13px;
 }
 
-.visitor-log-trigger small {
+.visitor-log-trigger small,
+.visitor-assistant-trigger small {
   color: #777;
   font-size: 9px;
   letter-spacing: 1px;
 }
 
-.visitor-log-modal {
+.visitor-log-modal,
+.visitor-assistant-modal {
   position: fixed;
   inset: 0;
   z-index: 120;
@@ -155,11 +165,13 @@ body::before {
   backdrop-filter: blur(8px);
 }
 
-.visitor-log-modal[hidden] {
+.visitor-log-modal[hidden],
+.visitor-assistant-modal[hidden] {
   display: none;
 }
 
-.visitor-log-card {
+.visitor-log-card,
+.visitor-assistant-card {
   position: relative;
   width: min(420px, 100%);
   border: 1px solid #d5d5d5;
@@ -169,7 +181,8 @@ body::before {
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.12);
 }
 
-.visitor-log-card h2 {
+.visitor-log-card h2,
+.visitor-assistant-card h2 {
   margin: 8px 0 22px;
   color: #111;
   font-size: 30px;
@@ -234,6 +247,86 @@ body::before {
   margin: 0;
   color: #666;
   font-size: 12px;
+}
+
+.visitor-assistant-card {
+  width: min(520px, 100%);
+}
+
+.visitor-assistant-boundary {
+  margin: -8px 0 20px;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.visitor-assistant-prompts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.visitor-assistant-prompts button {
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  color: #111;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.visitor-assistant-prompts button:hover,
+.visitor-assistant-prompts button:focus-visible {
+  border-color: #777;
+  outline: none;
+}
+
+.visitor-assistant-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.visitor-assistant-form label {
+  display: grid;
+  gap: 8px;
+  color: #333;
+  font-size: 13px;
+}
+
+.visitor-assistant-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d5d5d5;
+  background: #fff;
+  color: #111;
+  padding: 12px;
+  font: inherit;
+}
+
+.visitor-assistant-form button {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  padding: 12px 15px;
+  cursor: pointer;
+}
+
+.visitor-assistant-answer {
+  min-height: 86px;
+  border: 1px solid #e1e1e1;
+  background: #fafafa;
+  color: #222;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-line;
 }
 
 .featured-section {
@@ -406,18 +499,30 @@ body::before {
     white-space: normal;
   }
 
-  .visitor-log-trigger {
+  .visitor-floating-actions {
     right: 14px;
     bottom: 14px;
+    gap: 8px;
+  }
+
+  .visitor-log-trigger,
+  .visitor-assistant-trigger {
     padding: 10px 12px;
   }
 
-  .visitor-log-modal {
+  .visitor-log-modal,
+  .visitor-assistant-modal {
     align-items: end;
     padding: 12px;
   }
 
-  .visitor-log-card {
+  .visitor-log-card,
+  .visitor-assistant-card {
     padding: 24px 18px;
+  }
+
+  .visitor-assistant-prompts,
+  .visitor-assistant-form {
+    grid-template-columns: 1fr;
   }
 }
