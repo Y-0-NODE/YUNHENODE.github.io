@@ -239,8 +239,8 @@ body.visitor-browse-mode .edge-drawer,
   .edge-drawer-handle {
     width: var(--drawer-peek);
     box-sizing: border-box;
-    justify-content: flex-start;
-    padding-top: 112px;
+    justify-content: center;
+    padding-top: 0;
     touch-action: none;
   }
 
