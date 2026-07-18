@@ -13,7 +13,7 @@
     <meta property="og:url" content="https://y-0-node.github.io/YUNHENODE.github.io/" />
     <title>云鹤系统｜YUNHENODE</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/index.css" />
+    <link rel="stylesheet" href="assets/styles/pages/index.css?v=20260718-archive" />
   </head>
   <body>
     <header class="topbar">
@@ -70,11 +70,40 @@
       </section>
       <section class="section">
         <div class="section-head">
-          <h2>Latest Updates｜最近更新</h2>
-          <p>文章、案例与视频</p>
+          <h2>Archive Status｜档案状态</h2>
+          <p>YUNHENODE ARCHIVE</p>
         </div>
-        <div id="latest-status" class="status">正在读取最新内容…</div>
-        <div id="latest" class="latest-grid"></div>
+        <div id="archive-status" class="archive-status-grid" aria-label="云鹤系统档案状态">
+          <article>
+            <span>Articles</span>
+            <strong id="archive-articles">—</strong>
+          </article>
+          <article>
+            <span>Cases</span>
+            <strong id="archive-cases">—</strong>
+          </article>
+          <article>
+            <span>Works</span>
+            <strong id="archive-works">—</strong>
+          </article>
+          <article>
+            <span>Courses</span>
+            <strong>Preparing</strong>
+          </article>
+          <article>
+            <span>Last Updated</span>
+            <strong id="archive-updated">—</strong>
+          </article>
+        </div>
+        <p id="archive-status-note" class="status">正在读取档案状态…</p>
+      </section>
+      <section class="section">
+        <div class="section-head">
+          <h2>Latest Archive｜最新归档</h2>
+          <p>文章、案例、摄影的持续归档时间线</p>
+        </div>
+        <div id="latest-status" class="status">正在读取最新归档…</div>
+        <div id="latest" class="archive-timeline"></div>
       </section>
       <section class="section">
         <div class="section-head">
@@ -119,6 +148,6 @@
     <script src="scripts/core/config.js"></script>
     <script src="scripts/core/utils.js"></script>
     <script src="scripts/core/api-client.js"></script>
-    <script src="scripts/pages/home.js"></script>
+    <script src="scripts/pages/home.js?v=20260718-archive"></script>
   </body>
 </html>

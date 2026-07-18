@@ -3,7 +3,8 @@
 
   const config = window.YUNHE_CONFIG;
   const { escapeHtml, formatDate } = window.YunheUtils;
-  const typeNames = { article: "ARTICLE", case: "CASE", video: "VIDEO" };
+  const typeNames = { article: "文章", case: "案例", photo: "摄影", video: "影像" };
+  const publicMediaApi = "https://yunhenode-github-io-qwu7.vercel.app/api/media-list";
 
   function contentUrl(content) {
     const query = content.slug
@@ -12,41 +13,117 @@
     return `content.html?${query}`;
   }
 
-  async function loadLatest() {
-    const status = document.getElementById("latest-status");
+  function formatArchiveDate(value) {
+    const formatted = formatDate(value);
+    return formatted ? formatted.replaceAll("-", ".").replaceAll("/", ".") : "未标注";
+  }
+
+  function workUrl() {
+    return "gallery.html";
+  }
+
+  async function fetchContents() {
     const query =
-      "select=id,title,slug,intro,topic,type,created_at&type=in.(article,case,video)&order=created_at.desc&limit=6";
-    try {
-      const response = await fetch(`${config.supabaseUrl}/rest/v1/contents?${query}`, {
-        headers: {
-          apikey: config.supabaseKey,
-          Authorization: `Bearer ${config.supabaseKey}`
-        }
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const rows = await response.json();
-      if (!rows.length) {
-        status.textContent = "暂无公开内容。";
-        return;
+      "select=id,title,slug,intro,topic,type,created_at&type=in.(article,case)&order=created_at.desc&limit=60";
+    const response = await fetch(`${config.supabaseUrl}/rest/v1/contents?${query}`, {
+      cache: "no-store",
+      headers: {
+        apikey: config.supabaseKey,
+        Authorization: `Bearer ${config.supabaseKey}`
       }
-      status.textContent = "";
-      document.getElementById("latest").innerHTML = rows
-        .map(
-          content => `
-        <a class="latest-card" href="${contentUrl(content)}">
-          <div class="latest-meta">
-            <span class="content-type">${typeNames[content.type] || "CONTENT"}</span>
-            <span class="category">${escapeHtml(content.topic || "未分类")}</span>
-          </div>
-          <h3>${escapeHtml(content.title)}</h3>
-          <p>${escapeHtml(content.intro || "暂无摘要")}</p>
-          <time datetime="${escapeHtml(content.created_at)}">${formatDate(content.created_at)}</time>
+    });
+    if (!response.ok) throw new Error(`contents HTTP ${response.status}`);
+    return response.json();
+  }
+
+  async function fetchWorks() {
+    try {
+      const response = await fetch(`./api/media-list?archive=${Date.now()}`, { cache: "no-store" });
+      const result = response.ok
+        ? await response.json()
+        : await fetch(`${publicMediaApi}?archive=${Date.now()}`, { cache: "no-store" }).then(res =>
+            res.ok ? res.json() : { data: [] }
+          );
+      return Array.isArray(result.data)
+        ? result.data.filter(item => ["photo", "video"].includes(item.kind))
+        : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function updateArchiveStatus(contents, works) {
+    const articles = contents.filter(item => item.type === "article");
+    const cases = contents.filter(item => item.type === "case");
+    const dates = [...contents, ...works]
+      .map(item => item.shot_at || item.created_at)
+      .filter(Boolean)
+      .sort()
+      .reverse();
+    document.getElementById("archive-articles").textContent = articles.length;
+    document.getElementById("archive-cases").textContent = cases.length;
+    document.getElementById("archive-works").textContent = works.length;
+    document.getElementById("archive-updated").textContent = formatArchiveDate(dates[0]);
+    document.getElementById("archive-status-note").textContent =
+      "档案状态会随公开文章、案例和作品持续更新。";
+  }
+
+  function archiveItems(contents, works) {
+    const contentItems = contents.map(content => ({
+      title: content.title,
+      summary: content.intro || content.topic || "暂无摘要",
+      type: content.type,
+      date: content.created_at,
+      href: contentUrl(content)
+    }));
+    const workItems = works.map(work => ({
+      title: work.title || "未命名作品",
+      summary: work.description || "摄影与视觉作品归档。",
+      type: work.kind === "video" ? "video" : "photo",
+      date: work.shot_at || work.created_at,
+      href: workUrl(work)
+    }));
+    return [...contentItems, ...workItems]
+      .filter(item => item.title && item.date)
+      .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
+      .slice(0, 8);
+  }
+
+  function renderLatestArchive(items) {
+    const status = document.getElementById("latest-status");
+    const box = document.getElementById("latest");
+    if (!items.length) {
+      status.textContent = "暂无公开归档。";
+      box.innerHTML = "";
+      return;
+    }
+    status.textContent = "";
+    box.innerHTML = items
+      .map(
+        item => `
+        <a class="archive-row" href="${escapeHtml(item.href)}">
+          <time datetime="${escapeHtml(item.date)}">${formatArchiveDate(item.date)}</time>
+          <span>${escapeHtml(typeNames[item.type] || "归档")}</span>
+          <h3>《${escapeHtml(item.title)}》</h3>
+          <p>${escapeHtml(item.summary || "")}</p>
         </a>
       `
-        )
-        .join("");
+      )
+      .join("");
+  }
+
+  async function loadArchive() {
+    const latestStatus = document.getElementById("latest-status");
+    const archiveStatus = document.getElementById("archive-status-note");
+    try {
+      const [contents, works] = await Promise.all([fetchContents(), fetchWorks()]);
+      const safeContents = Array.isArray(contents) ? contents : [];
+      const safeWorks = Array.isArray(works) ? works : [];
+      updateArchiveStatus(safeContents, safeWorks);
+      renderLatestArchive(archiveItems(safeContents, safeWorks));
     } catch (error) {
-      status.textContent = "最新内容读取失败。";
+      latestStatus.textContent = "最新归档读取失败。";
+      archiveStatus.textContent = "档案状态暂时无法读取。";
     }
   }
 
@@ -71,5 +148,5 @@
     }
   };
 
-  loadLatest();
+  loadArchive();
 })();
