@@ -440,6 +440,10 @@ body::before {
 }
 
 @media (max-width: 560px) {
+  .topbar {
+    padding-left: 70px;
+  }
+
   .topbar nav a {
     border-color: #ddd;
     background: #fff;
@@ -447,7 +451,7 @@ body::before {
 
   .visitor-shell {
     width: auto;
-    margin: 0 14px 0 56px;
+    margin: 0 14px 0 70px;
     padding: 30px 0 52px;
   }
 
@@ -471,12 +475,21 @@ body::before {
   }
 
   .visitor-card {
+    display: grid;
+    grid-template-rows: 46px 54px auto;
+    align-items: start;
     min-height: 140px;
     padding: 14px;
   }
 
+  .visitor-card span {
+    display: block;
+    min-height: 42px;
+    line-height: 1.55;
+  }
+
   .visitor-card h2 {
-    margin-top: 24px;
+    margin: 0 0 8px;
     font-size: 23px;
   }
 
