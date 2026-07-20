@@ -352,9 +352,10 @@ function toggleVisitorTools() {
   setVisitorTools(Boolean(panel?.hidden));
 }
 
-function chooseVisitorTool(type) {
+function chooseVisitorTool(type, event) {
   setVisitorTools(false);
   if (type === "route") {
+    event?.stopPropagation();
     const drawer = document.getElementById("reading-route-drawer");
     if (drawer && !drawer.classList.contains("open")) {
       window.toggleEdgeDrawer?.("reading-route-drawer");
