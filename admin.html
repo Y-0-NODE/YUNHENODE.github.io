@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>后台｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/admin.css" />
+    <link rel="stylesheet" href="assets/styles/pages/admin.css?v=20260721-knowledge-1" />
   </head>
 
   <body>
@@ -111,12 +111,96 @@
             <h3>Quick Notes｜随笔管理</h3>
             <p>管理随笔的发布、关联、归档与版本。</p></a
           >
-          <a class="card" href="photography-manage.html"
+          <a class="card knowledge-manager-card" href="#knowledge-card-studio"
             ><span>MANAGE 07</span>
+            <h3>Knowledge Cards｜知识卡片</h3>
+            <p>把随笔中的观察、判断和方法提炼为可复用卡片。</p></a
+          >
+          <a class="card" href="photography-manage.html"
+            ><span>MANAGE 08</span>
             <h3>Photography Manager｜摄影管理</h3>
             <p>管理摄影作品、发布状态、作品集和历史版本。</p></a
           >
         </div>
+
+        <section
+          id="knowledge-card-studio"
+          class="knowledge-card-studio"
+          aria-labelledby="knowledge-card-studio-title"
+        >
+          <div class="knowledge-card-studio-head">
+            <div>
+              <p>THOUGHT → KNOWLEDGE</p>
+              <h3 id="knowledge-card-studio-title">随笔与知识卡片工作台</h3>
+            </div>
+            <a href="content-control.html?type=knowledge_card">进入卡片管理</a>
+          </div>
+
+          <div class="knowledge-card-studio-layout">
+            <aside class="knowledge-card-flow" aria-label="知识卡片整理流程">
+              <div><span>01</span><strong>随笔</strong><small>保留即时观察和直觉。</small></div>
+              <div><span>02</span><strong>提炼</strong><small>压缩成一句核心判断。</small></div>
+              <div><span>03</span><strong>关联</strong><small>连接文章、案例与验证材料。</small></div>
+              <div><span>04</span><strong>卡片</strong><small>进入首页和知识系统。</small></div>
+            </aside>
+
+            <form id="knowledge-card-form" class="knowledge-card-form">
+              <div class="knowledge-card-form-row">
+                <label>
+                  管理员名称
+                  <input id="knowledge-card-admin" value="YUNHE" autocomplete="username" />
+                </label>
+                <label>
+                  管理员密码
+                  <input
+                    id="knowledge-card-password"
+                    type="password"
+                    autocomplete="current-password"
+                  />
+                </label>
+              </div>
+
+              <div class="knowledge-card-form-row">
+                <label>
+                  卡片标题
+                  <input id="knowledge-card-title" placeholder="一个概念、问题或判断" />
+                </label>
+                <label>
+                  主题
+                  <input id="knowledge-card-topic" placeholder="例如：系统观察" />
+                </label>
+              </div>
+
+              <label>
+                核心结论
+                <textarea
+                  id="knowledge-card-intro"
+                  rows="3"
+                  placeholder="用一到两句话写出这张卡片最重要的判断。"
+                ></textarea>
+              </label>
+
+              <label>
+                展开说明
+                <textarea
+                  id="knowledge-card-body"
+                  rows="6"
+                  placeholder="写下来源、推理、例子或之后需要验证的部分。"
+                ></textarea>
+              </label>
+
+              <label>
+                关联随笔或内容 ID（可选，每行一个）
+                <textarea id="knowledge-card-related" rows="3"></textarea>
+              </label>
+
+              <div class="knowledge-card-form-actions">
+                <button type="submit">保存并同步到首站</button>
+                <span id="knowledge-card-status" role="status"></span>
+              </div>
+            </form>
+          </div>
+        </section>
       </section>
 
       <section id="media" class="admin-section">
@@ -308,5 +392,8 @@
         YUNHE；密码填写该环境变量对应的值。
       </div>
     </main>
+    <script src="scripts/core/config.js"></script>
+    <script src="scripts/core/api-client.js"></script>
+    <script src="scripts/pages/admin.js?v=20260721-knowledge-1"></script>
   </body>
 </html>

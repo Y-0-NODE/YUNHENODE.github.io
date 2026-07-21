@@ -36,6 +36,25 @@
     return response.json();
   }
 
+  async function fetchKnowledgeCards() {
+    const query =
+      "select=id,title,slug,intro,topic,created_at&type=eq.knowledge_card&order=created_at.desc&limit=6";
+    try {
+      const response = await fetch(`${config.supabaseUrl}/rest/v1/contents?${query}`, {
+        cache: "no-store",
+        headers: {
+          apikey: config.supabaseKey,
+          Authorization: `Bearer ${config.supabaseKey}`
+        }
+      });
+      if (!response.ok) return [];
+      const rows = await response.json();
+      return Array.isArray(rows) ? rows : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
   async function fetchWorks() {
     try {
       const response = await fetch(`./api/media-list?archive=${Date.now()}`, { cache: "no-store" });
@@ -112,18 +131,68 @@
       .join("");
   }
 
+  const knowledgeGuideCards = [
+    {
+      topic: "Observation",
+      title: "观察",
+      intro: "记录一个还没有结论、但值得继续追踪的现象。"
+    },
+    {
+      topic: "Decision",
+      title: "判断",
+      intro: "把随笔里的直觉压缩成一句可以被验证的核心判断。"
+    },
+    {
+      topic: "Connection",
+      title: "关联",
+      intro: "连接文章、案例与摄影材料，让一张卡片拥有现实依据。"
+    }
+  ];
+
+  function renderKnowledgeCards(cards) {
+    const box = document.getElementById("knowledge-card-list");
+    const status = document.getElementById("knowledge-card-status");
+    const items = cards.length ? cards : knowledgeGuideCards;
+    box.innerHTML = items
+      .map((card, index) => {
+        const guide = !cards.length;
+        const tag = escapeHtml(card.topic || "知识卡片");
+        const title = escapeHtml(card.title || "未命名卡片");
+        const intro = escapeHtml(card.intro || "等待补充核心判断。");
+        const date = guide ? "SYSTEM GUIDE" : formatArchiveDate(card.created_at);
+        const inner = `
+          <div class="knowledge-card-meta"><span>${String(index + 1).padStart(2, "0")}</span><span>${tag}</span></div>
+          <h3>${title}</h3>
+          <p>${intro}</p>
+          <footer><span>${escapeHtml(date)}</span><span>${guide ? "整理方法" : "打开卡片 →"}</span></footer>
+        `;
+        if (guide) return `<article class="knowledge-card is-guide">${inner}</article>`;
+        return `<a class="knowledge-card" href="${escapeHtml(contentUrl(card))}">${inner}</a>`;
+      })
+      .join("");
+    status.textContent = cards.length
+      ? `展示最近 ${cards.length} 张知识卡片。`
+      : "建立第一张卡片后，这里会自动替换为真实内容。";
+  }
+
   async function loadArchive() {
     const latestStatus = document.getElementById("latest-status");
     const archiveStatus = document.getElementById("archive-status-note");
     try {
-      const [contents, works] = await Promise.all([fetchContents(), fetchWorks()]);
+      const [contents, works, knowledgeCards] = await Promise.all([
+        fetchContents(),
+        fetchWorks(),
+        fetchKnowledgeCards()
+      ]);
       const safeContents = Array.isArray(contents) ? contents : [];
       const safeWorks = Array.isArray(works) ? works : [];
       updateArchiveStatus(safeContents, safeWorks);
       renderLatestArchive(archiveItems(safeContents, safeWorks));
+      renderKnowledgeCards(knowledgeCards);
     } catch (error) {
       latestStatus.textContent = "最新归档读取失败。";
       archiveStatus.textContent = "档案状态暂时无法读取。";
+      renderKnowledgeCards([]);
     }
   }
 

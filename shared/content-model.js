@@ -5,7 +5,13 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function createContentModel() {
   "use strict";
 
-  const CONTENT_TYPES = Object.freeze(["article", "case", "video", "thought"]);
+  const CONTENT_TYPES = Object.freeze([
+    "article",
+    "case",
+    "video",
+    "thought",
+    "knowledge_card"
+  ]);
   const LIFECYCLES = Object.freeze(["published", "private", "archived"]);
 
   function baseType(type) {

@@ -1,5 +1,11 @@
 const TYPE = new URLSearchParams(location.search).get("type") || "article",
-  NAMES = { article: "文章", case: "案例", video: "视频", thought: "随笔" };
+  NAMES = {
+    article: "文章",
+    case: "案例",
+    video: "视频",
+    thought: "随笔",
+    knowledge_card: "知识卡片"
+  };
 let ITEMS = [],
   CURRENT = null;
 document.getElementById("page-title").textContent = `${NAMES[TYPE] || "内容"}管理`;
@@ -71,10 +77,14 @@ function selectItem(id) {
   document.getElementById("related").value = (m.related_documents || []).join("\n");
   document.getElementById("media").value = (m.media_files || []).join("\n");
   document.getElementById("lifecycle").value = CURRENT.lifecycle || "published";
-  document.getElementById("edit").href =
+  const editLink = document.getElementById("edit");
+  editLink.href =
     TYPE === "thought"
       ? "thought-manage.html"
-      : `article-manage.html?type=${TYPE}&id=${CURRENT.id}`;
+      : TYPE === "knowledge_card"
+        ? `content.html?id=${CURRENT.id}`
+        : `article-manage.html?type=${TYPE}&id=${CURRENT.id}`;
+  editLink.textContent = TYPE === "knowledge_card" ? "View｜查看公开卡片" : "Edit｜编辑";
 }
 function resetTopic() {
   if (!CURRENT) return alert("请先选择内容");

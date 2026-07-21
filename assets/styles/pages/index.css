@@ -101,6 +101,116 @@
   margin-top: 32px;
 }
 
+.knowledge-card-section {
+  position: relative;
+}
+
+.knowledge-card-intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 26px;
+}
+
+.knowledge-card-intro p {
+  max-width: 760px;
+  margin: 0;
+  color: #929a95;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.knowledge-card-intro a {
+  flex: 0 0 auto;
+  border-bottom: 1px solid #59665f;
+  color: #c7cec9;
+  padding: 6px 0;
+  text-decoration: none;
+}
+
+.knowledge-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.knowledge-card {
+  position: relative;
+  display: flex;
+  min-height: 240px;
+  box-sizing: border-box;
+  flex-direction: column;
+  border: 1px solid #2d3831;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(111, 143, 124, 0.14), transparent 10rem),
+    linear-gradient(150deg, #141815, #0f1110 68%);
+  color: #edf0ee;
+  padding: 24px;
+  text-decoration: none;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.knowledge-card:hover,
+.knowledge-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: #65776c;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.3);
+  outline: none;
+}
+
+.knowledge-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #75827a;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.knowledge-card h3 {
+  margin: 34px 0 13px;
+  color: #f1f4f2;
+  font-size: clamp(21px, 2.3vw, 29px);
+  line-height: 1.28;
+}
+
+.knowledge-card > p {
+  margin: 0;
+  color: #9da6a0;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.knowledge-card footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 24px;
+  color: #69756e;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.knowledge-card.is-guide {
+  cursor: default;
+}
+
+.knowledge-card.is-guide:hover {
+  transform: none;
+  border-color: #2d3831;
+  box-shadow: none;
+}
+
 .archive-status-grid article {
   min-height: 132px;
   border: 1px solid #2a2a2a;
@@ -224,6 +334,9 @@
   margin-top: 8px;
 }
 @media (max-width: 900px) {
+  .knowledge-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .archive-status-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -238,6 +351,7 @@
   }
   .entry-grid,
   .architecture,
+  .knowledge-card-grid,
   .archive-status-grid {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -252,6 +366,7 @@
   }
   .private-entry,
   .section-head,
+  .knowledge-card-intro,
   .private-login {
     align-items: stretch;
     flex-direction: column;
