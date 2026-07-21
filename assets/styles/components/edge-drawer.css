@@ -23,13 +23,6 @@
   backdrop-filter: blur(16px);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .edge-drawer:hover {
-    transform: translateX(0);
-    box-shadow: 16px 0 38px rgba(0, 0, 0, 0.2);
-  }
-}
-
 .edge-drawer.open {
   transform: translateX(0);
   box-shadow: 16px 0 38px rgba(0, 0, 0, 0.2);

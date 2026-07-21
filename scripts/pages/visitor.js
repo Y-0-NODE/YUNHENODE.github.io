@@ -352,14 +352,15 @@ function toggleVisitorTools() {
   setVisitorTools(Boolean(panel?.hidden));
 }
 
-function chooseVisitorTool(type, event) {
+function chooseVisitorTool(type) {
   setVisitorTools(false);
   if (type === "route") {
-    event?.stopPropagation();
-    const drawer = document.getElementById("reading-route-drawer");
-    if (drawer && !drawer.classList.contains("open")) {
-      window.toggleEdgeDrawer?.("reading-route-drawer");
-    }
+    window.setTimeout(() => {
+      const drawer = document.getElementById("reading-route-drawer");
+      if (drawer && !drawer.classList.contains("open")) {
+        window.toggleEdgeDrawer?.("reading-route-drawer");
+      }
+    }, 0);
   }
   if (type === "log") openVisitorLog();
   if (type === "assistant") openVisitorAssistant();
