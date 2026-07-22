@@ -55,7 +55,16 @@ function render(list) {
   });
 }
 
+function setActiveFilter(label) {
+  document.querySelectorAll(".toolbar button").forEach(button => {
+    const active = button.textContent.trim() === label;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
 function filterType(type) {
+  setActiveFilter(type === "all" ? "全部" : type);
   if (type === "all") return render(DATA);
   render(DATA.filter(i => i.type === type));
 }
@@ -66,6 +75,7 @@ function filterTopic(topic) {
 }
 
 function filterDimension(name) {
+  setActiveFilter(name);
   const topics = DIMENSIONS[name] || [];
   render(DATA.filter(item => topics.includes(window.YunheTaxonomy.classifyContent(item))));
 }

@@ -96,7 +96,10 @@
 
 .archive-status-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(3, minmax(120px, 0.75fr))
+    minmax(160px, 1fr)
+    minmax(190px, 1.2fr);
   gap: 24px;
   margin-top: 32px;
 }
@@ -232,12 +235,15 @@
   font-size: clamp(24px, 2vw, 34px);
   font-weight: 700;
   line-height: 1.08;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
 
 .archive-status-grid article:nth-child(4) strong,
 .archive-status-grid article:nth-child(5) strong {
-  font-size: clamp(22px, 1.75vw, 30px);
+  font-size: clamp(21px, 1.45vw, 25px);
+  letter-spacing: -0.025em;
+  white-space: nowrap;
 }
 
 .archive-timeline {
@@ -333,7 +339,7 @@
   color: #aaa;
   margin-top: 8px;
 }
-@media (max-width: 900px) {
+@media (max-width: 1050px) {
   .knowledge-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

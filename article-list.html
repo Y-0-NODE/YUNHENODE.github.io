@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>文章列表｜云鹤系统</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/article-list.css" />
+    <link rel="stylesheet" href="assets/styles/pages/article-list.css?v=20260722-1" />
   </head>
 
   <body>
@@ -35,11 +35,11 @@
       <p class="intro">从 Supabase 自动读取已发布文章。</p>
 
       <div class="toolbar">
-        <button type="button" onclick="filterType('all')">全部</button>
-        <button type="button" onclick="filterDimension('人与关系')">人与关系</button>
-        <button type="button" onclick="filterDimension('组织与系统')">组织与系统</button>
-        <button type="button" onclick="filterDimension('社会与现实')">社会与现实</button>
-        <button type="button" onclick="filterDimension('创作与内在')">创作与内在</button>
+        <button class="active" type="button" aria-pressed="true" onclick="filterType('all')">全部</button>
+        <button type="button" aria-pressed="false" onclick="filterDimension('人与关系')">人与关系</button>
+        <button type="button" aria-pressed="false" onclick="filterDimension('组织与系统')">组织与系统</button>
+        <button type="button" aria-pressed="false" onclick="filterDimension('社会与现实')">社会与现实</button>
+        <button type="button" aria-pressed="false" onclick="filterDimension('创作与内在')">创作与内在</button>
       </div>
 
       <div id="status" class="status">正在加载文章...</div>
@@ -49,6 +49,6 @@
     <script src="scripts/core/config.js"></script>
     <script src="scripts/core/utils.js?v=20260716-3"></script>
     <script src="scripts/pages/visitor.js?v=20260718-13"></script>
-    <script src="scripts/pages/article-list.js?v=20260716-3"></script>
+    <script src="scripts/pages/article-list.js?v=20260722-1"></script>
   </body>
 </html>
