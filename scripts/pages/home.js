@@ -18,6 +18,13 @@
     return formatted ? formatted.replaceAll("-", ".").replaceAll("/", ".") : "未标注";
   }
 
+  function formatArchiveStatusDate(value) {
+    const formatted = formatDate(value);
+    const parts = String(formatted || "").match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    if (!parts) return "暂无更新时间";
+    return `${parts[1]} 年 ${Number(parts[2])} 月 ${Number(parts[3])} 日`;
+  }
+
   function workUrl() {
     return "gallery.html";
   }
@@ -79,10 +86,12 @@
       .filter(Boolean)
       .sort()
       .reverse();
-    document.getElementById("archive-articles").textContent = articles.length;
-    document.getElementById("archive-cases").textContent = cases.length;
-    document.getElementById("archive-works").textContent = works.length;
-    document.getElementById("archive-updated").textContent = formatArchiveDate(dates[0]);
+    document.getElementById("archive-articles").textContent = `已归档 ${articles.length} 篇文章`;
+    document.getElementById("archive-cases").textContent = `已归档 ${cases.length} 个案例`;
+    document.getElementById("archive-works").textContent = `已归档 ${works.length} 项作品`;
+    document.getElementById("archive-updated").textContent = dates[0]
+      ? `更新于 ${formatArchiveStatusDate(dates[0])}`
+      : "暂无更新时间";
     document.getElementById("archive-status-note").textContent =
       "档案状态会随公开文章、案例和作品持续更新。";
   }
