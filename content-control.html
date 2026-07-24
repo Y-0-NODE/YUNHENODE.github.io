@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>内容管理｜YUNHENODE CMS</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="assets/styles/pages/content-control.css?v=20260716-3" />
+    <link rel="stylesheet" href="assets/styles/pages/content-control.css?v=20260724-paywall-1" />
   </head>
   <body>
     <header class="topbar">
@@ -95,6 +95,33 @@
                 <option>Method</option>
               </select>
             </label>
+
+            <section id="paywall-settings" class="paywall-settings wide" hidden>
+              <p class="category-kicker">PAID READING</p>
+              <h3>文章付费窗口</h3>
+              <p class="category-note">
+                二维码统一在“付费阅读设置”窗口管理。这里每篇文章只需要选择是否付费和价格。
+              </p>
+              <label class="paywall-switch">
+                <input id="paywall-enabled" type="checkbox" />
+                开启这篇文章的付费窗口
+              </label>
+              <label>
+                文章价格
+                <select id="paywall-price">
+                  <option value="9.9">¥9.9</option>
+                  <option value="19.9">¥19.9</option>
+                  <option value="29.9">¥29.9</option>
+                  <option value="59">¥59</option>
+                  <option value="99">¥99</option>
+                  <option value="199">¥199</option>
+                </select>
+              </label>
+              <a class="paywall-settings-link" href="payment-settings.html"
+                >打开统一二维码设置窗口</a
+              >
+            </section>
+
             <label class="wide">正文<textarea id="body"></textarea></label>
             <label class="wide">
               Collections｜作品集（每行一个）
@@ -118,6 +145,6 @@
 
     <script src="scripts/core/utils.js?v=20260716-3"></script>
     <script src="shared/metadata.js"></script>
-    <script src="scripts/pages/content-control.js?v=20260716-3"></script>
+    <script src="scripts/pages/content-control.js?v=20260724-paywall-1"></script>
   </body>
 </html>

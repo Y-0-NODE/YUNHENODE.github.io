@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>付费阅读设置｜YUNHENODE CMS</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/styles/pages/payment-settings.css?v=20260724-1" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo" href="admin.html">YUNHENODE CMS</a>
+      <nav><a href="admin.html">后台首页</a><a href="content-control.html?type=article">文章管理</a></nav>
+    </header>
+
+    <main class="home payment-settings-page">
+      <p class="eyebrow">PAID READING SETTINGS</p>
+      <h1>付费阅读设置</h1>
+      <p class="intro">
+        在一个窗口中统一管理六个价位的微信与支付宝二维码。文章只选择价位，不重复上传二维码。
+      </p>
+
+      <section class="payment-auth">
+        <label>管理员名称<input id="payment-admin" value="YUNHE" autocomplete="username" /></label>
+        <label
+          >管理员密码<input
+            id="payment-password"
+            type="password"
+            autocomplete="current-password"
+        /></label>
+        <button type="button" onclick="savePaymentSettings()">保存全部二维码设置</button>
+      </section>
+
+      <section class="payment-instructions">
+        <strong>使用方法</strong>
+        <p>
+          每个价位可以分别上传微信和支付宝二维码。图片上传成功后，还需要点击上方“保存全部二维码设置”。
+        </p>
+        <label>
+          付款说明
+          <textarea id="payment-note">扫码付款后，请保留付款截图，并通过“关于”页面的联系方式与我联系。</textarea>
+        </label>
+        <p id="payment-status" class="status" role="status">正在读取当前二维码设置…</p>
+      </section>
+
+      <div id="payment-tier-grid" class="payment-tier-grid"></div>
+    </main>
+
+    <script src="scripts/pages/payment-settings.js?v=20260724-1"></script>
+  </body>
+</html>

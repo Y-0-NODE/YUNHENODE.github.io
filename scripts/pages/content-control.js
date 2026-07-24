@@ -8,7 +8,9 @@ const TYPE = new URLSearchParams(location.search).get("type") || "article",
   };
 let ITEMS = [],
   CURRENT = null;
+const PAYWALL_PRICES = new Set(["9.9", "19.9", "29.9", "59", "99", "199"]);
 document.getElementById("page-title").textContent = `${NAMES[TYPE] || "内容"}管理`;
+document.getElementById("paywall-settings").hidden = TYPE !== "article";
 const v = id => document.getElementById(id).value,
   auth = () => ({ adminName: v("admin"), password: v("password") }),
   lines = id =>
@@ -77,6 +79,11 @@ function selectItem(id) {
   document.getElementById("related").value = (m.related_documents || []).join("\n");
   document.getElementById("media").value = (m.media_files || []).join("\n");
   document.getElementById("lifecycle").value = CURRENT.lifecycle || "published";
+  const paywall = m.paywall || {};
+  document.getElementById("paywall-enabled").checked = Boolean(paywall.enabled);
+  document.getElementById("paywall-price").value = PAYWALL_PRICES.has(String(paywall.price))
+    ? String(paywall.price)
+    : "9.9";
   const editLink = document.getElementById("edit");
   editLink.href =
     TYPE === "thought"
@@ -98,6 +105,8 @@ function resetTopic() {
 }
 async function saveItem() {
   if (!CURRENT) return alert("请先选择内容");
+  const paywallEnabled =
+    TYPE === "article" && document.getElementById("paywall-enabled").checked;
   try {
     await call("./api/update", {
       id: CURRENT.id,
@@ -112,7 +121,9 @@ async function saveItem() {
       knowledgeLevel: v("level"),
       collections: lines("collections"),
       relatedDocuments: lines("related"),
-      mediaFiles: lines("media")
+      mediaFiles: lines("media"),
+      paywallEnabled,
+      paywallPrice: v("paywall-price")
     });
     await loadItems();
     alert("已保存");

@@ -94,6 +94,43 @@
   color: #aaa;
   line-height: 1.7;
 }
+.paywall-settings {
+  padding: 22px;
+  border: 1px solid #4c5b51;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #151a17, #101210);
+}
+.paywall-settings h3 {
+  margin: 5px 0 8px;
+  color: #f3f5f3;
+  font-size: 24px;
+}
+.paywall-switch {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  color: #eef2ef !important;
+  font-weight: 700;
+}
+.paywall-switch input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
+.paywall-settings-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  margin-top: 16px;
+  border: 1px solid #718076;
+  border-radius: 999px;
+  background: #e7ece8;
+  color: #18201b;
+  padding: 0 16px;
+  text-decoration: none;
+  font-weight: 700;
+}
 .actions {
   display: flex;
   flex-wrap: wrap;

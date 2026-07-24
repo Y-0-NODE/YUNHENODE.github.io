@@ -201,6 +201,102 @@ function renderBody(raw) {
     .join("");
 }
 
+function paywallConfig(meta) {
+  const allowed = new Set(["9.9", "19.9", "29.9", "59", "99", "199"]);
+  const source = meta?.paywall || {};
+  const price = allowed.has(String(source.price)) ? String(source.price) : "9.9";
+  return {
+    enabled: Boolean(source.enabled),
+    price
+  };
+}
+
+async function loadPaymentOptions(price) {
+  const fallback = {
+    wechat: "",
+    alipay: "",
+    note: "扫码付款后，请保留付款截图，并通过“关于”页面的联系方式与我联系。"
+  };
+  try {
+    const response = await fetch(`./api/media-list?includeSettings=1&payment=${Date.now()}`, {
+      cache: "no-store"
+    });
+    if (!response.ok) return fallback;
+    const result = await response.json();
+    const record = (Array.isArray(result.data) ? result.data : []).find(
+      item => item.title === "YUNHE_PAYMENT_SETTINGS"
+    );
+    if (!record?.description) return fallback;
+    const settings = JSON.parse(record.description);
+    const tier = settings.tiers?.[price] || {};
+    return {
+      wechat: String(tier.wechat || ""),
+      alipay: String(tier.alipay || ""),
+      note: String(settings.note || fallback.note)
+    };
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function closePaywallWindow() {
+  const windowElement = document.getElementById("paywall-window");
+  if (!windowElement) return;
+  windowElement.hidden = true;
+  windowElement.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("paywall-window-open");
+}
+
+function openPaywallWindow() {
+  const windowElement = document.getElementById("paywall-window");
+  if (!windowElement) return;
+  windowElement.hidden = false;
+  windowElement.setAttribute("aria-hidden", "false");
+  document.body.classList.add("paywall-window-open");
+  windowElement.querySelector(".paywall-close")?.focus();
+}
+
+function renderPaywall(config) {
+  const methods = [
+    { key: "wechat", label: "微信支付", url: config.wechat },
+    { key: "alipay", label: "支付宝", url: config.alipay }
+  ].filter(method => method.url);
+  const paymentChoices = methods.length
+    ? methods
+        .map(
+          method => `
+            <article class="paywall-method">
+              <h3>${method.label}</h3>
+              <img src="${escapeHtml(method.url)}" alt="${method.label} ¥${escapeHtml(config.price)} 二维码" loading="eager">
+            </article>
+          `
+        )
+        .join("")
+    : '<p class="paywall-qr-missing">这个价位的付款二维码还没有上传，请通过“关于”页面联系作者。</p>';
+  document.getElementById("body").innerHTML = `
+    <section class="paywall-gate" aria-label="付费阅读">
+      <p class="paywall-kicker">PAID READING / 付费阅读</p>
+      <h2>这篇文章需要付费阅读</h2>
+      <p>当前页面保留文章标题与摘要，付款确认后可获取完整内容。</p>
+      <div class="paywall-price"><span>阅读价格</span><strong>¥${escapeHtml(config.price)}</strong></div>
+      <button type="button" onclick="openPaywallWindow()">查看付款二维码</button>
+    </section>
+    <div id="paywall-window" class="paywall-window" role="dialog" aria-modal="true" aria-hidden="true" aria-label="付款二维码窗口" hidden>
+      <div class="paywall-window-card">
+        <button class="paywall-close" type="button" onclick="closePaywallWindow()" aria-label="关闭付款窗口">×</button>
+        <p class="paywall-kicker">YUNHENODE PAID READING</p>
+        <h2>扫码付款 ¥${escapeHtml(config.price)}</h2>
+        <div class="paywall-methods">${paymentChoices}</div>
+        <p class="paywall-note">${escapeHtml(config.note)}</p>
+        <a href="about.html?visitor=1#contact">前往联系方式</a>
+      </div>
+    </div>
+  `;
+  document.getElementById("paywall-window")?.addEventListener("click", event => {
+    if (event.target.id === "paywall-window") closePaywallWindow();
+  });
+}
+
 applyDesign();
 
 const query = buildQuery();
@@ -223,7 +319,7 @@ fetch(
     if (!res.ok) throw new Error("load failed");
     return res.json();
   })
-  .then(data => {
+  .then(async data => {
     if (!data || data.length === 0) {
       setTitle("文章不存在");
       return;
@@ -241,7 +337,11 @@ fetch(
       post.intro && post.intro !== subtitle ? post.intro : "";
     const body = cleanBody(post.body || "");
     renderMeta(meta, post.created_at, body);
-    renderBody(body);
+    const paywall = paywallConfig(meta);
+    if (post.type === "article" && paywall.enabled) {
+      const paymentOptions = await loadPaymentOptions(paywall.price);
+      renderPaywall({ ...paywall, ...paymentOptions });
+    } else renderBody(body);
     renderArticleTools(post);
   })
   .catch(err => {
@@ -265,3 +365,7 @@ function renderArticleTools(post) {
   tools.hidden = true;
   tools.innerHTML = "";
 }
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closePaywallWindow();
+});
