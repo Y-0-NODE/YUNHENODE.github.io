@@ -98,16 +98,16 @@
 
             <section id="paywall-settings" class="paywall-settings wide" hidden>
               <p class="category-kicker">PAID READING</p>
-              <h3>文章付费窗口</h3>
+              <h3 id="paywall-heading">内容付费窗口</h3>
               <p class="category-note">
-                二维码统一在“付费阅读设置”窗口管理。这里每篇文章只需要选择是否付费和价格。
+                二维码统一在“付费阅读设置”窗口管理。这里每项作品只需要选择是否付费和价格。
               </p>
               <label class="paywall-switch">
                 <input id="paywall-enabled" type="checkbox" />
-                开启这篇文章的付费窗口
+                <span id="paywall-enabled-label">开启这项内容的付费窗口</span>
               </label>
               <label>
-                文章价格
+                <span id="paywall-price-label">内容价格</span>
                 <select id="paywall-price">
                   <option value="9.9">¥9.9</option>
                   <option value="19.9">¥19.9</option>
@@ -145,6 +145,6 @@
 
     <script src="scripts/core/utils.js?v=20260716-3"></script>
     <script src="shared/metadata.js"></script>
-    <script src="scripts/pages/content-control.js?v=20260724-paywall-1"></script>
+    <script src="scripts/pages/content-control.js?v=20260724-paywall-2"></script>
   </body>
 </html>

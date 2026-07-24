@@ -42,7 +42,7 @@
         <input id="admin-password" type="password" />
 
         <label for="kind">类型</label>
-        <select id="kind">
+        <select id="kind" onchange="syncPaidMediaOptions()">
           <option value="photo">摄影 / 图片</option>
           <option value="video">视频 / 影像</option>
           <option value="audio">音频 / 录音 / 音乐</option>
@@ -75,6 +75,25 @@
           placeholder="视频或图片已经在其他平台时，粘贴 https://..."
         />
 
+        <section id="paid-media-settings" class="paid-settings">
+          <p>PAID WORK｜付费作品</p>
+          <h2>连接统一付款二维码</h2>
+          <label class="paid-switch">
+            <input id="paywall-enabled" type="checkbox" />
+            开启这件作品的付费窗口
+          </label>
+          <label for="paywall-price">选择价格</label>
+          <select id="paywall-price">
+            <option value="9.9">¥9.9</option>
+            <option value="19.9">¥19.9</option>
+            <option value="29.9">¥29.9</option>
+            <option value="59">¥59</option>
+            <option value="99">¥99</option>
+            <option value="199">¥199</option>
+          </select>
+          <a href="payment-settings.html" target="_blank">查看统一二维码设置</a>
+        </section>
+
         <button type="button" onclick="uploadMedia()">上传作品</button>
         <div id="status" class="status">
           所有文件只进入 Media Center；内容页使用资源地址引用，不重复上传。
@@ -89,6 +108,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/core/config.js"></script>
-    <script src="scripts/pages/media-manage.js"></script>
+    <script src="scripts/pages/media-manage.js?v=20260724-paywall-1"></script>
   </body>
 </html>

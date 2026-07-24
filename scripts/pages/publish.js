@@ -12,6 +12,8 @@ async function publishToSite() {
   const source = document.getElementById("source").value;
   const video = document.getElementById("video").value.trim();
   const body = document.getElementById("body").value.trim();
+  const paywallEnabled = document.getElementById("paywall-enabled").checked;
+  const paywallPrice = document.getElementById("paywall-price").value;
   const output = document.getElementById("output");
 
   if (!adminName || !password || !title || !body || !template || !knowledgeLevel) {
@@ -40,7 +42,9 @@ async function publishToSite() {
         topic,
         template,
         knowledgeLevel,
-        video
+        video,
+        paywallEnabled,
+        paywallPrice
       })
     });
 
@@ -80,3 +84,8 @@ function resetPublishTopic() {
 }
 
 window.YunheTaxonomy.populateTopicSelect(document.getElementById("topic"));
+
+const requestedType = new URLSearchParams(location.search).get("type");
+if (["article", "case", "video"].includes(requestedType)) {
+  document.getElementById("type").value = requestedType;
+}

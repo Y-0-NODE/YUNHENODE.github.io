@@ -1,5 +1,6 @@
 let ITEMS = [],
   CURRENT = null;
+const PAYWALL_PRICES = new Set(["9.9", "19.9", "29.9", "59", "99", "199"]);
 const v = id => document.getElementById(id).value,
   auth = () => ({ adminName: v("admin"), password: v("password") }),
   lines = id =>
@@ -75,6 +76,12 @@ function selectItem(index) {
   document.getElementById("files").value = (
     m.media_files || [CURRENT.large_url || CURRENT.url]
   ).join("\n");
+  document.getElementById("paywall-enabled").checked = Boolean(m.paywall?.enabled);
+  document.getElementById("paywall-price").value = PAYWALL_PRICES.has(
+    String(m.paywall?.price)
+  )
+    ? String(m.paywall.price)
+    : "9.9";
 }
 function localNotice(action) {
   alert(
@@ -93,7 +100,9 @@ async function save() {
       status: v("publish"),
       collections: lines("collections"),
       relatedContent: lines("related"),
-      mediaFiles: lines("files")
+      mediaFiles: lines("files"),
+      paywallEnabled: document.getElementById("paywall-enabled").checked,
+      paywallPrice: v("paywall-price")
     });
     await loadItems();
     alert("已保存");

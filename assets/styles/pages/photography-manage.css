@@ -71,6 +71,37 @@ button,
   border-top: 1px solid #292929;
   padding: 10px 0;
 }
+
+.paid-settings {
+  border-top: 1px solid #292929;
+  padding-top: 16px;
+}
+
+.paid-settings > p {
+  color: #858585;
+  letter-spacing: 0.12em;
+  margin: 0 0 6px;
+}
+
+.paid-settings h3 {
+  margin: 0 0 8px;
+}
+
+.paid-settings .paid-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.paid-settings .paid-switch input {
+  width: auto;
+  margin: 0;
+}
+
+.paid-settings a {
+  color: #eee;
+}
+
 @media (max-width: 800px) {
   .layout,
   .grid {

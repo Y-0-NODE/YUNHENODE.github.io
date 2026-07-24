@@ -9,8 +9,15 @@ const TYPE = new URLSearchParams(location.search).get("type") || "article",
 let ITEMS = [],
   CURRENT = null;
 const PAYWALL_PRICES = new Set(["9.9", "19.9", "29.9", "59", "99", "199"]);
+const PAYWALL_TYPES = new Set(["article", "case", "video"]);
 document.getElementById("page-title").textContent = `${NAMES[TYPE] || "内容"}管理`;
-document.getElementById("paywall-settings").hidden = TYPE !== "article";
+document.getElementById("paywall-settings").hidden = !PAYWALL_TYPES.has(TYPE);
+document.getElementById("paywall-heading").textContent =
+  `${NAMES[TYPE] || "内容"}付费窗口`;
+document.getElementById("paywall-enabled-label").textContent =
+  `开启这项${NAMES[TYPE] || "内容"}的付费窗口`;
+document.getElementById("paywall-price-label").textContent =
+  `${NAMES[TYPE] || "内容"}价格`;
 const v = id => document.getElementById(id).value,
   auth = () => ({ adminName: v("admin"), password: v("password") }),
   lines = id =>
@@ -106,7 +113,7 @@ function resetTopic() {
 async function saveItem() {
   if (!CURRENT) return alert("请先选择内容");
   const paywallEnabled =
-    TYPE === "article" && document.getElementById("paywall-enabled").checked;
+    PAYWALL_TYPES.has(TYPE) && document.getElementById("paywall-enabled").checked;
   try {
     await call("./api/update", {
       id: CURRENT.id,
@@ -158,7 +165,9 @@ async function duplicateItem() {
       source: m.source,
       collections: m.collections,
       relatedDocuments: m.related_documents,
-      mediaFiles: m.media_files
+      mediaFiles: m.media_files,
+      paywallEnabled: Boolean(m.paywall?.enabled),
+      paywallPrice: m.paywall?.price
     });
     await loadItems();
     alert("已生成一份新副本");

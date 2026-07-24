@@ -276,8 +276,8 @@ function renderPaywall(config) {
   document.getElementById("body").innerHTML = `
     <section class="paywall-gate" aria-label="付费阅读">
       <p class="paywall-kicker">PAID READING / 付费阅读</p>
-      <h2>这篇文章需要付费阅读</h2>
-      <p>当前页面保留文章标题与摘要，付款确认后可获取完整内容。</p>
+      <h2>这项内容需要付费查看</h2>
+      <p>当前页面保留标题与摘要，付款确认后可获取完整内容。</p>
       <div class="paywall-price"><span>阅读价格</span><strong>¥${escapeHtml(config.price)}</strong></div>
       <button type="button" onclick="openPaywallWindow()">查看付款二维码</button>
     </section>
@@ -338,7 +338,7 @@ fetch(
     const body = cleanBody(post.body || "");
     renderMeta(meta, post.created_at, body);
     const paywall = paywallConfig(meta);
-    if (post.type === "article" && paywall.enabled) {
+    if (["article", "case", "video"].includes(post.type) && paywall.enabled) {
       const paymentOptions = await loadPaymentOptions(paywall.price);
       renderPaywall({ ...paywall, ...paymentOptions });
     } else renderBody(body);

@@ -256,7 +256,9 @@ async function saveCase() {
       type: "case",
       topic: document.getElementById("topic").value,
       template,
-      knowledgeLevel
+      knowledgeLevel,
+      paywallEnabled: document.getElementById("paywall-enabled").checked,
+      paywallPrice: document.getElementById("paywall-price").value
     })
   });
 

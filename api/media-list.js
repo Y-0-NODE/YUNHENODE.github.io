@@ -1,5 +1,6 @@
 const { createClient } = require("@supabase/supabase-js");
 const mediaMetadata = require("../shared/metadata").media;
+const { getMediaMetadataMap } = require("../lib/metadata-repository");
 const CONTACT_SETTINGS_TITLE = "YUNHE_PUBLIC_CONTACTS";
 const PAYMENT_SETTINGS_TITLE = "YUNHE_PAYMENT_SETTINGS";
 const SETTINGS_TITLES = new Set([CONTACT_SETTINGS_TITLE, PAYMENT_SETTINGS_TITLE]);
@@ -49,11 +50,16 @@ module.exports = async function handler(req, res) {
   if (error) return res.status(500).json({ success: false, error: error.message || error });
 
   const includeSettings = String(req.query?.includeSettings || "") === "1";
+  const independent = await getMediaMetadataMap((data || []).map(item => item.id));
   const cleaned = (data || [])
     .filter(item => includeSettings || !SETTINGS_TITLES.has(item.title))
     .map(item => ({
       ...item,
-      description: mediaMetadata.strip(item.description)
+      description: mediaMetadata.strip(item.description),
+      metadata: {
+        ...mediaMetadata.parse(item.description),
+        ...(independent.get(String(item.id)) || {})
+      }
     }));
   return res.status(200).json({ success: true, data: cleaned });
 };

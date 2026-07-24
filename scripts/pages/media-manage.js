@@ -8,6 +8,19 @@ function formatBytes(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
+function paidMediaValues() {
+  return {
+    paywallEnabled: document.getElementById("paywall-enabled").checked,
+    paywallPrice: document.getElementById("paywall-price").value
+  };
+}
+
+function syncPaidMediaOptions() {
+  const supported = ["photo", "video"].includes(document.getElementById("kind").value);
+  document.getElementById("paid-media-settings").hidden = !supported;
+  if (!supported) document.getElementById("paywall-enabled").checked = false;
+}
+
 function imageFromFile(file) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -161,7 +174,8 @@ async function uploadMedia() {
         shot_at: shotAt || null,
         fileName: externalUrl.split("/").pop() || "external-media",
         path: `external/${Date.now()}`,
-        url: externalUrl
+        url: externalUrl,
+        ...paidMediaValues()
       })
     });
     const record = await recordRes.json().catch(() => ({}));
@@ -289,7 +303,8 @@ async function uploadMedia() {
       shot_at: shotAt || null,
       fileName: file.name,
       path: sign.path,
-      url: sign.publicUrl
+      url: sign.publicUrl,
+      ...paidMediaValues()
     })
   });
 
@@ -309,4 +324,8 @@ async function uploadMedia() {
 }
 
 setupSelectedFilePreview();
-
+const requestedKind = new URLSearchParams(location.search).get("kind");
+if (["photo", "video"].includes(requestedKind)) {
+  document.getElementById("kind").value = requestedKind;
+}
+syncPaidMediaOptions();

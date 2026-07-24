@@ -40,6 +40,38 @@
   border-top: 1px solid #2a2a2a;
 }
 
+.paid-settings {
+  border-top: 1px solid #2a2a2a;
+  margin-top: 22px;
+  padding-top: 18px;
+}
+
+.paid-settings > p {
+  color: #858585;
+  letter-spacing: 0.12em;
+  margin: 0 0 6px;
+}
+
+.paid-settings h2 {
+  margin: 0 0 12px;
+}
+
+.paid-settings .paid-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.paid-settings .paid-switch input {
+  width: auto;
+}
+
+.paid-settings a {
+  display: inline-block;
+  color: #f2f2f2;
+  margin-top: 12px;
+}
+
 .media-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

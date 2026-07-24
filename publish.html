@@ -125,6 +125,25 @@
         <label for="body">正文</label>
         <textarea id="body"></textarea>
 
+        <section class="paid-settings">
+          <p>PAID CONTENT｜付费内容</p>
+          <h2>连接统一付款二维码</h2>
+          <label class="paid-switch">
+            <input id="paywall-enabled" type="checkbox" />
+            开启这项内容的付费窗口
+          </label>
+          <label for="paywall-price">选择价格</label>
+          <select id="paywall-price">
+            <option value="9.9">¥9.9</option>
+            <option value="19.9">¥19.9</option>
+            <option value="29.9">¥29.9</option>
+            <option value="59">¥59</option>
+            <option value="99">¥99</option>
+            <option value="199">¥199</option>
+          </select>
+          <a href="payment-settings.html" target="_blank">查看统一二维码设置</a>
+        </section>
+
         <button onclick="publishToSite()">发布到网站</button>
       </section>
 
@@ -135,7 +154,7 @@
     </main>
 
     <script src="scripts/core/utils.js?v=20260716-3"></script>
-    <script src="scripts/pages/publish.js?v=20260716-3"></script>
+    <script src="scripts/pages/publish.js?v=20260724-paywall-1"></script>
 
     <script src="scripts/core/knowledge-client.js?v=20260716-3"></script>
   </body>

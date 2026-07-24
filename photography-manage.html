@@ -54,7 +54,26 @@
             ><label>Metadata｜作品名称<input id="title" /></label
             ><label>拍摄日期<input id="shot" type="date" /></label
             ><label>作品说明<textarea id="description"></textarea></label
-            ><label class="wide">Collections｜作品集<textarea id="collections"></textarea></label
+            ><section class="paid-settings wide">
+              <p>PAID PHOTOGRAPHY｜付费摄影</p>
+              <h3>连接统一付款二维码</h3>
+              <label class="paid-switch">
+                <input id="paywall-enabled" type="checkbox" />
+                开启这件摄影作品的付费窗口
+              </label>
+              <label
+                >选择价格<select id="paywall-price">
+                  <option value="9.9">¥9.9</option>
+                  <option value="19.9">¥19.9</option>
+                  <option value="29.9">¥29.9</option>
+                  <option value="59">¥59</option>
+                  <option value="99">¥99</option>
+                  <option value="199">¥199</option>
+                </select></label
+              >
+              <a href="payment-settings.html" target="_blank">查看统一二维码设置</a>
+            </section>
+            <label class="wide">Collections｜作品集<textarea id="collections"></textarea></label
             ><label class="wide">Related Content｜关联内容<textarea id="related"></textarea></label
             ><label class="wide">Media Files｜媒体文件<textarea id="files"></textarea></label>
           </div>
@@ -63,6 +82,6 @@
         </section>
       </div>
     </main>
-    <script src="scripts/pages/photography-manage.js"></script>
+    <script src="scripts/pages/photography-manage.js?v=20260724-paywall-1"></script>
   </body>
 </html>

@@ -106,7 +106,7 @@ async function uploadPaymentQr(price, method) {
       body: JSON.stringify({
         ...credentials,
         mode: "inline",
-        kind: "asset",
+        kind: "photo",
         fileName: file.name,
         contentType: file.type,
         dataUrl: await fileToDataUrl(file)
@@ -167,7 +167,7 @@ async function savePaymentSettings() {
     const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.success) throw new Error(result.error || "保存失败");
     PAYMENT_RECORD = result.data || PAYMENT_RECORD;
-    status.textContent = "全部二维码设置已保存并同步到文章付费窗口。";
+    status.textContent = "全部二维码设置已保存，并同步到文章、案例、摄影和视频付费窗口。";
   } catch (error) {
     status.textContent = error.message || "保存失败。";
   }

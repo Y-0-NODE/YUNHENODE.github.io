@@ -7,6 +7,8 @@ const { getMediaMetadataMap, saveMediaMetadata } = require("../lib/metadata-repo
 const clean = mediaMetadata.strip;
 const readMeta = mediaMetadata.parse;
 const textWithMeta = mediaMetadata.append;
+const PAYMENT_SETTINGS_TITLE = "YUNHE_PAYMENT_SETTINGS";
+const PAYWALL_PRICES = new Set(["9.9", "19.9", "29.9", "59", "99", "199"]);
 async function backup(supabase, row, operation, user) {
   if (!row) return;
   await supabase
@@ -34,14 +36,16 @@ module.exports = async function handler(req, res) {
       const independent = await getMediaMetadataMap((data || []).map(item => item.id));
       return res.status(200).json({
         success: true,
-        data: (data || []).map(x => ({
-          ...x,
-          description: clean(x.description),
-          metadata: {
-            ...readMeta(x.description),
-            ...(independent.get(String(x.id)) || {})
-          }
-        }))
+        data: (data || [])
+          .filter(x => x.title !== PAYMENT_SETTINGS_TITLE)
+          .map(x => ({
+            ...x,
+            description: clean(x.description),
+            metadata: {
+              ...readMeta(x.description),
+              ...(independent.get(String(x.id)) || {})
+            }
+          }))
       });
     }
     if (!body?.id) return res.status(400).json({ success: false, error: "缺少作品 ID" });
@@ -140,6 +144,20 @@ module.exports = async function handler(req, res) {
     if (Array.isArray(body.relatedContent)) meta.related_content = body.relatedContent;
     if (Array.isArray(body.mediaFiles)) meta.media_files = body.mediaFiles;
     if (body.visibility) meta.visibility = body.visibility;
+    if (body.paywallEnabled !== undefined || body.paywallPrice !== undefined) {
+      const paywallPrice = PAYWALL_PRICES.has(String(body.paywallPrice))
+        ? String(body.paywallPrice)
+        : PAYWALL_PRICES.has(String(oldMeta.paywall?.price))
+          ? String(oldMeta.paywall.price)
+          : "9.9";
+      meta.paywall = {
+        enabled:
+          body.paywallEnabled === undefined
+            ? Boolean(oldMeta.paywall?.enabled)
+            : Boolean(body.paywallEnabled),
+        price: paywallPrice
+      };
+    }
     const patch = { updated_at: new Date().toISOString() };
     if (body.title !== undefined) patch.title = String(body.title || "未命名作品");
     if (body.description !== undefined || Object.keys(meta).length)
